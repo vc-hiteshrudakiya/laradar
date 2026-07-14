@@ -1,0 +1,13 @@
+{
+    "name": "hitesh/laravel-architecture-discovery",
+    "description": "Automatically discover, visualize, and document Laravel application architecture.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Hitesh\\LaravelArchitectureDiscovery\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {}
+}
