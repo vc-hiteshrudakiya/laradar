@@ -1,0 +1,2 @@
+providers:
+  - Hitesh\LaravelArchitectureDiscovery\ArchitectureDiscoveryServiceProvider

@@ -1,7 +1,9 @@
 /vendor
 /node_modules
+/workbench
 /.idea
 /.vscode
 composer.lock
 package-lock.json
+.phpunit.result.cache
 .DS_Store
