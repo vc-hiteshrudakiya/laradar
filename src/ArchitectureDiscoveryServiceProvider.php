@@ -8,6 +8,7 @@ use Hitesh\LaravelArchitectureDiscovery\Services\ReportExporter;
 use Hitesh\LaravelArchitectureDiscovery\Analyzers\ModelAnalyzer;
 use Hitesh\LaravelArchitectureDiscovery\Analyzers\RouteAnalyzer;
 use Hitesh\LaravelArchitectureDiscovery\Analyzers\ControllerAnalyzer;
+use Hitesh\LaravelArchitectureDiscovery\Analyzers\DependencyAnalyzer;
 
 class ArchitectureDiscoveryServiceProvider extends ServiceProvider
 {
@@ -41,6 +42,10 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
                 $analyzers['routes'] = new RouteAnalyzer($appNamespace);
             }
 
+            if ($scan['dependencies'] ?? true) {
+                $analyzers['dependencies'] = new DependencyAnalyzer(app_path());
+            }
+
             return new ArchitectureScanner($analyzers);
         });
 
@@ -53,6 +58,8 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'architecture-discovery');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Commands\DiscoverArchitectureCommand::class,
@@ -61,6 +68,10 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../config/architecture-discovery.php' => config_path('architecture-discovery.php'),
             ], 'architecture-discovery-config');
+
+            $this->publishes([
+                __DIR__ . '/../resources/views' => resource_path('views/vendor/architecture-discovery'),
+            ], 'architecture-discovery-views');
         }
     }
 
