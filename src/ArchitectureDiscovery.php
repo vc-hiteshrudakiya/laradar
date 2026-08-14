@@ -7,7 +7,7 @@ use Hitesh\LaravelArchitectureDiscovery\Services\ArchitectureScanner;
 
 class ArchitectureDiscovery
 {
-    const VERSION = '0.1.0';
+    const VERSION = '0.3.9';
 
     public function __construct(protected ArchitectureScanner $scanner) {}
 

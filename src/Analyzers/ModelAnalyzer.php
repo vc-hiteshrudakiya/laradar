@@ -60,6 +60,8 @@ class ModelAnalyzer
             'hidden'        => $this->detectArrayProperty($content, 'hidden'),
             'casts'         => $this->detectCasts($content),
             'relationships' => $this->detectRelationships($content),
+            'traits'        => $this->detectTraits($content),
+            'observer'      => $this->detectObserver($content),
         ];
     }
 
@@ -132,5 +134,35 @@ class ModelAnalyzer
         }
 
         return $relationships;
+    }
+
+    private function detectTraits(string $content): array
+    {
+        // Find the class body start (after the class declaration line)
+        $classPos = strpos($content, '{');
+        if ($classPos === false) return [];
+        $body = substr($content, $classPos);
+
+        // Match use statements inside class body (traits, not imports)
+        // Traits start with uppercase; imports would have been in file header
+        $traits = [];
+        if (preg_match('/\buse\s+([\w,\s\\\\]+?)\s*;/s', $body, $m)) {
+            $parts = preg_split('/\s*,\s*/', $m[1]);
+            foreach ($parts as $part) {
+                $part = trim($part);
+                if ($part === '') continue;
+                $traits[] = class_basename($part);
+            }
+        }
+        return $traits;
+    }
+
+    private function detectObserver(string $content): ?string
+    {
+        // #[ObservedBy(UserObserver::class)]
+        if (preg_match('/#\[ObservedBy\(([A-Za-z]+)::class\)\]/', $content, $m)) {
+            return $m[1];
+        }
+        return null;
     }
 }

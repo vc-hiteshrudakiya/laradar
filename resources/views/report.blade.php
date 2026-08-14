@@ -579,26 +579,35 @@
                     $depNodes = $data['dependencies']['nodes'] ?? [];
                     $depEdges = $data['dependencies']['edges'] ?? [];
 
-                    // Group nodes by layer
-                    $byLayer     = [];
-                    $layerOrder  = ['controller', 'service', 'repository', 'model'];
-                    $layerLabels = ['controller' => 'Controllers', 'service' => 'Services', 'repository' => 'Repositories', 'model' => 'Models'];
+                    $layerOrder  = ['controller','job','event','listener','service','repository','model','database'];
+                    $layerLabels = [
+                        'controller' => 'Controllers', 'job' => 'Jobs', 'event' => 'Events',
+                        'listener'   => 'Listeners', 'service' => 'Services',
+                        'repository' => 'Repositories', 'model' => 'Models', 'database' => 'Database',
+                    ];
+                    $byLayer = array_fill_keys($layerOrder, []);
                     foreach ($depNodes as $node) {
-                        $byLayer[$node['layer']][] = $node['name'];
+                        $l = $node['layer'] ?? 'model';
+                        if (isset($byLayer[$l])) $byLayer[$l][] = $node['name'];
                     }
 
-                    // LR layout + subgraphs per layer for clean hierarchical view
-                    $flowLines = ['flowchart LR'];
+                    $edgeLabel = ['injects' => '', 'uses' => 'uses', 'triggers' => 'triggers', 'persists' => 'persists'];
+
+                    $flowLines = ['flowchart TD'];
                     foreach ($layerOrder as $layer) {
                         if (empty($byLayer[$layer])) continue;
+                        if ($layer === 'database') continue; // cylinder defined inline
                         $flowLines[] = "    subgraph {$layerLabels[$layer]}";
-                        foreach ($byLayer[$layer] as $name) {
-                            $flowLines[] = "        {$name}";
-                        }
+                        foreach ($byLayer[$layer] as $name) { $flowLines[] = "        {$name}"; }
                         $flowLines[] = "    end";
                     }
+                    if (!empty($byLayer['database'])) {
+                        $flowLines[] = '    Database[("Database")]';
+                    }
                     foreach ($depEdges as $edge) {
-                        $flowLines[] = "    {$edge['from']} --> {$edge['to']}";
+                        $lbl   = $edgeLabel[$edge['type'] ?? ''] ?? '';
+                        $arrow = $lbl ? "-->|\"{$lbl}\"|" : '-->';
+                        $flowLines[] = "    {$edge['from']} {$arrow} {$edge['to']}";
                     }
                     foreach ($depNodes as $node) {
                         $flowLines[] = "    class {$node['name']} {$node['layer']}";
@@ -607,9 +616,12 @@
                     $flowLines[] = '    classDef service    fill:#d1fae5,stroke:#10b981,color:#064e3b';
                     $flowLines[] = '    classDef repository fill:#fef3c7,stroke:#f59e0b,color:#78350f';
                     $flowLines[] = '    classDef model      fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95';
+                    $flowLines[] = '    classDef job        fill:#fef9c3,stroke:#ca8a04,color:#713f12';
+                    $flowLines[] = '    classDef event      fill:#fdf4ff,stroke:#a855f7,color:#581c87';
+                    $flowLines[] = '    classDef listener   fill:#fce7f3,stroke:#ec4899,color:#831843';
+                    $flowLines[] = '    classDef database   fill:#f1f5f9,stroke:#64748b,color:#1e293b';
                     $depCode = implode("\n", $flowLines);
 
-                    // Layer counts for legend
                     $layerCounts = [];
                     foreach ($depNodes as $node) { $layerCounts[$node['layer']] = ($layerCounts[$node['layer']] ?? 0) + 1; }
                 @endphp
@@ -624,17 +636,30 @@
 
                     {{-- Toolbar --}}
                     <div class="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-gray-50/80">
-                        <div class="flex items-center gap-5">
-                            @foreach(['controller','service','repository','model'] as $layer)
-                            @if(isset($layerCounts[$layer]))
-                            @php $dot = ['controller'=>'bg-blue-500','service'=>'bg-emerald-500','repository'=>'bg-amber-500','model'=>'bg-violet-500'][$layer]; @endphp
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                            @php
+                            $dotColors = [
+                                'controller'=>'bg-blue-500','service'=>'bg-emerald-500',
+                                'repository'=>'bg-amber-500','model'=>'bg-violet-500',
+                                'job'=>'bg-yellow-500','event'=>'bg-purple-500',
+                                'listener'=>'bg-pink-500','database'=>'bg-slate-500',
+                            ];
+                            @endphp
+                            @foreach($layerOrder as $layer)
+                            @if(isset($layerCounts[$layer]) && $layer !== 'database')
                             <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                                <span class="w-2 h-2 rounded-full {{ $dot }}"></span>
+                                <span class="w-2 h-2 rounded-full {{ $dotColors[$layer] ?? 'bg-gray-400' }}"></span>
                                 <span class="font-semibold capitalize">{{ $layer }}</span>
                                 <span class="text-gray-400">({{ $layerCounts[$layer] }})</span>
                             </span>
                             @endif
                             @endforeach
+                            @if(isset($layerCounts['database']))
+                            <span class="flex items-center gap-1.5 text-xs text-gray-500">
+                                <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                                <span class="font-semibold">Database</span>
+                            </span>
+                            @endif
                         </div>
                         <div class="flex items-center gap-1.5">
                             <button onclick="copyDepCode()" id="dep-copy-btn"

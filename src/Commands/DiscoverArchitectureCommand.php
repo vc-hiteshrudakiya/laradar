@@ -9,12 +9,12 @@ use Hitesh\LaravelArchitectureDiscovery\Services\ReportExporter;
 class DiscoverArchitectureCommand extends Command
 {
     protected $signature = 'architecture:discover
-                            {--format= : Override output format — json, html, or markdown}
+                            {--format= : Override output format — json, html, markdown, or svg}
                             {--output= : Custom output path (single-format runs only)}';
 
     protected $description = 'Discover and document Laravel application architecture';
 
-    private const EXTENSIONS = ['json' => 'json', 'html' => 'html', 'markdown' => 'md'];
+    private const EXTENSIONS = ['json' => 'json', 'html' => 'html', 'markdown' => 'md', 'svg' => 'svg'];
     private const GRADE_COLORS = [
         'Excellent' => 'green', 'Good' => 'cyan', 'Fair' => 'yellow', 'Needs Work' => 'red',
     ];

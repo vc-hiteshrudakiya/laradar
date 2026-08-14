@@ -16,6 +16,7 @@ class ArchitectureScanner
             base_path(),
         );
 
+        // Core analyzers
         foreach (['models', 'controllers', 'routes'] as $type) {
             if (!isset($this->analyzers[$type])) continue;
 
@@ -31,6 +32,27 @@ class ArchitectureScanner
             foreach ($result['errors'] as $error) { $report->addError($error); }
         }
 
+        // Extended analyzers
+        $extendedMap = [
+            'jobs'         => fn($item) => $report->addJob($item),
+            'events'       => fn($item) => $report->addEvent($item),
+            'services'     => fn($item) => $report->addService($item),
+            'repositories' => fn($item) => $report->addRepository($item),
+            'observers'    => fn($item) => $report->addObserver($item),
+            'policies'     => fn($item) => $report->addPolicy($item),
+            'modules'      => fn($item) => $report->addModule($item),
+            'packages'     => fn($item) => $report->addPackage($item),
+            'api_docs'     => fn($item) => $report->addApiDoc($item),
+        ];
+
+        foreach ($extendedMap as $type => $addFn) {
+            if (!isset($this->analyzers[$type])) continue;
+            $result = $this->analyzers[$type]->analyze();
+            foreach ($result['items']  as $item)  { $addFn($item); }
+            foreach ($result['errors'] as $error) { $report->addError($error); }
+        }
+
+        // Dependency graph
         if (isset($this->analyzers['dependencies'])) {
             $result = $this->analyzers['dependencies']->analyze();
             $report->setDependencies($result);
@@ -42,7 +64,6 @@ class ArchitectureScanner
             (memory_get_usage(true) - $startMemory) / 1024 / 1024,
         );
 
-        // Score is computed last — it reads the fully-populated report data
         $report->setScore((new ArchitectureScorer())->score($report->getReport()));
 
         return $report;

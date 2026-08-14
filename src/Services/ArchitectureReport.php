@@ -13,6 +13,15 @@ class ArchitectureReport
     private array $performance  = [];
     private array $dependencies = ['nodes' => [], 'edges' => []];
     private array $score        = [];
+    private array $jobs         = [];
+    private array $events       = [];
+    private array $services     = [];
+    private array $repositories = [];
+    private array $observers    = [];
+    private array $policies     = [];
+    private array $modules      = [];
+    private array $packages     = [];
+    private array $apiDocs      = [];
 
     public function __construct(
         private string $projectName,
@@ -45,6 +54,16 @@ class ArchitectureReport
         $this->score = $score;
     }
 
+    public function addJob(array $job): void         { $this->jobs[]         = $job; }
+    public function addEvent(array $event): void     { $this->events[]       = $event; }
+    public function addService(array $s): void       { $this->services[]     = $s; }
+    public function addRepository(array $r): void    { $this->repositories[] = $r; }
+    public function addObserver(array $o): void      { $this->observers[]    = $o; }
+    public function addPolicy(array $p): void        { $this->policies[]     = $p; }
+    public function addModule(array $m): void        { $this->modules[]      = $m; }
+    public function addPackage(array $p): void       { $this->packages[]     = $p; }
+    public function addApiDoc(array $e): void        { $this->apiDocs[]      = $e; }
+
     public function getReport(): array
     {
         return [
@@ -62,6 +81,14 @@ class ArchitectureReport
                 'models'               => count($this->models),
                 'controllers'          => count($this->controllers),
                 'routes'               => count($this->routes),
+                'jobs'                 => count($this->jobs),
+                'events'               => count($this->events),
+                'services'             => count($this->services),
+                'repositories'         => count($this->repositories),
+                'observers'            => count($this->observers),
+                'policies'             => count($this->policies),
+                'modules'              => count($this->modules),
+                'packages'             => count($this->packages),
                 'relationship_summary' => $this->buildRelationshipSummary(),
             ],
             'route_summary' => $this->buildRouteSummary(),
@@ -69,6 +96,15 @@ class ArchitectureReport
             'models'        => $this->models,
             'controllers'   => $this->controllers,
             'routes'        => $this->routes,
+            'jobs'          => $this->jobs,
+            'events'        => $this->events,
+            'services'      => $this->services,
+            'repositories'  => $this->repositories,
+            'observers'     => $this->observers,
+            'policies'      => $this->policies,
+            'modules'       => $this->modules,
+            'packages'      => $this->packages,
+            'api_docs'      => $this->apiDocs,
             'errors'        => $this->errors,
         ];
     }
