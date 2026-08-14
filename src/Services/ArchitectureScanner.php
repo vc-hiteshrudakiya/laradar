@@ -17,9 +17,7 @@ class ArchitectureScanner
         );
 
         foreach (['models', 'controllers', 'routes'] as $type) {
-            if (!isset($this->analyzers[$type])) {
-                continue;
-            }
+            if (!isset($this->analyzers[$type])) continue;
 
             $result = $this->analyzers[$type]->analyze();
 
@@ -29,19 +27,23 @@ class ArchitectureScanner
                 'routes'      => fn($item) => $report->addRoute($item),
             };
 
-            foreach ($result['items'] as $item) {
-                $addItem($item);
-            }
+            foreach ($result['items']  as $item)  { $addItem($item); }
+            foreach ($result['errors'] as $error) { $report->addError($error); }
+        }
 
-            foreach ($result['errors'] as $error) {
-                $report->addError($error);
-            }
+        if (isset($this->analyzers['dependencies'])) {
+            $result = $this->analyzers['dependencies']->analyze();
+            $report->setDependencies($result);
+            foreach ($result['errors'] as $error) { $report->addError($error); }
         }
 
         $report->setPerformance(
             (microtime(true) - $startTime) * 1000,
             (memory_get_usage(true) - $startMemory) / 1024 / 1024,
         );
+
+        // Score is computed last — it reads the fully-populated report data
+        $report->setScore((new ArchitectureScorer())->score($report->getReport()));
 
         return $report;
     }

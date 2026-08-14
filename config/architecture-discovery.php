@@ -8,10 +8,11 @@ return [
     |--------------------------------------------------------------------------
     */
     'scan' => [
-        'models'      => true,
-        'controllers' => true,
-        'routes'      => true,
-        'migrations'  => true,
+        'models'       => true,
+        'controllers'  => true,
+        'routes'       => true,
+        'migrations'   => true,
+        'dependencies' => true,
     ],
 
     /*
@@ -51,5 +52,16 @@ return [
     | are excluded. Only your application routes are kept.
     */
     'include_vendor_routes' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default output formats
+    |--------------------------------------------------------------------------
+    | Formats generated when running architecture:discover without --format.
+    | Supported: json, html, markdown
+    |
+    | Example: ['json', 'html', 'markdown']
+    */
+    'output' => ['json', 'html', 'markdown'],
 
 ];
