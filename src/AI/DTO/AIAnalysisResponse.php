@@ -1,6 +1,6 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\AI\DTO;
+namespace Vcian\Laradar\AI\DTO;
 
 class AIAnalysisResponse
 {

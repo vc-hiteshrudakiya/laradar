@@ -1,6 +1,6 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Analyzers;
+namespace Vcian\Laradar\Analyzers;
 
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Finder\SplFileInfo;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\AI\Providers;
+namespace Vcian\Laradar\AI\Providers;
 
 use Illuminate\Support\Facades\Http;
 use RuntimeException;

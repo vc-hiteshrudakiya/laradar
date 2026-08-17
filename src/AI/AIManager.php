@@ -1,16 +1,16 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\AI;
+namespace Vcian\Laradar\AI;
 
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Contracts\AIProvider;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\DTO\AIAnalysisResponse;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Providers\AnthropicProvider;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Providers\GeminiProvider;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Providers\GroqProvider;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Providers\MistralProvider;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Providers\OllamaProvider;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Providers\OpenAIProvider;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Providers\OpenRouterProvider;
+use Vcian\Laradar\AI\Contracts\AIProvider;
+use Vcian\Laradar\AI\DTO\AIAnalysisResponse;
+use Vcian\Laradar\AI\Providers\AnthropicProvider;
+use Vcian\Laradar\AI\Providers\GeminiProvider;
+use Vcian\Laradar\AI\Providers\GroqProvider;
+use Vcian\Laradar\AI\Providers\MistralProvider;
+use Vcian\Laradar\AI\Providers\OllamaProvider;
+use Vcian\Laradar\AI\Providers\OpenAIProvider;
+use Vcian\Laradar\AI\Providers\OpenRouterProvider;
 use RuntimeException;
 
 class AIManager

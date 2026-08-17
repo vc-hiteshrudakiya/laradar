@@ -1,6 +1,6 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Analyzers;
+namespace Vcian\Laradar\Analyzers;
 
 class RouteAnalyzer
 {
@@ -8,7 +8,7 @@ class RouteAnalyzer
 
     public function analyze(): array
     {
-        $includeVendor = config('architecture-discovery.include_vendor_routes', false);
+        $includeVendor = config('laradar.include_vendor_routes', false);
 
         $items  = [];
         $errors = [];

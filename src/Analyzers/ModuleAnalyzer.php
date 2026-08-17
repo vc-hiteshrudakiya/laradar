@@ -1,6 +1,6 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Analyzers;
+namespace Vcian\Laradar\Analyzers;
 
 class ModuleAnalyzer
 {

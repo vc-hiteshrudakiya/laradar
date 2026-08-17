@@ -1,6 +1,6 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Services;
+namespace Vcian\Laradar\Services;
 
 class ArchitectureScanner
 {

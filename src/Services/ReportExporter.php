@@ -1,6 +1,6 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Services;
+namespace Vcian\Laradar\Services;
 
 use InvalidArgumentException;
 
@@ -25,7 +25,7 @@ class ReportExporter
 
     public function renderHtml(ArchitectureReport $report): string
     {
-        return view('architecture-discovery::report', [
+        return view('laradar::report', [
             'data' => $report->getReport(),
         ])->render();
     }
@@ -75,7 +75,7 @@ class ReportExporter
         $svg .= '<text x="20" y="50" font-size="12" fill="#94a3b8">'
               . 'Laravel ' . htmlspecialchars($data['laravel_version'], ENT_XML1)
               . ' · PHP ' . htmlspecialchars($data['php_version'], ENT_XML1)
-              . ' · laravel-architecture-discovery v' . htmlspecialchars($data['package_version'], ENT_XML1)
+              . ' · laradar v' . htmlspecialchars($data['package_version'], ENT_XML1)
               . '</text>' . "\n";
 
         // score badge in header
@@ -141,7 +141,7 @@ class ReportExporter
         $out[] = "# Architecture Report — {$data['project']['name']}";
         $out[] = '';
         $out[] = "> Generated: {$data['generated_at']}  ";
-        $out[] = "> Laravel {$data['laravel_version']} · PHP {$data['php_version']} · laravel-architecture-discovery v{$data['package_version']}";
+        $out[] = "> Laravel {$data['laravel_version']} · PHP {$data['php_version']} · laradar v{$data['package_version']}";
         $out[] = '';
         $out[] = '---';
         $out[] = '';

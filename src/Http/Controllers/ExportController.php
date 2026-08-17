@@ -1,10 +1,10 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Http\Controllers;
+namespace Vcian\Laradar\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Viitorcloud\LaravelArchitectureDiscovery\ArchitectureDiscovery;
-use Viitorcloud\LaravelArchitectureDiscovery\Services\ReportExporter;
+use Vcian\Laradar\ArchitectureDiscovery;
+use Vcian\Laradar\Services\ReportExporter;
 
 class ExportController extends Controller
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\AI\Prompts;
+namespace Vcian\Laradar\AI\Prompts;
 
 class ArchitectureReviewPrompt
 {

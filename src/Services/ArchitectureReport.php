@@ -1,8 +1,8 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Services;
+namespace Vcian\Laradar\Services;
 
-use Viitorcloud\LaravelArchitectureDiscovery\ArchitectureDiscovery;
+use Vcian\Laradar\ArchitectureDiscovery;
 
 class ArchitectureReport
 {

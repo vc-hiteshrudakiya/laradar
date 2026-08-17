@@ -1,12 +1,12 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\AI\Providers;
+namespace Vcian\Laradar\AI\Providers;
 
 use Illuminate\Support\Facades\Http;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Contracts\AIProvider;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\DTO\AIAnalysisResponse;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Prompts\ArchitectureReviewPrompt;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Prompts\DocumentationPrompt;
+use Vcian\Laradar\AI\Contracts\AIProvider;
+use Vcian\Laradar\AI\DTO\AIAnalysisResponse;
+use Vcian\Laradar\AI\Prompts\ArchitectureReviewPrompt;
+use Vcian\Laradar\AI\Prompts\DocumentationPrompt;
 use RuntimeException;
 
 class AnthropicProvider implements AIProvider

@@ -1,12 +1,12 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Http\Controllers;
+namespace Vcian\Laradar\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\AIManager;
-use Viitorcloud\LaravelArchitectureDiscovery\ArchitectureDiscovery;
+use Vcian\Laradar\AI\AIManager;
+use Vcian\Laradar\ArchitectureDiscovery;
 
 class AIController extends Controller
 {

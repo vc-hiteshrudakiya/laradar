@@ -1,9 +1,9 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Http\Controllers;
+namespace Vcian\Laradar\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Viitorcloud\LaravelArchitectureDiscovery\ArchitectureDiscovery;
+use Vcian\Laradar\ArchitectureDiscovery;
 
 class DashboardController extends Controller
 {
@@ -12,6 +12,6 @@ class DashboardController extends Controller
         $report = $discovery->discover();
         $data   = $report->getReport();
 
-        return view('architecture-discovery::dashboard', compact('data'));
+        return view('laradar::dashboard', compact('data'));
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\Commands;
+namespace Vcian\Laradar\Commands;
 
 use Illuminate\Console\Command;
-use Viitorcloud\LaravelArchitectureDiscovery\ArchitectureDiscovery;
-use Viitorcloud\LaravelArchitectureDiscovery\Services\ReportExporter;
+use Vcian\Laradar\ArchitectureDiscovery;
+use Vcian\Laradar\Services\ReportExporter;
 
 class DiscoverArchitectureCommand extends Command
 {
@@ -31,11 +31,11 @@ class DiscoverArchitectureCommand extends Command
             }
             $formats = [$formatFlag];
         } else {
-            $configured = config('architecture-discovery.output', ['json']);
+            $configured = config('laradar.output', ['json']);
             $formats    = array_filter((array) $configured, fn($f) => array_key_exists($f, self::EXTENSIONS));
 
             if (empty($formats)) {
-                $this->error('No valid output formats configured. Check architecture-discovery.output in config.');
+                $this->error('No valid output formats configured. Check laradar.output in config.');
                 return self::FAILURE;
             }
         }

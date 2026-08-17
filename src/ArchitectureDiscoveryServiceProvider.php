@@ -1,39 +1,39 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery;
+namespace Vcian\Laradar;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\ControllerAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\DependencyAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\EventAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\JobAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\ModelAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\ObserverAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\ApiDocAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\ModuleAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\PackageDetector;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\PolicyAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\RouteAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\Analyzers\ServiceAnalyzer;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\AIManager;
-use Viitorcloud\LaravelArchitectureDiscovery\Http\Controllers\AIController;
-use Viitorcloud\LaravelArchitectureDiscovery\Http\Controllers\DashboardController;
-use Viitorcloud\LaravelArchitectureDiscovery\Http\Controllers\ExportController;
-use Viitorcloud\LaravelArchitectureDiscovery\Services\ArchitectureScanner;
-use Viitorcloud\LaravelArchitectureDiscovery\Services\ReportExporter;
+use Vcian\Laradar\Analyzers\ControllerAnalyzer;
+use Vcian\Laradar\Analyzers\DependencyAnalyzer;
+use Vcian\Laradar\Analyzers\EventAnalyzer;
+use Vcian\Laradar\Analyzers\JobAnalyzer;
+use Vcian\Laradar\Analyzers\ModelAnalyzer;
+use Vcian\Laradar\Analyzers\ObserverAnalyzer;
+use Vcian\Laradar\Analyzers\ApiDocAnalyzer;
+use Vcian\Laradar\Analyzers\ModuleAnalyzer;
+use Vcian\Laradar\Analyzers\PackageDetector;
+use Vcian\Laradar\Analyzers\PolicyAnalyzer;
+use Vcian\Laradar\Analyzers\RouteAnalyzer;
+use Vcian\Laradar\Analyzers\ServiceAnalyzer;
+use Vcian\Laradar\AI\AIManager;
+use Vcian\Laradar\Http\Controllers\AIController;
+use Vcian\Laradar\Http\Controllers\DashboardController;
+use Vcian\Laradar\Http\Controllers\ExportController;
+use Vcian\Laradar\Services\ArchitectureScanner;
+use Vcian\Laradar\Services\ReportExporter;
 
 class ArchitectureDiscoveryServiceProvider extends ServiceProvider
 {
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/architecture-discovery.php',
-            'architecture-discovery'
+            __DIR__ . '/../config/laradar.php',
+            'laradar'
         );
 
         $this->app->singleton(ArchitectureScanner::class, function ($app) {
-            $config = $app['config']->get('architecture-discovery', []);
+            $config = $app['config']->get('laradar', []);
             $scan   = $config['scan'] ?? [];
             $paths  = $config['paths'] ?? [];
 
@@ -127,14 +127,14 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
 
         $this->app->singleton(AIManager::class, function ($app) {
             return new AIManager(
-                $app['config']->get('architecture-discovery.ai', [])
+                $app['config']->get('laradar.ai', [])
             );
         });
     }
 
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'architecture-discovery');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'laradar');
 
         $this->registerDashboardRoute();
 
@@ -144,18 +144,18 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
             ]);
 
             $this->publishes([
-                __DIR__ . '/../config/architecture-discovery.php' => config_path('architecture-discovery.php'),
-            ], 'architecture-discovery-config');
+                __DIR__ . '/../config/laradar.php' => config_path('laradar.php'),
+            ], 'laradar-config');
 
             $this->publishes([
-                __DIR__ . '/../resources/views' => resource_path('views/vendor/architecture-discovery'),
-            ], 'architecture-discovery-views');
+                __DIR__ . '/../resources/views' => resource_path('views/vendor/laradar'),
+            ], 'laradar-views');
         }
     }
 
     private function registerDashboardRoute(): void
     {
-        $config = config('architecture-discovery.dashboard', []);
+        $config = config('laradar.dashboard', []);
 
         if (!($config['enabled'] ?? true)) {
             return;
@@ -170,17 +170,17 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
 
         Route::middleware($middleware)
             ->get($path, DashboardController::class)
-            ->name('architecture.dashboard');
+            ->name('laradar.dashboard');
 
         Route::middleware($middleware)
             ->get($path . '/export/{format}', ExportController::class)
-            ->name('architecture.export')
+            ->name('laradar.export')
             ->where('format', 'html|svg');
 
         Route::middleware($middleware)->group(function () use ($path) {
-            Route::post($path . '/ai/analyze',       [AIController::class, 'analyze'])->name('architecture.ai.analyze');
-            Route::post($path . '/ai/chat',          [AIController::class, 'chat'])->name('architecture.ai.chat');
-            Route::post($path . '/ai/documentation', [AIController::class, 'documentation'])->name('architecture.ai.documentation');
+            Route::post($path . '/ai/analyze',       [AIController::class, 'analyze'])->name('laradar.ai.analyze');
+            Route::post($path . '/ai/chat',          [AIController::class, 'chat'])->name('laradar.ai.chat');
+            Route::post($path . '/ai/documentation', [AIController::class, 'documentation'])->name('laradar.ai.documentation');
         });
     }
 

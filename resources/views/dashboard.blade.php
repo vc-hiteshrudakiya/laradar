@@ -460,7 +460,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
             <button onclick="navigate('ai')" id="nav-ai" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                 AI Insights
-                @if(config('architecture-discovery.ai.enabled', false))
+                @if(config('laradar.ai.enabled', false))
                 <span style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 3px rgba(52,211,153,0.18);flex:none;"></span>
                 @endif
             </button>
@@ -2214,7 +2214,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     <p class="sec-sub" style="margin-bottom:30px;">Download your architecture report in multiple formats for sharing, documentation, or archiving.</p>
 
     @php
-    $exportPath = rtrim(request()->getSchemeAndHttpHost() . request()->getBasePath(), '/') . '/' . ltrim(config('architecture-discovery.dashboard.path', 'architecture'), '/');
+    $exportPath = rtrim(request()->getSchemeAndHttpHost() . request()->getBasePath(), '/') . '/' . ltrim(config('laradar.dashboard.path', 'architecture'), '/');
     @endphp
 
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:880px;">
@@ -2328,10 +2328,10 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 <section id="sec-ai" class="p-6" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px;">
         <h1 class="sec-title">AI Insights</h1>
-        @if(config('architecture-discovery.ai.enabled', false))
+        @if(config('laradar.ai.enabled', false))
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--emerald);background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);padding:5px 12px;border-radius:20px;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>
-            AI Ready · {{ config('architecture-discovery.ai.model', 'gemini-2.5-flash') }}
+            AI Ready · {{ config('laradar.ai.model', 'gemini-2.5-flash') }}
         </span>
         @else
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--text-faint);background:var(--bg-hover);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">
@@ -2342,7 +2342,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     </div>
     <p class="sec-sub" style="margin-bottom:24px;">AI-powered architecture review — score, SOLID analysis, code smells, and actionable suggestions.</p>
 
-    @if(!config('architecture-discovery.ai.enabled', false))
+    @if(!config('laradar.ai.enabled', false))
     {{-- Setup card --}}
     <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:24px;margin-bottom:24px;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
@@ -2353,7 +2353,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 <div style="background:var(--bg-sunken);border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:12px;color:var(--emerald);margin-bottom:10px;">
                     GEMINI_API_KEY=your_api_key_here
                 </div>
-                <p style="font-size:13px;color:var(--text-dim);margin-bottom:8px;">Then in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">config/architecture-discovery.php</code>:</p>
+                <p style="font-size:13px;color:var(--text-dim);margin-bottom:8px;">Then in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">config/laradar.php</code>:</p>
                 <div style="background:var(--bg-sunken);border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:12px;color:var(--text);">
                     'ai' => [<br>
                     &nbsp;&nbsp;'enabled' => <span style="color:var(--emerald);">true</span>,<br>
@@ -2370,12 +2370,12 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     {{-- Analyze button --}}
     <div id="ai-trigger" style="margin-bottom:24px;">
         <button onclick="aiAnalyze()"
-            {{ !config('architecture-discovery.ai.enabled', false) ? 'disabled' : '' }}
+            {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
             style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(0,82,204,0.15);border:1px solid rgba(0,82,204,0.4);border-radius:10px;color:var(--cyan);font-weight:600;font-size:13px;cursor:pointer;transition:background .2s;font-family:var(--font-mono);">
             <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
             Analyze with AI
         </button>
-        <p style="font-size:12px;color:var(--text-faint);margin-top:8px;font-family:var(--font-mono);">Sends your architecture data to {{ config('architecture-discovery.ai.model', 'gemini-2.5-flash') }} for analysis. Takes 10–30 seconds.</p>
+        <p style="font-size:12px;color:var(--text-faint);margin-top:8px;font-family:var(--font-mono);">Sends your architecture data to {{ config('laradar.ai.model', 'gemini-2.5-flash') }} for analysis. Takes 10–30 seconds.</p>
     </div>
 
     {{-- Loading state --}}
@@ -2462,16 +2462,16 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 <section id="sec-chat" style="display:none;flex-direction:column;height:100%;padding:24px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px;">
         <h1 class="sec-title">AI Chat</h1>
-        @if(config('architecture-discovery.ai.enabled', false))
+        @if(config('laradar.ai.enabled', false))
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--emerald);background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);padding:5px 12px;border-radius:20px;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>
-            {{ config('architecture-discovery.ai.model') }}
+            {{ config('laradar.ai.model') }}
         </span>
         @endif
     </div>
     <p class="sec-sub" style="margin-bottom:20px;">Ask anything. The package finds the relevant controllers, models, and routes in your architecture — then sends only that to AI.</p>
 
-    @if(!config('architecture-discovery.ai.enabled', false))
+    @if(!config('laradar.ai.enabled', false))
     <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:20px;">
         <p style="font-size:13px;color:var(--amber);">AI is not enabled. Set <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ai.enabled = true</code> and <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code> in your .env.</p>
     </div>
@@ -2499,14 +2499,14 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     <div style="border:1px solid var(--border);border-radius:10px;background:var(--bg-elevated);overflow:hidden;">
         <textarea id="chat-input" rows="2"
             placeholder="e.g. Trace the main request flow  •  Which controller is too large?  •  Where should I add a service?"
-            {{ !config('architecture-discovery.ai.enabled', false) ? 'disabled' : '' }}
+            {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
             oninput="chatPreviewContext(this.value)"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend();}"
             style="width:100%;padding:12px 16px 4px;font-size:13px;color:var(--text);background:transparent;resize:none;outline:none;border:none;font-family:var(--font-sans);box-sizing:border-box;"></textarea>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 16px 12px;">
             <span id="chat-context-hint" style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px;"></span>
             <button onclick="chatSend()" id="chat-send-btn"
-                {{ !config('architecture-discovery.ai.enabled', false) ? 'disabled' : '' }}
+                {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
                 style="display:flex;align-items:center;gap:6px;padding:6px 16px;background:rgba(0,82,204,0.15);border:1px solid rgba(0,82,204,0.4);border-radius:8px;color:var(--cyan);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-mono);flex:none;">
                 <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 Send
@@ -2519,16 +2519,16 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 <section id="sec-aidocs" class="p-6" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px;">
         <h1 class="sec-title">AI Documentation</h1>
-        @if(config('architecture-discovery.ai.enabled', false))
+        @if(config('laradar.ai.enabled', false))
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--emerald);background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);padding:5px 12px;border-radius:20px;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>
-            {{ config('architecture-discovery.ai.model') }}
+            {{ config('laradar.ai.model') }}
         </span>
         @endif
     </div>
     <p class="sec-sub" style="margin-bottom:24px;">AI writes full markdown docs for each layer of your architecture. One click per file — or generate all at once.</p>
 
-    @if(!config('architecture-discovery.ai.enabled', false))
+    @if(!config('laradar.ai.enabled', false))
     <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:24px;">
         <p style="font-size:13px;color:var(--amber);">AI is not enabled. Set <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ai.enabled = true</code> and <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code> in your .env.</p>
     </div>
@@ -2536,9 +2536,9 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
     <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
         <button onclick="docsGenerateAll()"
-            {{ !config('architecture-discovery.ai.enabled', false) ? 'disabled' : '' }}
+            {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
             class="atlas-btn atlas-btn--cyan"
-            style="padding:9px 18px;font-size:13px;border-radius:10px;opacity:{{ config('architecture-discovery.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('architecture-discovery.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
+            style="padding:9px 18px;font-size:13px;border-radius:10px;opacity:{{ config('laradar.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('laradar.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
             <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
             Generate All Docs
         </button>
@@ -2549,9 +2549,9 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         {{-- AI Graphic Report button --}}
         <button onclick="generateAIGraphicReport()" id="ai-report-btn"
-            {{ !config('architecture-discovery.ai.enabled', false) ? 'disabled' : '' }}
+            {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
             class="atlas-btn"
-            style="padding:9px 18px;font-size:13px;border-radius:10px;border-color:rgba(167,139,250,0.4);color:var(--violet);background:rgba(167,139,250,0.08);opacity:{{ config('architecture-discovery.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('architecture-discovery.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
+            style="padding:9px 18px;font-size:13px;border-radius:10px;border-color:rgba(167,139,250,0.4);color:var(--violet);background:rgba(167,139,250,0.08);opacity:{{ config('laradar.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('laradar.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
             <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
             </svg>
@@ -2635,10 +2635,10 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
             <p style="font-size:12px;color:var(--text-dim);line-height:1.6;">{{ $desc }}</p>
             <div style="display:flex;gap:8px;margin-top:auto;padding-top:4px;">
                 <button onclick="docsGenerate('{{ $type }}')"
-                    {{ !config('architecture-discovery.ai.enabled', false) ? 'disabled' : '' }}
+                    {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
                     id="doc-gen-btn-{{ $type }}"
                     class="atlas-btn atlas-btn--cyan"
-                    style="flex:1;justify-content:center;font-size:11px;padding:7px 10px;border-radius:8px;opacity:{{ config('architecture-discovery.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('architecture-discovery.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
+                    style="flex:1;justify-content:center;font-size:11px;padding:7px 10px;border-radius:8px;opacity:{{ config('laradar.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('laradar.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
                     <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                     Generate
                 </button>
@@ -5234,7 +5234,7 @@ function depClearHighlight(resetSel = true) {
 
 // ── AI Chat ───────────────────────────────────────────────────────────────────
 
-const CHAT_ENDPOINT = '{{ route("architecture.ai.chat") }}';
+const CHAT_ENDPOINT = '{{ route("laradar.ai.chat") }}';
 let _chatBusy = false;
 
 function chatSuggest(text) {
@@ -5415,7 +5415,7 @@ function chatMarkdown(text) {
 
 // ── AI Docs ────────────────────────────────────────────────────────────────────
 
-const DOCS_ENDPOINT = '{{ route("architecture.ai.documentation") }}';
+const DOCS_ENDPOINT = '{{ route("laradar.ai.documentation") }}';
 const _docsContent  = {};
 const DOC_TYPES     = ['architecture','models','controllers','routes','services','modules'];
 
@@ -5832,7 +5832,7 @@ ${ai?.summary ? `<div style="background:#f0f9ff;border-bottom:2px solid #bfdbfe;
 
 <!-- FOOTER -->
 <div style="background:#1e293b;color:#64748b;text-align:center;padding:28px;font-size:12px;font-family:system-ui,sans-serif">
-    AI Architecture Report · Generated by <strong style="color:#94a3b8">laravel-architecture-discovery</strong> · ${esc(d.generated_at ?? '')}
+    AI Architecture Report · Generated by <strong style="color:#94a3b8">laradar</strong> · ${esc(d.generated_at ?? '')}
 </div>
 
 </body>
@@ -5871,7 +5871,7 @@ function exportMarkdown() {
     out.push('# Architecture Report — ' + (d.project?.name || 'Laravel Application'));
     out.push('');
     out.push('> Generated: ' + d.generated_at);
-    out.push('> Laravel ' + d.laravel_version + ' · PHP ' + d.php_version + ' · laravel-architecture-discovery v' + d.package_version);
+    out.push('> Laravel ' + d.laravel_version + ' · PHP ' + d.php_version + ' · laradar v' + d.package_version);
     out.push('');
     out.push('---');
     out.push('');
@@ -6223,7 +6223,7 @@ table tr:hover{background:#f1f5f9}
 
 <!-- ═══ FOOTER ═══════════════════════════════════════════════════════════ -->
 <div style="background:#1e293b;color:#64748b;text-align:center;padding:24px;font-size:12px;font-family:system-ui,sans-serif;margin-top:20px">
-    Generated by <strong style="color:#94a3b8">laravel-architecture-discovery</strong> · ${esc(d.generated_at ?? '')}
+    Generated by <strong style="color:#94a3b8">laradar</strong> · ${esc(d.generated_at ?? '')}
 </div>
 
 </body>
@@ -6307,7 +6307,7 @@ function _buildDepSvg(nodes, edges) {
 
 // ── AI Insights ───────────────────────────────────────────────────────────────
 
-const AI_ENDPOINT = '{{ route("architecture.ai.analyze") }}';
+const AI_ENDPOINT = '{{ route("laradar.ai.analyze") }}';
 const AI_CSRF     = '{{ csrf_token() }}';
 
 async function aiAnalyze() {

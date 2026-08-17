@@ -1,8 +1,8 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\AI\Contracts;
+namespace Vcian\Laradar\AI\Contracts;
 
-use Viitorcloud\LaravelArchitectureDiscovery\AI\DTO\AIAnalysisResponse;
+use Vcian\Laradar\AI\DTO\AIAnalysisResponse;
 
 interface AIProvider
 {

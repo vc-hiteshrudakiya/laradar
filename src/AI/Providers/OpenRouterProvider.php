@@ -1,10 +1,10 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\AI\Providers;
+namespace Vcian\Laradar\AI\Providers;
 
 use Illuminate\Support\Facades\Http;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\DTO\AIAnalysisResponse;
-use Viitorcloud\LaravelArchitectureDiscovery\AI\Prompts\ArchitectureReviewPrompt;
+use Vcian\Laradar\AI\DTO\AIAnalysisResponse;
+use Vcian\Laradar\AI\Prompts\ArchitectureReviewPrompt;
 use RuntimeException;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Viitorcloud\LaravelArchitectureDiscovery\AI\Providers;
+namespace Vcian\Laradar\AI\Providers;
 
 class GroqProvider extends OpenAICompatibleProvider
 {

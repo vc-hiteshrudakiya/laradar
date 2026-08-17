@@ -1,9 +1,9 @@
-# Laravel Architecture Discovery
+# Laradar
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/viitorcloud/laravel-architecture-discovery.svg?style=flat-square)](https://packagist.org/packages/viitorcloud/laravel-architecture-discovery)
-[![Total Downloads](https://img.shields.io/packagist/dt/viitorcloud/laravel-architecture-discovery.svg?style=flat-square)](https://packagist.org/packages/viitorcloud/laravel-architecture-discovery)
-[![License](https://img.shields.io/packagist/l/viitorcloud/laravel-architecture-discovery.svg?style=flat-square)](https://packagist.org/packages/viitorcloud/laravel-architecture-discovery)
-[![PHP Version](https://img.shields.io/packagist/php-v/viitorcloud/laravel-architecture-discovery.svg?style=flat-square)](https://packagist.org/packages/viitorcloud/laravel-architecture-discovery)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/vcian/laradar.svg?style=flat-square)](https://packagist.org/packages/vcian/laradar)
+[![Total Downloads](https://img.shields.io/packagist/dt/vcian/laradar.svg?style=flat-square)](https://packagist.org/packages/vcian/laradar)
+[![License](https://img.shields.io/github/license/vcian/laradar.svg?style=flat-square)](https://github.com/vcian/laradar/blob/main/LICENSE)
+[![PHP Version](https://img.shields.io/packagist/php-v/vcian/laradar.svg?style=flat-square)](https://packagist.org/packages/vcian/laradar)
 
 Automatically **discover, visualize, and document** your Laravel application architecture — without writing a single line of configuration.
 
@@ -26,13 +26,13 @@ Automatically **discover, visualize, and document** your Laravel application arc
 ## Installation
 
 ```bash
-composer require viitorcloud/laravel-architecture-discovery
+composer require vcian/laradar
 ```
 
 Publish the config file:
 
 ```bash
-php artisan vendor:publish --tag=architecture-discovery-config
+php artisan vendor:publish --tag=laradar-config
 ```
 
 ---
@@ -81,7 +81,7 @@ Reports are saved to `storage/app/architecture/`.
 ## Configuration
 
 ```php
-// config/architecture-discovery.php
+// config/laradar.php
 
 return [
     'dashboard' => [

@@ -1,5 +1,5 @@
 {
-    "name": "viitorcloud/laravel-architecture-discovery",
+    "name": "vcian/laradar",
     "description": "Automatically discover, visualize, and document Laravel application architecture with an interactive dashboard, HTML/JSON/Markdown reports, dependency graphs, and AI-powered insights.",
     "type": "library",
     "license": "MIT",
@@ -13,30 +13,30 @@
         "dependency-graph",
         "ai",
         "code-analysis",
-        "package"
+        "laradar"
     ],
     "authors": [
         {
-            "name": "Viitorcloud Technologies",
+            "name": "Hitesh Rudakiya",
             "email": "hitesh.rudakiya@viitor.cloud",
             "homepage": "https://viitorcloud.com",
             "role": "Developer"
         }
     ],
-    "homepage": "https://github.com/vc-hiteshrudakiya/laravel-architecture-discovery",
+    "homepage": "https://github.com/vcian/laradar",
     "support": {
-        "issues": "https://github.com/vc-hiteshrudakiya/laravel-architecture-discovery/issues",
-        "source": "https://github.com/vc-hiteshrudakiya/laravel-architecture-discovery"
+        "issues": "https://github.com/vcian/laradar/issues",
+        "source": "https://github.com/vcian/laradar"
     },
     "autoload": {
         "psr-4": {
-            "Viitorcloud\\LaravelArchitectureDiscovery\\": "src/"
+            "Vcian\\Laradar\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Viitorcloud\\LaravelArchitectureDiscovery\\ArchitectureDiscoveryServiceProvider"
+                "Vcian\\Laradar\\ArchitectureDiscoveryServiceProvider"
             ]
         }
     },
@@ -53,7 +53,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Viitorcloud\\LaravelArchitectureDiscovery\\Tests\\": "tests/"
+            "Vcian\\Laradar\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",
