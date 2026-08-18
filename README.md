@@ -1,10 +1,10 @@
 # Laradar
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/vcian/laradar.svg?style=flat-square)](https://packagist.org/packages/vcian/laradar)
-[![Total Downloads](https://img.shields.io/packagist/dt/vcian/laradar.svg?style=flat-square)](https://packagist.org/packages/vcian/laradar)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
-[![PHP](https://img.shields.io/badge/php-%5E8.1-blue.svg?style=flat-square)](https://www.php.net)
-[![Laravel](https://img.shields.io/badge/laravel-10%20|%2011%20|%2012%20|%2013-red.svg?style=flat-square)](https://laravel.com)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/vcian/laradar.svg?style=flat-square&label=Packagist)](https://packagist.org/packages/vcian/laradar)
+[![Total Downloads](https://img.shields.io/packagist/dt/vcian/laradar.svg?style=flat-square&label=Downloads)](https://packagist.org/packages/vcian/laradar)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
+[![PHP](https://img.shields.io/badge/PHP-%5E8.1-blue.svg?style=flat-square)](https://www.php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-10%20|%2011%20|%2012%20|%2013-red.svg?style=flat-square)](https://laravel.com)
 
 Automatically **discover, visualize, and document** your Laravel application architecture — without writing a single line of configuration.
 
@@ -17,8 +17,6 @@ Automatically **discover, visualize, and document** your Laravel application arc
 ![Routes Explorer](art/routes.png)
 
 ![Dependency Graph](art/dependency-graph.png)
-
-![ER Diagram](art/er-diagram.png)
 
 - Interactive dashboard with dependency graph, ER diagram, and route explorer
 - Exportable reports in **HTML**, **JSON**, and **Markdown**
