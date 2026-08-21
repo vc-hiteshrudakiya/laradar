@@ -19,8 +19,8 @@ class ArchitectureScorer
         $this->checkFillableDefined($data['models']);
         $this->checkRelationshipsMapped($data['models']);
         $this->checkControllersFocused($data['controllers']);
-        $this->checkServiceLayer($data['dependencies']['nodes']);
-        $this->checkRepositoryLayer($data['dependencies']['nodes']);
+        $this->checkServiceLayer($data['dependencies']['nodes'] ?? []);
+        $this->checkRepositoryLayer($data['dependencies']['nodes'] ?? []);
         $this->checkRoutesNamed($data['route_summary']);
         $this->checkApiVersioned($data['route_summary']);
         $this->checkMiddlewareSecured($data['route_summary']);

@@ -20,7 +20,7 @@ Automatically **discover, visualize, and document** your Laravel application arc
 
 - Interactive dashboard with dependency graph, ER diagram, and route explorer
 - Exportable reports in **HTML**, **JSON**, and **Markdown**
-- Scans models, controllers, routes, migrations, jobs, events, services, repositories, observers, policies, modules, and packages
+- Scans models, controllers, routes, jobs, events, services, repositories, observers, policies, modules, and packages
 - Optional **AI-powered architecture review** (OpenAI, Anthropic, Gemini, Groq, Mistral, Ollama, OpenRouter)
 
 ---
@@ -50,7 +50,7 @@ php artisan vendor:publish --tag=laradar-config
 
 ## Interactive Dashboard
 
-Visit `/architecture` in your browser (only available when `APP_ENV=local` by default):
+Visit `/architecture` in your browser (only available when `APP_ENV=local` or `APP_ENV=development` by default):
 
 ```
 http://your-app.test/architecture
@@ -74,18 +74,15 @@ Generate reports from the command line:
 
 ```bash
 # Generate all formats (json, html, markdown)
-php artisan architecture:discover
+php artisan laradar:scan
 
 # Generate specific formats
-php artisan architecture:discover --format=html
-php artisan architecture:discover --format=json
-php artisan architecture:discover --format=markdown
-
-# Include AI analysis
-php artisan architecture:discover --ai
+php artisan laradar:scan --format=html
+php artisan laradar:scan --format=json
+php artisan laradar:scan --format=markdown
 ```
 
-Reports are saved to `storage/app/architecture/`.
+Reports are saved to `storage/architecture/`.
 
 ---
 
@@ -105,7 +102,6 @@ return [
         'models'       => true,
         'controllers'  => true,
         'routes'       => true,
-        'migrations'   => true,
         'dependencies' => true,
         'jobs'         => true,
         'events'       => true,
@@ -113,6 +109,9 @@ return [
         'repositories' => true,
         'observers'    => true,
         'policies'     => true,
+        'modules'      => true,
+        'packages'     => true,
+        'api_docs'     => true,
     ],
 
     // AI analysis (optional)
@@ -179,7 +178,6 @@ OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
 | **Models** | Table, fillable, hidden, casts, relationships, observers |
 | **Controllers** | Methods, route bindings, dependencies |
 | **Routes** | URI, method, middleware, name, controller |
-| **Migrations** | Table name, columns, indexes |
 | **Jobs** | Queue connection, class hierarchy |
 | **Events** | Listeners, broadcast channels |
 | **Services** | Service classes in `App\Services` |

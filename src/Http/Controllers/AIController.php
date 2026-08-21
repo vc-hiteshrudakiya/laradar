@@ -6,17 +6,17 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Vcian\Laradar\AI\AIManager;
-use Vcian\Laradar\ArchitectureDiscovery;
+use Vcian\Laradar\Laradar;
 
 class AIController extends Controller
 {
     private const DOC_TYPES = ['architecture', 'models', 'controllers', 'routes', 'services', 'modules'];
 
-    public function analyze(ArchitectureDiscovery $discovery, AIManager $ai): JsonResponse
+    public function analyze(Laradar $discovery, AIManager $ai): JsonResponse
     {
         if (!$ai->isEnabled()) {
             return response()->json([
-                'error' => 'AI is disabled. Set ai.enabled = true and configure GEMINI_API_KEY in your .env.',
+                'error' => 'AI is disabled. Set AI_ENABLED=true and configure the API key for your chosen provider in your .env.',
             ], 503);
         }
 
@@ -39,6 +39,9 @@ class AIController extends Controller
         if (empty($message)) {
             return response()->json(['error' => 'Message is required.'], 422);
         }
+        if (strlen($message) > 5000) {
+            return response()->json(['error' => 'Message too long. Maximum 5000 characters allowed.'], 422);
+        }
 
         try {
             $context = $request->input('context', []);
@@ -49,7 +52,7 @@ class AIController extends Controller
         }
     }
 
-    public function documentation(Request $request, ArchitectureDiscovery $discovery, AIManager $ai): JsonResponse
+    public function documentation(Request $request, Laradar $discovery, AIManager $ai): JsonResponse
     {
         if (!$ai->isEnabled()) {
             return response()->json(['error' => 'AI is disabled.'], 503);

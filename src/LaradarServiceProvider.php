@@ -23,7 +23,7 @@ use Vcian\Laradar\Http\Controllers\ExportController;
 use Vcian\Laradar\Services\ArchitectureScanner;
 use Vcian\Laradar\Services\ReportExporter;
 
-class ArchitectureDiscoveryServiceProvider extends ServiceProvider
+class LaradarServiceProvider extends ServiceProvider
 {
     public function register()
     {
@@ -82,7 +82,7 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
 
             if ($scan['repositories'] ?? true) {
                 $analyzers['repositories'] = new ServiceAnalyzer(
-                    $paths['repositories'] ?? app_path('Repositories'),
+                    $paths['repositories'] ?? $this->detectRepositoriesPath(),
                     'Repository'
                 );
             }
@@ -119,8 +119,8 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
             return new ArchitectureScanner($analyzers);
         });
 
-        $this->app->singleton(ArchitectureDiscovery::class, function ($app) {
-            return new ArchitectureDiscovery($app->make(ArchitectureScanner::class));
+        $this->app->singleton(Laradar::class, function ($app) {
+            return new Laradar($app->make(ArchitectureScanner::class));
         });
 
         $this->app->singleton(ReportExporter::class, fn() => new ReportExporter());
@@ -140,7 +140,7 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                Commands\DiscoverArchitectureCommand::class,
+                Commands\LaradarCommand::class,
             ]);
 
             $this->publishes([
@@ -191,6 +191,14 @@ class ArchitectureDiscoveryServiceProvider extends ServiceProvider
             if (is_dir($path)) return $path;
         }
         return base_path('Modules');
+    }
+
+    private function detectRepositoriesPath(): string
+    {
+        foreach (['Repositories', 'Repository', 'Repos'] as $dir) {
+            if (is_dir(app_path($dir))) return app_path($dir);
+        }
+        return app_path('Repositories');
     }
 
     private function detectModelsPath(): string

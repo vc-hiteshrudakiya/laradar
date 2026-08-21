@@ -5,9 +5,9 @@ namespace Vcian\Laradar;
 use Vcian\Laradar\Services\ArchitectureReport;
 use Vcian\Laradar\Services\ArchitectureScanner;
 
-class ArchitectureDiscovery
+class Laradar
 {
-    const VERSION = '0.3.9';
+    const VERSION = '1.0.0';
 
     public function __construct(protected ArchitectureScanner $scanner) {}
 

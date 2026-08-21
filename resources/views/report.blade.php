@@ -368,7 +368,7 @@
                     <div class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-violet-500">
                         <p class="text-xs text-gray-400 mb-1">Routes</p>
                         <p class="text-3xl font-black text-gray-800">{{ $rs['total'] }}</p>
-                        <p class="text-xs text-violet-500 mt-1">{{ $rs['web'] }} web · {{ $rs['api'] }} api</p>
+                        <p class="text-xs text-violet-500 mt-1">{{ implode(' · ', array_map(fn($g, $c) => $c . ' ' . $g, array_keys($rs['by_group'] ?? []), array_values($rs['by_group'] ?? []))) }}</p>
                     </div>
 
                     <div class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-indigo-500">
@@ -771,8 +771,9 @@
                     </div>
 
                     {{-- SVG canvas --}}
-                    <div style="position:relative;background:#F4F5F7;border-radius:0 0 16px 16px;overflow:hidden;height:540px;">
-                        <svg id="dep-canvas" width="100%" height="100%" style="cursor:grab;display:block;">
+                    @php $canvasH = max(540, min(900, count($depNodes) * 8 + 220)); @endphp
+                    <div style="position:relative;background:#F4F5F7;border-radius:0 0 16px 16px;overflow:hidden;height:{{ $canvasH }}px;">
+                        <svg id="dep-canvas" width="100%" height="100%" overflow="visible" style="cursor:grab;display:block;">
                             <defs>
                                 <marker id="dep-arr" viewBox="0 0 10 6" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
                                     <path d="M0,0 L10,3 L0,6 Z" fill="rgba(0,82,204,0.35)"/>
@@ -951,7 +952,7 @@
                 <div class="flex items-center gap-3 mb-5">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Routes</p>
                     <span class="bg-violet-100 text-violet-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['routes'] }}</span>
-                    <span class="text-xs text-gray-400">{{ $data['route_summary']['web'] }} web · {{ $data['route_summary']['api'] }} api</span>
+                    <span class="text-xs text-gray-400">{{ implode(' · ', array_map(fn($g, $c) => $c . ' ' . $g, array_keys($data['route_summary']['by_group'] ?? []), array_values($data['route_summary']['by_group'] ?? []))) }}</span>
                 </div>
 
                 {{-- Filter + Search --}}
@@ -1064,8 +1065,8 @@
                             <div class="min-w-0">
                                 <h3 class="font-bold text-gray-800 text-sm truncate">{{ $item['name'] }}</h3>
                                 <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $item['namespace'] ?? '' }}</p>
-                                @if(!empty($item['listeners']))
-                                <p class="text-xs text-gray-500 mt-2">{{ count($item['listeners']) }} listener(s)</p>
+                                @if(!empty($item['properties']))
+                                <p class="text-xs text-gray-500 mt-2">{{ count($item['properties']) }} payload prop{{ count($item['properties']) === 1 ? '' : 's' }}</p>
                                 @endif
                             </div>
                         </div>
@@ -1179,9 +1180,9 @@
                                 @if(!empty($item['model']))
                                 <span class="inline-block mt-2 text-xs bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded-lg">{{ class_basename($item['model']) }}</span>
                                 @endif
-                                @if(!empty($item['methods']))
+                                @if(!empty($item['actions']))
                                 <div class="flex flex-wrap gap-1 mt-2">
-                                    @foreach(array_slice($item['methods'], 0, 5) as $m)
+                                    @foreach(array_slice($item['actions'], 0, 5) as $m)
                                     <span class="text-xs bg-gray-50 text-gray-500 border border-gray-100 px-2 py-0.5 rounded font-mono">{{ $m }}</span>
                                     @endforeach
                                 </div>
@@ -1213,10 +1214,9 @@
                                 <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $item['path'] ?? '' }}</p>
                             </div>
                         </div>
-                        @if(!empty($item['providers']) || !empty($item['routes']))
+                        @if(!empty($item['routes']))
                         <div class="flex gap-3 text-xs text-gray-500 border-t border-gray-50 pt-3">
-                            @if(!empty($item['providers']))<span>{{ count($item['providers']) }} provider(s)</span>@endif
-                            @if(!empty($item['routes']))<span>{{ count($item['routes']) }} route file(s)</span>@endif
+                            <span>{{ $item['routes'] }} route(s)</span>
                         </div>
                         @endif
                     </div>
@@ -1313,7 +1313,7 @@
 
             {{-- Footer --}}
             <footer class="text-center text-xs text-gray-300 border-t border-gray-100 pt-6 pb-2">
-                Generated by <strong class="text-gray-400">Laravel Architecture Discovery</strong> v{{ $data['package_version'] }}
+                Generated by <strong class="text-gray-400">Laradar</strong> v{{ $data['package_version'] }}
                 &nbsp;·&nbsp; {{ $data['performance']['execution_time_ms'] }}ms &nbsp;·&nbsp; {{ $data['performance']['memory_usage_mb'] }}MB
             </footer>
 
@@ -1372,7 +1372,7 @@
 
         // Init dep graph on first visit
         if (id === 'dependencies') {
-            setTimeout(initDepGraph, 60);
+            requestAnimationFrame(() => requestAnimationFrame(initDepGraph));
         }
     }
 
@@ -1425,16 +1425,23 @@
         const edgesG = document.getElementById('diag-edges-g');
         const nodesG = document.getElementById('diag-nodes-g');
 
+        // Virtual canvas scales with node count so nodes spread rather than stack
+        const N      = _gNodes.length;
+        const _vSpan = Math.ceil(Math.sqrt(N * 1.6));
+        const VW     = Math.max(W, _vSpan * 165);
+        const VH     = Math.max(H, _vSpan * 120);
+
         const nodes = _gNodes.map((n, i) => {
-            const angle = (i / Math.max(_gNodes.length, 1)) * 2 * Math.PI - Math.PI / 2;
-            const r     = Math.min(W, H) * 0.32;
-            return { ...n, x: W/2 + r*Math.cos(angle), y: H/2 + r*Math.sin(angle), vx: 0, vy: 0 };
+            const angle = (i / Math.max(N, 1)) * 2 * Math.PI - Math.PI / 2;
+            const r     = Math.min(VW, VH) * 0.40;
+            return { ...n, x: VW/2 + r*Math.cos(angle), y: VH/2 + r*Math.sin(angle), vx: 0, vy: 0 };
         });
         const nById = {};
         nodes.forEach(n => nById[n.id] = n);
 
-        const REPEL = 7000, IDEAL = 200, SPRING = 0.06, GRAV = 0.003, DAMP = 0.78;
-        for (let it = 0; it < 350; it++) {
+        const REPEL = Math.max(9000, N * 150), IDEAL = Math.max(180, Math.min(220, Math.sqrt(N) * 18));
+        const SPRING = 0.05, GRAV = 0.0015, DAMP = 0.80;
+        for (let it = 0; it < 400; it++) {
             for (let a = 0; a < nodes.length; a++) {
                 for (let b = a + 1; b < nodes.length; b++) {
                     const na = nodes[a], nb = nodes[b];
@@ -1453,10 +1460,10 @@
                 nb.vx -= dx/d*f; nb.vy -= dy/d*f;
             });
             nodes.forEach(n => {
-                n.vx += (W/2 - n.x) * GRAV; n.vy += (H/2 - n.y) * GRAV;
+                n.vx += (VW/2 - n.x) * GRAV; n.vy += (VH/2 - n.y) * GRAV;
                 n.vx *= DAMP; n.vy *= DAMP;
-                n.x = Math.max(NW/2 + 20, Math.min(W - NW/2 - 20, n.x + n.vx));
-                n.y = Math.max(NH/2 + 20, Math.min(H - NH/2 - 20, n.y + n.vy));
+                n.x = Math.max(NW/2 + 20, Math.min(VW - NW/2 - 20, n.x + n.vx));
+                n.y = Math.max(NH/2 + 20, Math.min(VH - NH/2 - 20, n.y + n.vy));
             });
         }
         _diagNodes = nodes;
@@ -1574,17 +1581,29 @@
         };
         svg.addEventListener('click', e => { if (e.target === svg) diagClear(); });
 
-        initMinimap(nodes, W, H);
-        applyVp();
+        initMinimap(nodes, VW, VH);
+        // Start at min 0.75× so text is legible; fit button shows full overview
+        (function diagCenterView() {
+            if (!_diagNodes.length) return;
+            const xs = _diagNodes.map(n => n.x), ys = _diagNodes.map(n => n.y);
+            const minX = Math.min(...xs), maxX = Math.max(...xs);
+            const minY = Math.min(...ys), maxY = Math.max(...ys);
+            const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+            const fitZ = Math.min(W / (maxX - minX + NW + 40), H / (maxY - minY + NH + 40));
+            vp.z = Math.max(0.75, Math.min(4, fitZ));
+            vp.x = cx - W / (2 * vp.z);
+            vp.y = cy - H / (2 * vp.z);
+            applyVp();
+        })();
     }
 
-    function initMinimap(nodes, W, H) {
+    function initMinimap(nodes, vW, vH) {
         const mm = document.getElementById('diag-mm');
         if (!mm) return;
         const mmW = 160, mmH = 100;
-        const scale = Math.min(mmW / W, mmH / H) * 0.88;
-        const offX  = (mmW - W * scale) / 2;
-        const offY  = (mmH - H * scale) / 2;
+        const scale = Math.min(mmW / vW, mmH / vH) * 0.88;
+        const offX  = (mmW - vW * scale) / 2;
+        const offY  = (mmH - vH * scale) / 2;
 
         const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         bg.setAttribute('width', mmW); bg.setAttribute('height', mmH); bg.setAttribute('fill', '#f8fafc');
@@ -1902,6 +1921,7 @@
             _depT.tx = e.clientX - _depDrag.sx; _depT.ty = e.clientY - _depDrag.sy; _depApplyT();
         });
         window.addEventListener('mouseup', () => { _depDrag = null; if(canvas) canvas.style.cursor='grab'; });
+        window.addEventListener('resize', depFit, { passive: true });
     }
 
     function _depApplyT() {
@@ -1915,7 +1935,11 @@
         const minX = Math.min(...allX), maxX = Math.max(...allX)+_DEP_NW;
         const minY = Math.min(...allY), maxY = Math.max(...allY)+_DEP_NH;
         const gW = maxX-minX, gH = maxY-minY;
-        const cW = canvas.clientWidth || 800, cH = canvas.clientHeight || 540;
+        const par = canvas.parentElement;
+        const cW = (par && par.clientWidth > 0 ? par.clientWidth : null)
+                || canvas.getBoundingClientRect().width || 800;
+        const cH = (par && par.clientHeight > 0 ? par.clientHeight : null)
+                || canvas.getBoundingClientRect().height || 540;
         _depT.s  = Math.min((cW-80)/gW, (cH-80)/gH, 1.4);
         _depT.tx = cW/2 - _depT.s*(minX+gW/2);
         _depT.ty = cH/2 - _depT.s*(minY+gH/2);

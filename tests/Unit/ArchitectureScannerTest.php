@@ -1,10 +1,10 @@
 <?php
 
-namespace Hitesh\LaravelArchitectureDiscovery\Tests\Unit;
+namespace Vcian\Laradar\Tests\Unit;
 
-use Hitesh\LaravelArchitectureDiscovery\Services\ArchitectureReport;
-use Hitesh\LaravelArchitectureDiscovery\Services\ArchitectureScanner;
-use Hitesh\LaravelArchitectureDiscovery\Tests\TestCase;
+use Vcian\Laradar\Services\ArchitectureReport;
+use Vcian\Laradar\Services\ArchitectureScanner;
+use Vcian\Laradar\Tests\TestCase;
 
 class ArchitectureScannerTest extends TestCase
 {
