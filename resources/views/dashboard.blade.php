@@ -88,6 +88,12 @@ body{
 .kpi-card__label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-faint);display:block;}
 .kpi-card__num{font-family:var(--font-mono);font-size:28px;letter-spacing:-0.01em;margin-top:4px;display:block;}
 
+/* ── Back Button ── */
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--cyan);background:rgba(0,82,204,0.06);border:1px solid rgba(0,82,204,0.22);border-radius:8px;padding:8px 14px;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);transition:background .18s,border-color .18s,transform .18s;}
+.back-btn:hover{background:rgba(0,82,204,0.12);border-color:rgba(0,82,204,0.4);transform:translateX(-2px);}
+.back-btn svg{width:15px;height:15px;flex:none;transition:transform .18s;}
+.back-btn:hover svg{transform:translateX(-2px);}
+
 /* ── Controller Cards ── */
 .ctrl-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:22px;cursor:pointer;transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s;box-shadow:var(--shadow);}
 .ctrl-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:rgba(255,139,0,0.4);}
@@ -325,6 +331,40 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .ov-btn-icon:hover{background:rgba(0,82,204,.08);border-color:rgba(0,82,204,.3);color:var(--cyan);}
 .ov-reveal{opacity:0;transform:translateY(14px);transition:opacity .55s var(--ease),transform .55s var(--ease);}
 .ov-reveal.ov-in{opacity:1;transform:none;}
+@keyframes secIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.sec-fade{animation:secIn .38s var(--ease) both;}
+@keyframes backBtnIn{from{opacity:0;transform:translateX(-14px) scale(.94);}to{opacity:1;transform:none;}}
+@keyframes backBtnPulse{0%{box-shadow:0 0 0 0 rgba(0,101,255,0.45);}60%{box-shadow:0 0 0 7px rgba(0,101,255,0);}100%{box-shadow:0 0 0 0 rgba(0,101,255,0);}}
+.topbar-back-btn{display:none;align-items:center;gap:8px;background:rgba(0,101,255,0.10);border:1px solid rgba(0,101,255,0.30);border-radius:9px;padding:6px 13px 6px 10px;cursor:pointer;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#0065FF;transition:background .15s,border-color .15s,transform .15s;}
+.topbar-back-btn:hover{background:rgba(0,101,255,0.18);border-color:rgba(0,101,255,0.55);transform:translateX(-2px);}
+.topbar-back-btn.is-visible{display:inline-flex;animation:backBtnIn .26s var(--ease) both,backBtnPulse 1.4s ease .26s infinite;}
+/* ── Doc Preview Modal ── */
+.doc-modal-ov{position:fixed;inset:0;z-index:300;background:rgba(23,43,77,0.52);backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:32px 20px;overflow-y:auto;}
+.doc-modal-box{background:var(--bg-elevated);border-radius:20px;width:100%;max-width:860px;box-shadow:0 24px 80px rgba(23,43,77,0.22);border:1px solid var(--border);overflow:hidden;margin:auto;}
+.doc-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--bg-sunken);}
+.doc-modal-body{padding:32px 36px;max-height:72vh;overflow-y:auto;}
+.doc-modal-body::-webkit-scrollbar{width:5px}.doc-modal-body::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+/* Doc rendered typography */
+.doc-r h1{font-size:23px;font-weight:800;color:var(--text);margin:0 0 18px;line-height:1.2;}
+.doc-r h2{font-size:17px;font-weight:700;color:var(--text);margin:26px 0 10px;padding-bottom:7px;border-bottom:2px solid var(--border);}
+.doc-r h3{font-size:14.5px;font-weight:700;color:var(--text);margin:18px 0 7px;}
+.doc-r p{font-size:13.5px;color:var(--text-dim);line-height:1.75;margin:0 0 12px;}
+.doc-r ul,.doc-r ol{padding-left:22px;margin:8px 0 12px;}
+.doc-r li{font-size:13.5px;color:var(--text-dim);margin-bottom:5px;line-height:1.65;}
+.doc-r strong{color:var(--text);font-weight:700;}
+.doc-r em{font-style:italic;}
+.doc-r code{font-family:var(--font-mono);font-size:12px;background:var(--bg-sunken);color:var(--cyan);padding:2px 6px;border-radius:4px;border:1px solid var(--border);}
+.doc-r pre{background:#172B4D;color:#e2e8f0;border-radius:10px;padding:16px;overflow-x:auto;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;margin:12px 0;}
+.doc-r hr{border:none;border-top:1px solid var(--border);margin:22px 0;}
+.doc-r table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+.doc-r th{background:var(--bg-sunken);padding:9px 12px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);border-bottom:2px solid var(--border);}
+.doc-r td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-dim);}
+.doc-r tr:last-child td{border-bottom:none;}
+.doc-r tr:hover td{background:rgba(0,82,204,.03);}
+/* Scrollytelling — opacity/transform driven by JS rAF, no CSS transitions on elements */
+.arch-scene { will-change: opacity; }
+.ast { opacity:0; will-change: opacity, transform; }
+@keyframes archEdgeDraw { from{stroke-dashoffset:1} to{stroke-dashoffset:0} }
 </style>
 </head>
 <body class="atlas-layout">
@@ -345,7 +385,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         <div class="mark">
             <span class="radar"><span class="radar__ring"></span><span class="radar__ring radar__ring--delay"></span><span class="radar__sweep"></span><span class="radar__dot"></span></span>
         </div>
-        <div><strong>{{ $data['project']['name'] }}</strong><span>Architecture Discovery</span></div>
+        <div><strong>{{ $data['project']['name'] }}</strong><span>Laradar</span></div>
     </div>
 
     @if(!empty($score))
@@ -355,7 +395,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
             <span style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--text);">{{ $score['score'] }}<span style="font-size:13px;color:var(--text-faint);">/{{ $score['max'] }}</span></span>
             <span class="px-2 py-0.5 rounded text-xs font-bold {{ $gradeClass }}" style="font-family:var(--font-mono);">{{ $grade }}</span>
         </div>
-        <div class="atlas-score-bar"><div class="atlas-score-fill" style="width:{{ round(($score['score']/max(1,$score['max']))*100) }}%"></div></div>
+        <div class="atlas-score-bar"><div class="atlas-score-fill" id="sidebar-score-bar" data-score-w="{{ round(($score['score']/max(1,$score['max']))*100) }}" style="width:0;"></div></div>
     </div>
     @endif
 
@@ -491,6 +531,10 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 <header class="topbar">
     <div class="breadcrumb">
         <b id="topbar-section">Overview</b>
+        <button id="topbar-back-btn" onclick="topbarGoBack()" class="topbar-back-btn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex:none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <span id="topbar-back-label">Back</span>
+        </button>
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-left:auto;">
         <div class="sync-pill">
@@ -502,6 +546,187 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 {{-- Overview --}}
 <section id="sec-overview" class="p-6">
+
+    {{-- ── Scrollytelling Hero ─────────────────────────────────────────────── --}}
+    @php
+        $stModels      = array_slice($data['models']??[], 0, 5);
+        $stControllers = array_slice($data['controllers']??[], 0, 4);
+    @endphp
+    <div id="arch-story-wrap" style="position:relative;height:400vh;margin:-24px -24px 40px -24px;">
+        <div id="arch-story-sticky" style="position:sticky;top:0;height:100vh;overflow:hidden;background:#FAFBFF;display:flex;flex-direction:column;transition:background 0.7s ease;">
+
+            {{-- Decorative orb (top-right, changes color per scene) --}}
+            <div id="arch-orb" style="position:absolute;top:-120px;right:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.12) 0%,transparent 70%);pointer-events:none;transition:background 0.8s ease;z-index:0;"></div>
+            {{-- Decorative orb bottom-left --}}
+            <div id="arch-orb2" style="position:absolute;bottom:-100px;left:-80px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.07) 0%,transparent 70%);pointer-events:none;transition:background 0.8s ease;z-index:0;"></div>
+
+            {{-- Faint large scene number --}}
+            <div id="arch-bg-num" style="position:absolute;right:5%;bottom:-10px;font-size:200px;font-weight:900;color:rgba(79,70,229,0.06);line-height:1;pointer-events:none;user-select:none;font-family:ui-monospace,monospace;transition:color 0.7s ease,transform 0.5s ease;z-index:0;">01</div>
+
+            {{-- Single centered content area --}}
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px 40px;overflow:hidden;position:relative;z-index:1;">
+                <div style="width:100%;max-width:760px;position:relative;">
+
+                    {{-- All 4 scenes stacked (absolute, only one visible at a time) --}}
+
+                    {{-- Scene 0: Overview --}}
+                    <div id="arch-scene-0" class="arch-scene" style="position:relative;">
+                        <div class="ast ast-l" style="transition-delay:0ms">
+                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(79,70,229,0.1);border:1px solid rgba(79,70,229,0.2);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#4F46E5;text-transform:uppercase;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#4F46E5;display:inline-block;"></span>
+                                Architecture Overview
+                            </span>
+                        </div>
+                        <div class="ast ast-u" style="transition-delay:100ms;margin-top:14px;">
+                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">{{ $data['project']['name'] }}</h2>
+                            <p style="font-size:12.5px;color:#6B7280;margin:6px 0 0;font-family:ui-monospace,monospace;letter-spacing:.04em;">Laravel {{ $data['laravel_version'] }} · Scroll down to explore each layer</p>
+                        </div>
+                        <div style="margin-top:24px;display:grid;grid-template-columns:repeat(2,1fr);gap:14px;">
+                            <div class="ast ast-l" style="transition-delay:200ms;display:flex;align-items:center;gap:16px;background:#FFFFFF;border-radius:16px;padding:16px 20px;border:1px solid rgba(79,70,229,0.15);box-shadow:0 2px 12px rgba(79,70,229,0.06);">
+                                <span style="font-size:34px;font-weight:900;color:#4F46E5;line-height:1;flex:none;">{{ $summary['models']??0 }}</span>
+                                <div><span style="font-size:13px;font-weight:600;color:#1E1B4B;display:block;">Models</span><span style="font-size:11px;color:#9CA3AF;">Eloquent classes</span></div>
+                            </div>
+                            <div class="ast ast-r" style="transition-delay:260ms;display:flex;align-items:center;gap:16px;background:#FFFFFF;border-radius:16px;padding:16px 20px;border:1px solid rgba(14,165,233,0.15);box-shadow:0 2px 12px rgba(14,165,233,0.06);">
+                                <span style="font-size:34px;font-weight:900;color:#0EA5E9;line-height:1;flex:none;">{{ $summary['controllers']??0 }}</span>
+                                <div><span style="font-size:13px;font-weight:600;color:#1E1B4B;display:block;">Controllers</span><span style="font-size:11px;color:#9CA3AF;">Request handlers</span></div>
+                            </div>
+                            <div class="ast ast-l" style="transition-delay:320ms;display:flex;align-items:center;gap:16px;background:#FFFFFF;border-radius:16px;padding:16px 20px;border:1px solid rgba(16,185,129,0.15);box-shadow:0 2px 12px rgba(16,185,129,0.06);">
+                                <span style="font-size:34px;font-weight:900;color:#10B981;line-height:1;flex:none;">{{ $rs['total']??0 }}</span>
+                                <div><span style="font-size:13px;font-weight:600;color:#1E1B4B;display:block;">Routes</span><span style="font-size:11px;color:#9CA3AF;">Web &amp; API</span></div>
+                            </div>
+                            <div class="ast ast-r" style="transition-delay:380ms;display:flex;align-items:center;gap:16px;background:#FFFFFF;border-radius:16px;padding:16px 20px;border:1px solid rgba(245,158,11,0.15);box-shadow:0 2px 12px rgba(245,158,11,0.06);">
+                                <span style="font-size:34px;font-weight:900;color:#F59E0B;line-height:1;flex:none;">{{ ($summary['jobs']??0)+($summary['events']??0)+($summary['services']??0) }}</span>
+                                <div><span style="font-size:13px;font-weight:600;color:#1E1B4B;display:block;">Background</span><span style="font-size:11px;color:#9CA3AF;">Jobs · Events · Services</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Scene 1: Data Layer --}}
+                    <div id="arch-scene-1" class="arch-scene" style="position:absolute;inset:0;opacity:0;pointer-events:none;">
+                        <div class="ast ast-l" style="transition-delay:0ms">
+                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#7C3AED;text-transform:uppercase;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#7C3AED;display:inline-block;"></span>
+                                Data Layer
+                            </span>
+                        </div>
+                        <div class="ast ast-u" style="transition-delay:80ms;margin-top:16px;">
+                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Eloquent Models</h2>
+                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;"><strong style="color:#7C3AED">{{ $summary['models']??0 }} models</strong> mapping to your database tables.</p>
+                        </div>
+                        <div style="margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            @foreach($stModels as $i => $m)
+                            @php $fromDir = $i % 2 === 0 ? 'l' : 'r'; @endphp
+                            <div class="ast ast-{{ $fromDir }}" style="transition-delay:{{ 160 + $i*70 }}ms;display:flex;align-items:center;gap:10px;background:#FFFFFF;border-radius:12px;padding:10px 14px;border:1px solid rgba(124,58,237,0.12);border-left:3px solid #7C3AED;box-shadow:0 1px 6px rgba(124,58,237,0.06);">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" style="flex:none"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                                <span style="font-size:12px;font-weight:700;color:#1E1B4B;font-family:ui-monospace,monospace;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $m['name'] }}</span>
+                                @if(!empty($m['table']))<span style="font-size:9.5px;color:#9CA3AF;font-family:ui-monospace,monospace;flex:none;">{{ $m['table'] }}</span>@endif
+                            </div>
+                            @endforeach
+                            @if(count($data['models']??[]) > 5)
+                            <div class="ast ast-u" style="transition-delay:{{ 160 + 5*70 }}ms;display:flex;align-items:center;justify-content:center;background:rgba(124,58,237,0.05);border-radius:12px;padding:10px;border:1px dashed rgba(124,58,237,0.2);">
+                                <span style="font-size:11px;color:#7C3AED;font-family:ui-monospace,monospace;font-weight:600;">+ {{ count($data['models']??[]) - 5 }} more</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Scene 2: HTTP Layer --}}
+                    <div id="arch-scene-2" class="arch-scene" style="position:absolute;inset:0;opacity:0;pointer-events:none;">
+                        <div class="ast ast-r" style="transition-delay:0ms">
+                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#0EA5E9;text-transform:uppercase;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#0EA5E9;display:inline-block;"></span>
+                                HTTP Layer
+                            </span>
+                        </div>
+                        <div class="ast ast-u" style="transition-delay:80ms;margin-top:16px;">
+                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Routes &amp; Controllers</h2>
+                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;"><strong style="color:#0EA5E9">{{ $rs['total']??0 }} routes</strong> across <strong style="color:#0EA5E9">{{ $summary['controllers']??0 }} controllers</strong>.</p>
+                        </div>
+                        {{-- HTTP method badges --}}
+                        <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;">
+                            @foreach(($rs['by_method']??[]) as $method => $cnt)
+                            @php
+                                $mPalette = ['GET'=>['#10B981','rgba(16,185,129,0.1)'],'POST'=>['#0EA5E9','rgba(14,165,233,0.1)'],'PUT'=>['#F59E0B','rgba(245,158,11,0.1)'],'PATCH'=>['#F59E0B','rgba(245,158,11,0.1)'],'DELETE'=>['#EF4444','rgba(239,68,68,0.1)'],'HEAD'=>['#6B7280','rgba(107,114,128,0.1)'],'OPTIONS'=>['#6B7280','rgba(107,114,128,0.1)']][strtoupper($method)] ?? ['#6B7280','rgba(107,114,128,0.1)'];
+                            @endphp
+                            <div class="ast ast-{{ $loop->index % 2 === 0 ? 'l' : 'r' }}" style="transition-delay:{{ 160 + $loop->index*60 }}ms;text-align:center;background:{{ $mPalette[1] }};border:1.5px solid {{ $mPalette[0] }};border-radius:14px;padding:12px 20px;min-width:70px;">
+                                <span style="font-family:ui-monospace,monospace;font-size:10px;font-weight:800;color:{{ $mPalette[0] }};display:block;letter-spacing:.08em;">{{ $method }}</span>
+                                <span style="font-size:28px;font-weight:900;color:#1E1B4B;display:block;line-height:1.1;margin-top:3px;">{{ $cnt }}</span>
+                            </div>
+                            @endforeach
+                        </div>
+                        {{-- Controller chips --}}
+                        @if(!empty($stControllers))
+                        <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:8px;">
+                            @foreach($stControllers as $i => $c)
+                            <div class="ast ast-{{ $i % 2 === 0 ? 'l' : 'r' }}" style="transition-delay:{{ 300 + $i*50 }}ms;display:inline-flex;align-items:center;gap:6px;background:#FFFFFF;border:1px solid rgba(14,165,233,0.2);border-radius:20px;padding:5px 12px;box-shadow:0 1px 4px rgba(14,165,233,0.08);">
+                                <span style="width:5px;height:5px;border-radius:50%;background:#0EA5E9;flex:none;"></span>
+                                <span style="font-size:11px;font-weight:600;color:#0369A1;font-family:ui-monospace,monospace;">{{ $c['name'] }}</span>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
+
+                    {{-- Scene 3: Background Layer --}}
+                    <div id="arch-scene-3" class="arch-scene" style="position:absolute;inset:0;opacity:0;pointer-events:none;">
+                        <div class="ast ast-l" style="transition-delay:0ms">
+                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#D97706;text-transform:uppercase;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#D97706;display:inline-block;"></span>
+                                Background Layer
+                            </span>
+                        </div>
+                        <div class="ast ast-u" style="transition-delay:80ms;margin-top:16px;">
+                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Async Architecture</h2>
+                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;">Keeping your app fast and scalable with background processing.</p>
+                        </div>
+                        <div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+                            <div class="ast ast-l" style="transition-delay:200ms;background:#FFFFFF;border-radius:18px;padding:24px 20px;border:1px solid rgba(245,158,11,0.2);border-top:4px solid #F59E0B;box-shadow:0 4px 16px rgba(245,158,11,0.08);text-align:center;">
+                                <span style="font-size:48px;font-weight:900;color:#F59E0B;display:block;line-height:1;">{{ $summary['jobs']??0 }}</span>
+                                <span style="font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:.12em;display:block;margin-top:8px;font-weight:600;">Jobs</span>
+                                <span style="font-size:10px;color:#9CA3AF;display:block;margin-top:4px;">Queued workers</span>
+                            </div>
+                            <div class="ast ast-u" style="transition-delay:300ms;background:#FFFFFF;border-radius:18px;padding:24px 20px;border:1px solid rgba(239,68,68,0.2);border-top:4px solid #EF4444;box-shadow:0 4px 16px rgba(239,68,68,0.08);text-align:center;">
+                                <span style="font-size:48px;font-weight:900;color:#EF4444;display:block;line-height:1;">{{ $summary['events']??0 }}</span>
+                                <span style="font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:.12em;display:block;margin-top:8px;font-weight:600;">Events</span>
+                                <span style="font-size:10px;color:#9CA3AF;display:block;margin-top:4px;">With listeners</span>
+                            </div>
+                            <div class="ast ast-r" style="transition-delay:400ms;background:#FFFFFF;border-radius:18px;padding:24px 20px;border:1px solid rgba(16,185,129,0.2);border-top:4px solid #10B981;box-shadow:0 4px 16px rgba(16,185,129,0.08);text-align:center;">
+                                <span style="font-size:48px;font-weight:900;color:#10B981;display:block;line-height:1;">{{ $summary['services']??0 }}</span>
+                                <span style="font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:.12em;display:block;margin-top:8px;font-weight:600;">Services</span>
+                                <span style="font-size:10px;color:#9CA3AF;display:block;margin-top:4px;">Service classes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {{-- Bottom navigation bar --}}
+            <div style="background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,0.06);height:52px;display:flex;align-items:stretch;flex-shrink:0;z-index:2;position:relative;">
+                <div style="display:flex;align-items:stretch;gap:0;padding:0 20px;">
+                    @php
+                        $stTabs = [
+                            ['Overview',   '#4F46E5'],
+                            ['Data Layer', '#7C3AED'],
+                            ['HTTP Layer', '#0EA5E9'],
+                            ['Background', '#D97706'],
+                        ];
+                    @endphp
+                    @foreach($stTabs as $ti => [$tl, $tc])
+                    <button id="arch-tab-{{ $ti }}" onclick="archJumpTo({{ $ti }})" style="padding:0 20px;font-size:12px;font-weight:600;color:{{ $ti===0 ? $tc : '#9CA3AF' }};background:none;border:none;border-bottom:2.5px solid {{ $ti===0 ? $tc : 'transparent' }};cursor:pointer;transition:color .25s,border-color .25s;font-family:inherit;letter-spacing:.02em;white-space:nowrap;">{{ $tl }}</button>
+                    @endforeach
+                </div>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:14px;padding:0 20px;">
+                    <div style="width:120px;height:3px;background:#E5E7EB;border-radius:2px;overflow:hidden;">
+                        <div id="arch-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#4F46E5,#0EA5E9);border-radius:2px;transition:width .08s linear;"></div>
+                    </div>
+                    <button onclick="archSkip()" style="font-size:11px;font-weight:600;color:#4F46E5;background:rgba(79,70,229,0.08);border:1px solid rgba(79,70,229,0.2);border-radius:16px;padding:5px 14px;cursor:pointer;font-family:inherit;">Skip →</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <div style="margin-bottom:24px;">
         <h1 class="sec-title">Overview</h1>
         <p class="sec-sub">{{ $data['project']['name'] }} · Laravel {{ $data['laravel_version'] }}</p>
@@ -552,12 +777,12 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     <div class="kpi-grid" style="margin-bottom:28px;">
         @foreach($stats as [$label,$count])
         @php $kc = $kpiColors[$label] ?? ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)']; $ki = $kpiIcons[$label] ?? ''; @endphp
-        <div class="kpi-card">
+        <div class="kpi-card ov-reveal" data-ov-reveal style="transition-delay:{{ $loop->index * 45 }}ms;">
             <div class="kpi-card__icon" style="background:{{ $kc['bg'] }};color:{{ $kc['color'] }};">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">{!! $ki !!}</svg>
             </div>
             <span class="kpi-card__label">{{ $label }}</span>
-            <span class="kpi-card__num" style="color:{{ $kc['color'] }};">{{ $count }}</span>
+            <span class="kpi-card__num" data-count="{{ $count }}" style="color:{{ $kc['color'] }};">{{ $count }}</span>
         </div>
         @endforeach
     </div>
@@ -584,12 +809,13 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
         {{-- Route breakdown --}}
-        <div class="atlas-card">
+        <div class="atlas-card ov-reveal" data-ov-reveal style="transition-delay:0ms;">
             <div class="atlas-card__head"><h3>Route Breakdown</h3></div>
             <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-faint);">Total</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ $rs['total']??0 }}</span></div>
-                <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-faint);">Web</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ $rs['web']??0 }}</span></div>
-                <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-faint);">API</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ $rs['api']??0 }}</span></div>
+                @foreach($rs['by_group']??[] as $group => $cnt)
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-faint);">{{ ucfirst($group) }}</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ $cnt }}</span></div>
+                @endforeach
                 <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-faint);">Named</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ $rs['named_count']??0 }} / {{ $rs['total']??0 }}</span></div>
                 @if(!empty($rs['api_versions']))
                 <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-faint);">API Versions</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ implode(', ', array_keys($rs['api_versions'])) }}</span></div>
@@ -608,7 +834,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
 
         {{-- Performance --}}
-        <div class="atlas-card">
+        <div class="atlas-card ov-reveal" data-ov-reveal style="transition-delay:80ms;">
             <div class="atlas-card__head"><h3>Performance</h3></div>
             @php $perf = $data['performance']??[]; @endphp
             <div style="display:flex;flex-direction:column;gap:18px;">
@@ -617,21 +843,21 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         <span style="color:var(--text-faint);">Scan Time</span>
                         <span style="font-family:var(--font-mono);color:var(--cyan);">{{ $perf['execution_time_ms']??0 }} ms</span>
                     </div>
-                    <div class="atlas-score-bar"><div class="atlas-score-fill" style="width:{{ min(100,($perf['execution_time_ms']??0)/50) }}%;background:linear-gradient(90deg,var(--cyan),var(--sky));"></div></div>
+                    <div class="atlas-score-bar"><div class="atlas-score-fill" data-score-w="{{ min(100,($perf['execution_time_ms']??0)/50) }}" style="width:0;background:linear-gradient(90deg,var(--cyan),var(--sky));"></div></div>
                 </div>
                 <div>
                     <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
                         <span style="color:var(--text-faint);">Memory</span>
                         <span style="font-family:var(--font-mono);color:var(--emerald);">{{ $perf['memory_usage_mb']??0 }} MB</span>
                     </div>
-                    <div class="atlas-score-bar"><div class="atlas-score-fill" style="width:{{ min(100,($perf['memory_usage_mb']??0)/1.28) }}%;background:linear-gradient(90deg,var(--emerald),var(--cyan));"></div></div>
+                    <div class="atlas-score-bar"><div class="atlas-score-fill" data-score-w="{{ min(100,($perf['memory_usage_mb']??0)/1.28) }}" style="width:0;background:linear-gradient(90deg,var(--emerald),var(--cyan));"></div></div>
                 </div>
             </div>
         </div>
 
         {{-- Score checks --}}
         @if(!empty($score['checks']))
-        <div class="atlas-card">
+        <div class="atlas-card ov-reveal" data-ov-reveal style="transition-delay:160ms;">
             <div class="atlas-card__head"><h3>Score Checks</h3></div>
             <div style="display:flex;flex-direction:column;gap:10px;">
                 @foreach($score['checks'] as $check)
@@ -803,10 +1029,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
     {{-- Detail --}}
     <div id="models-detail" style="display:none">
-        <button onclick="showList('models')" style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);background:none;border:none;cursor:pointer;margin-bottom:22px;font-family:var(--font-sans);padding:0;">
-            <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Back to Models
-        </button>
         <div id="models-detail-content"></div>
     </div>
 </section>
@@ -838,9 +1060,12 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         @if(!empty($ctrl['is_resource']))<span style="font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:12px;background:rgba(52,211,153,0.12);color:var(--emerald);border:1px solid rgba(52,211,153,0.25);">Resource</span>@endif
                     </div>
                 </div>
+                @php
+                $ctrlRouteCount = count(array_filter($data['routes'] ?? [], fn($r) => class_basename($r['controller']['class'] ?? '') === $ctrl['name']));
+                @endphp
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
                     <div class="ctrl-stat"><b>{{ $ctrl['method_count']??0 }}</b><span>Methods</span></div>
-                    <div class="ctrl-stat"><b>{{ count($ctrl['routes']??[]) }}</b><span>Routes</span></div>
+                    <div class="ctrl-stat"><b>{{ $ctrlRouteCount }}</b><span>Routes</span></div>
                     <div class="ctrl-stat"><b>{{ count($ctrl['dependencies']??[]) }}</b><span>Deps</span></div>
                 </div>
                 @if(!empty($ctrl['dependencies']))
@@ -865,9 +1090,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
     </div>
     <div id="controllers-detail" style="display:none">
-        <button onclick="showList('controllers')" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);background:none;border:none;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>Back to Controllers
-        </button>
         <div id="controllers-detail-content"></div>
     </div>
 </section>
@@ -1054,16 +1276,19 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
             {{-- Large-project warning --}}
             @if(count($data['models']) > 20)
-            <div style="display:flex;align-items:center;gap:7px;padding:6px 12px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;font-size:11px;color:var(--amber);margin-left:auto;">
+            <div style="display:flex;align-items:center;gap:7px;padding:6px 12px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;font-size:11px;color:var(--amber);">
                 <svg viewBox="0 0 20 20" fill="currentColor" style="width:13px;height:13px;flex:none;"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                 Large project — auto-focused on a single model. Select "All Models" to see everything.
             </div>
             @endif
+
         </div>
 
-        {{-- Diagram container --}}
-        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:24px;overflow:auto;min-height:280px;">
-            <div class="mermaid" id="er-diagram">{!! $mmErCode !!}</div>
+        {{-- Mermaid ER container --}}
+        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:auto;max-height:640px;">
+            <div style="padding:20px;min-width:600px;">
+                <pre class="mermaid" id="er-mermaid">{{ $mmErCode }}</pre>
+            </div>
         </div>
         @endif
     </div>
@@ -1234,10 +1459,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
     {{-- Detail view --}}
     <div id="routes-detail" style="display:none">
-        <button onclick="showList('routes')" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);background:none;border:none;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Back to Route Explorer
-        </button>
         <div id="routes-detail-content"></div>
     </div>
 
@@ -1652,9 +1873,9 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         <div id="jobs-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
             @foreach($data['jobs'] as $i => $job)
             <div class="card" style="padding:18px;cursor:pointer;" onclick="showDetail('jobs',{{$i}})" data-name="{{ strtolower($job['name']) }}">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
-                    <p style="font-weight:700;font-size:15px;color:var(--text);">{{ $job['name'] }}</p>
-                    @if($job['queued']??false)<span style="font-family:var(--font-mono);font-size:10px;background:rgba(251,191,36,0.12);color:var(--amber);padding:3px 8px;border-radius:12px;border:1px solid rgba(251,191,36,0.25);">Queued</span>@endif
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;">
+                    <p style="font-weight:700;font-size:15px;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0;">{{ $job['name'] }}</p>
+                    @if($job['should_queue']??false)<span style="flex:none;font-family:var(--font-mono);font-size:10px;background:rgba(251,191,36,0.12);color:var(--amber);padding:3px 8px;border-radius:12px;border:1px solid rgba(251,191,36,0.25);">Queued</span>@endif
                 </div>
                 <p style="font-size:12px;color:var(--text-faint);margin-bottom:8px;">Queue: <span style="font-family:var(--font-mono);color:var(--text);">{{ $job['queue']??'default' }}</span></p>
                 <div style="display:flex;gap:12px;font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">
@@ -1667,9 +1888,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         @endif
     </div>
     <div id="jobs-detail" style="display:none">
-        <button onclick="showList('jobs')" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);background:none;border:none;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>Back to Jobs
-        </button>
         <div id="jobs-detail-content"></div>
     </div>
 </section>
@@ -1689,7 +1907,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
             <div class="card" style="padding:18px;cursor:pointer;" onclick="showDetail('events',{{$i}})" data-name="{{ strtolower($evt['name']) }}">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
                     <p style="font-weight:700;font-size:15px;color:var(--text);">{{ $evt['name'] }}</p>
-                    @if($evt['broadcasts']??false)<span style="font-family:var(--font-mono);font-size:10px;background:rgba(248,113,113,0.12);color:var(--rose);padding:3px 8px;border-radius:12px;border:1px solid rgba(248,113,113,0.25);">Broadcast</span>@endif
+                    @if($evt['should_broadcast']??false)<span style="font-family:var(--font-mono);font-size:10px;background:rgba(248,113,113,0.12);color:var(--rose);padding:3px 8px;border-radius:12px;border:1px solid rgba(248,113,113,0.25);">Broadcast</span>@endif
                 </div>
                 <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $evt['namespace'] }}</p>
                 @if(!empty($evt['properties']))<p style="font-size:12px;color:var(--text-dim);margin-top:8px;">{{ count($evt['properties']) }} payload props</p>@endif
@@ -1699,9 +1917,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         @endif
     </div>
     <div id="events-detail" style="display:none">
-        <button onclick="showList('events')" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);background:none;border:none;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>Back to Events
-        </button>
         <div id="events-detail-content"></div>
     </div>
 </section>
@@ -1731,9 +1946,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         @endif
     </div>
     <div id="services-detail" style="display:none">
-        <button onclick="showList('services')" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);background:none;border:none;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>Back to Services
-        </button>
         <div id="services-detail-content"></div>
     </div>
 </section>
@@ -1750,12 +1962,25 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         @else
         <div id="repositories-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
             @foreach($data['repositories'] as $i => $repo)
-            <div class="card" style="padding:18px;cursor:pointer;" onclick="showDetail('repositories',{{$i}})" data-name="{{ strtolower($repo['name']) }}">
-                <p style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px;">{{ $repo['name'] }}</p>
-                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:10px;">{{ $repo['namespace'] }}</p>
-                <div style="display:flex;gap:12px;font-size:12px;color:var(--text-dim);">
-                    <span>{{ count($repo['methods']??[]) }} methods</span>
-                    @if(!empty($repo['dependencies']))<span>{{ count($repo['dependencies']) }} deps</span>@endif
+            <div class="card" style="padding:0;cursor:pointer;overflow:hidden;"
+                 onclick="showDetail('repositories',{{$i}})" data-name="{{ strtolower($repo['name']) }}"
+                 onmouseenter="this.style.borderColor='rgba(0,101,255,0.4)';this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow-hover)'"
+                 onmouseleave="this.style.borderColor='var(--border)';this.style.transform='';this.style.boxShadow='var(--shadow)'">
+                <div style="height:3px;background:linear-gradient(90deg,rgba(0,101,255,0.85),rgba(0,101,255,0.35));border-radius:12px 12px 0 0;"></div>
+                <div style="padding:18px;">
+                    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+                        <div style="width:36px;height:36px;border-radius:9px;background:rgba(0,101,255,0.10);color:#0065FF;display:flex;align-items:center;justify-content:center;flex:none;">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                        </div>
+                        <div style="min-width:0;flex:1;">
+                            <p style="font-weight:700;font-size:15px;color:var(--text);margin:0 0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $repo['name'] }}</p>
+                            <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $repo['namespace'] }}</p>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;font-family:var(--font-mono);">
+                        <span style="background:rgba(0,101,255,0.08);color:#0065FF;padding:3px 9px;border-radius:6px;border:1px solid rgba(0,101,255,0.2);">{{ count($repo['methods']??[]) }} methods</span>
+                        @if(!empty($repo['dependencies']))<span style="color:var(--text-dim);padding:3px 6px;">{{ count($repo['dependencies']) }} deps</span>@endif
+                    </div>
                 </div>
             </div>
             @endforeach
@@ -1763,9 +1988,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         @endif
     </div>
     <div id="repositories-detail" style="display:none">
-        <button onclick="showList('repositories')" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);background:none;border:none;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>Back to Repositories
-        </button>
         <div id="repositories-detail-content"></div>
     </div>
 </section>
@@ -1784,7 +2006,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
             @foreach($data['observers'] as $i => $obs)
             <div class="card" style="padding:18px;cursor:pointer;" onclick="showDetail('observers',{{$i}})" data-name="{{ strtolower($obs['name']) }}">
                 <p style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">{{ $obs['name'] }}</p>
-                <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Observes: <span style="color:var(--text);font-family:var(--font-mono);">{{ $obs['observes']??'Unknown' }}</span></p>
+                <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Observes: <span style="color:var(--text);font-family:var(--font-mono);">{{ $obs['model']??'Unknown' }}</span></p>
                 <div style="display:flex;flex-wrap:wrap;gap:4px;">
                     @foreach($obs['events']??[] as $e)<span style="font-size:10px;padding:3px 7px;border-radius:5px;background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.2);">{{ $e }}</span>@endforeach
                 </div>
@@ -1794,9 +2016,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         @endif
     </div>
     <div id="observers-detail" style="display:none">
-        <button onclick="showList('observers')" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);background:none;border:none;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>Back to Observers
-        </button>
         <div id="observers-detail-content"></div>
     </div>
 </section>
@@ -1825,9 +2044,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         @endif
     </div>
     <div id="policies-detail" style="display:none">
-        <button onclick="showList('policies')" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);background:none;border:none;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>Back to Policies
-        </button>
         <div id="policies-detail-content"></div>
     </div>
 </section>
@@ -2307,16 +2523,16 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--font-mono);font-size:12px;">
             <div style="display:flex;align-items:center;gap:8px;">
                 <span style="color:var(--text-faint);">$</span>
-                <span style="color:var(--emerald);">php artisan architecture:discover</span>
+                <span style="color:var(--emerald);">php artisan laradar:scan</span>
                 <span style="color:var(--text-faint);font-size:11px;margin-left:4px;">— exports json + html (configured formats)</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
                 <span style="color:var(--text-faint);">$</span>
-                <span style="color:var(--emerald);">php artisan architecture:discover <span style="color:var(--amber);">--format=svg</span></span>
+                <span style="color:var(--emerald);">php artisan laradar:scan <span style="color:var(--amber);">--format=svg</span></span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
                 <span style="color:var(--text-faint);">$</span>
-                <span style="color:var(--emerald);">php artisan architecture:discover <span style="color:var(--amber);">--format=markdown --output=docs/architecture.md</span></span>
+                <span style="color:var(--emerald);">php artisan laradar:scan <span style="color:var(--amber);">--format=markdown --output=docs/architecture.md</span></span>
             </div>
         </div>
     </div>
@@ -2633,7 +2849,15 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 <span id="doc-status-{{ $type }}" style="font-size:11px;color:var(--text-faint);flex-shrink:0;font-family:var(--font-mono);">Pending</span>
             </div>
             <p style="font-size:12px;color:var(--text-dim);line-height:1.6;">{{ $desc }}</p>
-            <div style="display:flex;gap:8px;margin-top:auto;padding-top:4px;">
+
+            {{-- Excerpt preview (shown after generation) --}}
+            <div id="doc-excerpt-{{ $type }}" onclick="docsPreview('{{ $type }}')"
+                style="display:none;padding:10px 13px;background:var(--bg-sunken);border-radius:9px;border:1px solid var(--border);font-size:11.5px;color:var(--text-dim);line-height:1.6;max-height:68px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .2s;">
+                <div id="doc-excerpt-text-{{ $type }}"></div>
+                <div style="position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(transparent,var(--bg-sunken));pointer-events:none;border-radius:0 0 9px 9px;"></div>
+            </div>
+
+            <div style="display:flex;gap:6px;margin-top:auto;padding-top:4px;flex-wrap:wrap;">
                 <button onclick="docsGenerate('{{ $type }}')"
                     {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
                     id="doc-gen-btn-{{ $type }}"
@@ -2642,12 +2866,29 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                     <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                     Generate
                 </button>
+                {{-- Preview button --}}
+                <button onclick="docsPreview('{{ $type }}')"
+                    id="doc-preview-btn-{{ $type }}"
+                    class="atlas-btn"
+                    style="display:none;align-items:center;justify-content:center;gap:5px;font-size:11px;padding:7px 10px;border-radius:8px;">
+                    <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    Preview
+                </button>
+                {{-- Download .md --}}
                 <button onclick="docsDownload('{{ $type }}')"
                     id="doc-dl-btn-{{ $type }}"
                     class="atlas-btn"
-                    style="display:none;align-items:center;justify-content:center;gap:6px;font-size:11px;padding:7px 10px;border-radius:8px;">
+                    style="display:none;align-items:center;justify-content:center;gap:5px;font-size:11px;padding:7px 10px;border-radius:8px;">
                     <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Download
+                    .md
+                </button>
+                {{-- Download .html --}}
+                <button onclick="docsDownloadHtml('{{ $type }}')"
+                    id="doc-dl-html-btn-{{ $type }}"
+                    class="atlas-btn atlas-btn--cyan"
+                    style="display:none;align-items:center;justify-content:center;gap:5px;font-size:11px;padding:7px 10px;border-radius:8px;">
+                    <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    .html
                 </button>
             </div>
         </div>
@@ -2659,6 +2900,30 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 </main>
 
+{{-- ── Doc Preview Modal ──────────────────────────────────────────────────── --}}
+<div id="doc-modal" class="doc-modal-ov" style="display:none;" onclick="if(event.target===this)closeDocModal()">
+    <div class="doc-modal-box">
+        <div class="doc-modal-head">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--cyan);flex:none;"></span>
+                <h3 id="doc-modal-title" style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--text);margin:0;"></h3>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <button id="doc-modal-dl-md" class="atlas-btn" style="font-size:11px;padding:5px 12px;border-radius:7px;gap:5px;">
+                    <svg style="width:11px;height:11px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    .md
+                </button>
+                <button id="doc-modal-dl-html" class="atlas-btn atlas-btn--cyan" style="font-size:11px;padding:5px 12px;border-radius:7px;gap:5px;">
+                    <svg style="width:11px;height:11px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    .html
+                </button>
+                <button onclick="closeDocModal()" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg-sunken);color:var(--text-dim);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">&#x2715;</button>
+            </div>
+        </div>
+        <div class="doc-modal-body doc-r" id="doc-modal-body"></div>
+    </div>
+</div>
+
 <script>
 const APP = @json($data);
 const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','jobs','events','services','repositories','observers','policies','dependencies','export','ai','chat','aidocs'];
@@ -2667,30 +2932,47 @@ let mapTreeRendered = false;
 let erRendered      = false;
 let graphRendered   = false;
 
-const erByModel  = @json($mmFocused ?? []);
-const erAllCode  = @json($mmErCode ?? '');
-const erLargeThreshold = 20;
+// ── ER Diagram — Mermaid erDiagram ──────────────────────────────────────────
+const _erFull    = @json($mmErCode);
+const _erFocused = @json($mmFocused);
 
 function erFocus(modelName) {
-    const el = document.getElementById('er-diagram');
+    const el = document.getElementById('er-mermaid');
     if (!el) return;
-    const code = (modelName === '__all__') ? erAllCode : (erByModel[modelName] || erAllCode);
-    if (!code) {
-        el.innerHTML = '<p style="color:var(--text-faint);font-size:12px;font-style:italic;">No relationships defined for this model.</p>';
-        return;
-    }
+    const code = modelName === '__all__' ? _erFull : (_erFocused[modelName] || '');
+    if (!code) return;
     el.removeAttribute('data-processed');
-    el.innerHTML = '';
     el.textContent = code;
-    if (window.mermaid) {
-        try { mermaid.run({ nodes: [el] }); } catch(e) {}
-    }
+    if (window.mermaid) mermaid.run({ nodes: [el] });
+}
+
+function initER() {
+    if (erRendered) return;
+    erRendered = true;
+    const el = document.getElementById('er-mermaid');
+    if (!el) return;
+    @if(count($data['models']) > 20 && $mmFirstFocusModel)
+    erFocus('{{ $mmFirstFocusModel }}');
+    const sel = document.getElementById('er-focus-select');
+    if (sel) sel.value = '{{ $mmFirstFocusModel }}';
+    @else
+    if (window.mermaid) mermaid.run({ nodes: [el] });
+    @endif
 }
 
 function navigate(s) {
     SECTIONS.forEach(id => {
         const sec = document.getElementById('sec-' + id);
-        if (sec) sec.style.display = id === s ? (id === 'chat' ? 'flex' : 'block') : 'none';
+        if (sec) {
+            if (id === s) {
+                sec.style.display = id === 'chat' ? 'flex' : 'block';
+                sec.classList.remove('sec-fade');
+                void sec.offsetWidth;
+                sec.classList.add('sec-fade');
+            } else {
+                sec.style.display = 'none';
+            }
+        }
         const nav = document.getElementById('nav-' + id);
         if (nav) {
             nav.classList.toggle('nav-active', id === s);
@@ -2708,7 +2990,7 @@ function navigate(s) {
     if (breadcrumb) breadcrumb.textContent = sectionNames[s] || s;
     if (s === 'dependencies' && !depRendered) {
         depRendered = true;
-        setTimeout(initDepGraph, 60);
+        requestAnimationFrame(() => requestAnimationFrame(initDepGraph));
     }
     if (s === 'modelmap' && !graphRendered) {
         setTimeout(initRelGraph, 50);
@@ -2719,17 +3001,47 @@ function _atlasTheme(el) {
     // Light theme: Tailwind's native colours are correct — no post-processing needed.
 }
 
+const _SECTION_LABELS = {
+    models:'Models', controllers:'Controllers', routes:'Route Explorer',
+    jobs:'Jobs', events:'Events', services:'Services',
+    repositories:'Repositories', observers:'Observers', policies:'Policies',
+};
+let _activeDetailType = null;
+
+function _showBackBtn(label) {
+    document.getElementById('topbar-section').style.display = 'none';
+    document.getElementById('topbar-back-label').textContent = label;
+    const btn = document.getElementById('topbar-back-btn');
+    btn.classList.remove('is-visible');
+    void btn.offsetWidth; // force reflow so animation replays
+    btn.classList.add('is-visible');
+}
+
+function _hideBackBtn() {
+    document.getElementById('topbar-section').style.display = '';
+    const btn = document.getElementById('topbar-back-btn');
+    btn.classList.remove('is-visible');
+}
+
 function showDetail(type, idx) {
     document.getElementById(type + '-list').style.display = 'none';
     document.getElementById(type + '-detail').style.display = 'block';
     const contentEl = document.getElementById(type + '-detail-content');
     contentEl.innerHTML = renderDetail(type, APP[type][idx]);
     _atlasTheme(contentEl);
+    _activeDetailType = type;
+    _showBackBtn('Back to ' + (_SECTION_LABELS[type] || type));
 }
 
 function showList(type) {
     document.getElementById(type + '-list').style.display = 'block';
     document.getElementById(type + '-detail').style.display = 'none';
+    _activeDetailType = null;
+    _hideBackBtn();
+}
+
+function topbarGoBack() {
+    if (_activeDetailType) showList(_activeDetailType);
 }
 
 function filterGrid(type) {
@@ -2900,6 +3212,48 @@ const RF_LAYER_ORDER = ['request','middleware','controller','service','repositor
 const RF_TYPE_LABEL  = { request:'HTTP Request', middleware:'Middleware', controller:'Controller', service:'Service', repository:'Repository', model:'Model', database:'Database', job:'Job', event:'Event', listener:'Listener', unknown:'Component' };
 
 let _rfNodes = {}, _rfEdges = [], _rfSelected = null, _rfTab = 'info', _rfRoute = null, _rfMws = [];
+let _rfAnimFrame = null;
+
+function startRfFlowAnimation() {
+    if (_rfAnimFrame) { cancelAnimationFrame(_rfAnimFrame); _rfAnimFrame = null; }
+    const svg   = document.getElementById('rf-svg');
+    const dotsG = document.getElementById('rf-dots-g');
+    if (!svg || !dotsG) return;
+    const paths = svg.querySelectorAll('.rf-edge-path');
+    if (!paths.length) return;
+
+    dotsG.innerHTML = '';
+    const ns   = 'http://www.w3.org/2000/svg';
+    const dots = [];
+
+    paths.forEach((path, i) => {
+        const len = path.getTotalLength();
+        if (len < 10) return;
+        for (let d = 0; d < 2; d++) {
+            const glow = document.createElementNS(ns, 'circle');
+            glow.setAttribute('r', '9'); glow.setAttribute('fill', '#4C9AFF'); glow.setAttribute('opacity', '0.18');
+            const circle = document.createElementNS(ns, 'circle');
+            circle.setAttribute('r', '4'); circle.setAttribute('fill', '#4C9AFF'); circle.setAttribute('opacity', '0.9');
+            dotsG.appendChild(glow);
+            dotsG.appendChild(circle);
+            dots.push({ dot: circle, glow, path, len, progress: (d * 0.5 + i * 0.17) % 1 });
+        }
+    });
+
+    const SPEED = 0.35;
+    let last = performance.now();
+    function tick(now) {
+        const dt = (now - last) / 1000; last = now;
+        dots.forEach(d => {
+            d.progress = (d.progress + SPEED * dt / d.len * 100) % 1;
+            const pt = d.path.getPointAtLength(d.progress * d.len);
+            d.dot.setAttribute('cx', pt.x); d.dot.setAttribute('cy', pt.y);
+            d.glow.setAttribute('cx', pt.x); d.glow.setAttribute('cy', pt.y);
+        });
+        _rfAnimFrame = requestAnimationFrame(tick);
+    }
+    _rfAnimFrame = requestAnimationFrame(tick);
+}
 
 function showRouteDetail(idx) {
     const route   = APP.routes[idx];
@@ -2913,6 +3267,8 @@ function showRouteDetail(idx) {
 
     document.getElementById('routes-list').style.display   = 'none';
     document.getElementById('routes-detail').style.display = 'block';
+    _activeDetailType = 'routes';
+    _showBackBtn('Back to Route Explorer');
 
     // ── Build graph nodes + edges ──────────────────────────────────────────────
     let uid = 0;
@@ -2959,7 +3315,7 @@ function showRouteDetail(idx) {
     }
 
     // ── Layout: group nodes into layers, position each ─────────────────────────
-    const NW = 224, NH = 74, GAP_Y = 100, GAP_X = 28, PAD = 40;
+    const NW = 224, NH = 74, GAP_Y = 100, GAP_X = 28, PAD = 40, MAX_PER_ROW = 3;
     const layers = {};
     Object.values(_rfNodes).forEach(n => {
         const li = RF_LAYER_ORDER.indexOf(n.type);
@@ -2967,18 +3323,24 @@ function showRouteDetail(idx) {
         (layers[k] = layers[k] || []).push(n);
     });
     const layerKeys   = Object.keys(layers).map(Number).sort((a, b) => a - b);
-    const maxRowW     = Math.max(...layerKeys.map(k => layers[k].length * NW + (layers[k].length - 1) * GAP_X));
+    const maxRowW     = Math.max(...layerKeys.map(k => Math.min(layers[k].length, MAX_PER_ROW) * NW + (Math.min(layers[k].length, MAX_PER_ROW) - 1) * GAP_X));
     const CANVAS_W    = Math.max(maxRowW + PAD * 2, 480);
-    const CANVAS_H    = layerKeys.length * (NH + GAP_Y) + PAD * 2 - GAP_Y + PAD;
+    const totalSubRows = layerKeys.reduce((sum, k) => sum + Math.ceil(layers[k].length / MAX_PER_ROW), 0);
+    const CANVAS_H    = totalSubRows * (NH + GAP_Y) + PAD * 2 - GAP_Y + PAD;
     const pos = {};
-    layerKeys.forEach((lk, li) => {
+    let currentY = PAD;
+    layerKeys.forEach(lk => {
         const row = layers[lk];
-        const totalW = row.length * NW + (row.length - 1) * GAP_X;
-        let x = (CANVAS_W - totalW) / 2;
-        const y = PAD + li * (NH + GAP_Y);
-        row.forEach(n => {
-            pos[n.id] = { x, y, cx: x + NW / 2, cy: y + NH / 2 };
-            x += NW + GAP_X;
+        const chunks = [];
+        for (let i = 0; i < row.length; i += MAX_PER_ROW) chunks.push(row.slice(i, i + MAX_PER_ROW));
+        chunks.forEach(chunk => {
+            const totalW = chunk.length * NW + (chunk.length - 1) * GAP_X;
+            let x = (CANVAS_W - totalW) / 2;
+            chunk.forEach(n => {
+                pos[n.id] = { x, y: currentY, cx: x + NW / 2, cy: currentY + NH / 2 };
+                x += NW + GAP_X;
+            });
+            currentY += NH + GAP_Y;
         });
     });
 
@@ -3004,12 +3366,12 @@ function showRouteDetail(idx) {
         const f = pos[e.from], t = pos[e.to];
         if (!f || !t) return '';
         const x1 = f.cx, y1 = f.y + NH, x2 = t.cx, y2 = t.y;
-        const cp = Math.abs(y2 - y1) * 0.45;
+        const cp = Math.min(Math.abs(y2 - y1) * 0.45, 100);
         const d  = `M${x1},${y1} C${x1},${y1+cp} ${x2},${y2-cp} ${x2},${y2}`;
         const mx = (x1+x2)/2, my = (y1+y2)/2;
         const lw = (e.label.length * 6) + 14;
         return `<g>
-            <path d="${d}" fill="none" stroke="rgba(148,178,222,0.35)" stroke-width="1.5" marker-end="url(#rf-arr)"/>
+            <path d="${d}" class="rf-edge-path" fill="none" stroke="rgba(148,178,222,0.35)" stroke-width="1.5" marker-end="url(#rf-arr)"/>
             ${e.label ? `<rect x="${mx-lw/2}" y="${my-8}" width="${lw}" height="16" rx="8" fill="#FFFFFF" stroke="#DFE1E6" stroke-width="1"/>
             <text x="${mx}" y="${my+4}" fill="#6B778C" font-size="9" font-family="ui-monospace,monospace" text-anchor="middle" font-weight="600" letter-spacing="0.04em">${_esc(e.label)}</text>` : ''}
         </g>`;
@@ -3027,8 +3389,9 @@ function showRouteDetail(idx) {
         const strokeDash = isInferred ? 'stroke-dasharray="5,3"' : '';
         const opacity    = isInferred ? 'opacity="0.88"' : '';
         return `<g class="rf-node" data-id="${n.id}" onclick="rfClick('${n.id}')" style="cursor:pointer" ${opacity}>
-            <rect x="${p.x}" y="${p.y}" width="${NW}" height="${NH}" rx="12" fill="${c.bg}" stroke="${c.border}" stroke-width="${isInferred ? 1.5 : 1.5}" ${strokeDash} id="rf-rect-${n.id}"/>
-            <rect x="${p.x+1.5}" y="${p.y+1.5}" width="${NW-3}" height="20" rx="10" fill="${c.border}" fill-opacity="${isInferred ? 0.08 : 0.15}"/>
+            <rect x="${p.x}" y="${p.y}" width="${NW}" height="${NH}" rx="12" fill="${c.bg}" stroke="${c.border}" stroke-width="1.5" ${strokeDash} id="rf-rect-${n.id}" filter="url(#rf-node-shadow)"/>
+            <rect x="${p.x}" y="${p.y}" width="${NW}" height="22" rx="12" fill="${c.border}" fill-opacity="0.2"/>
+            <rect x="${p.x}" y="${p.y+10}" width="${NW}" height="12" fill="${c.border}" fill-opacity="0.2"/>
             <circle cx="${p.x+14}" cy="${p.y+11}" r="3.5" fill="${c.dot}"/>
             <text x="${p.x+23}" y="${p.y+15}" fill="${c.type}" font-size="8.5" font-family="ui-monospace,monospace" font-weight="700" letter-spacing="0.1em">${typeLabel.toUpperCase()}${isInferred ? ' ~' : ''}</text>
             <text x="${p.x+12}" y="${p.y+43}" fill="${c.name}" font-size="12.5" font-family="ui-monospace,monospace" font-weight="700">${_esc(shortName)}</text>
@@ -3066,12 +3429,13 @@ function showRouteDetail(idx) {
 
             <!-- SVG scroll area -->
             <div style="flex:1;overflow:auto;padding:0;background:#F7F8F9" id="rf-canvas-wrap">
-                <svg width="${CANVAS_W}" height="${CANVAS_H}" style="display:block;min-width:${CANVAS_W}px">
+                <svg id="rf-svg" width="${CANVAS_W}" height="${CANVAS_H}" style="display:block;min-width:${CANVAS_W}px">
                     ${defs}
                     <rect width="${CANVAS_W}" height="${CANVAS_H}" fill="#F7F8F9"/>
                     <rect width="${CANVAS_W}" height="${CANVAS_H}" fill="url(#rf-dot)"/>
                     ${edgesSvg}
                     ${nodesSvg}
+                    <g id="rf-dots-g"></g>
                 </svg>
             </div>
         </div>
@@ -3103,11 +3467,8 @@ function showRouteDetail(idx) {
 
     </div>`;
 
-    // Apply ATLAS dark theme to injected content
-    const rdEl = document.getElementById('routes-detail-content');
-    if (rdEl) _atlasTheme(rdEl);
-    // Highlight first node
     setTimeout(() => rfHighlight(firstNode?.id), 10);
+    setTimeout(() => startRfFlowAnimation(), 60);
 }
 
 function rfProp(label, val) {
@@ -3763,7 +4124,7 @@ function renderJob(j) {
     if (j.timeout) meta += `<div><p style="font-size:11px;color:var(--text-faint);margin:0 0 4px;">Timeout</p><p style="font-weight:500;color:var(--text);margin:0;">${j.timeout}s</p></div>`;
     if (j.delay)   meta += `<div><p style="font-size:11px;color:var(--text-faint);margin:0 0 4px;">Delay</p><p style="font-weight:500;color:var(--text);margin:0;">${j.delay}s</p></div>`;
     meta += '</div>';
-    const flags = [j.queued && pill('ShouldQueue','#FBBF24'), j.unique && pill('ShouldBeUnique','#0052CC'), j.encrypted && pill('ShouldBeEncrypted','#A78BFA')].filter(Boolean);
+    const flags = [j.should_queue && pill('ShouldQueue','#FBBF24'), j.unique && pill('ShouldBeUnique','#0052CC'), j.encrypted && pill('ShouldBeEncrypted','#A78BFA')].filter(Boolean);
     if (flags.length) meta += `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">${flags.join('')}</div>`;
     h += detailCard('Queue Config', meta);
     if (j.dependencies?.length) h += detailCard('Dependencies', `<div style="display:flex;flex-wrap:wrap;gap:6px;">${j.dependencies.map(d => pill(d.split('\\\\').pop())).join('')}</div>`);
@@ -3773,7 +4134,7 @@ function renderJob(j) {
 function renderEvent(e) {
     let h = `<div class="flex items-center gap-3 mb-6">${avatar(e.name[0],'bg-pink-100','text-pink-600')}
         <div><h2 class="text-xl font-bold">${e.name}</h2><p class="text-sm text-slate-400 font-mono">${e.namespace}</p></div></div>`;
-    const flags = [e.broadcasts && pill('ShouldBroadcast','bg-pink-50 text-pink-700'), e.broadcastNow && pill('ShouldBroadcastNow','bg-rose-50 text-rose-700')].filter(Boolean);
+    const flags = [e.should_broadcast && pill('ShouldBroadcast','bg-pink-50 text-pink-700'), e.broadcastNow && pill('ShouldBroadcastNow','bg-rose-50 text-rose-700')].filter(Boolean);
     if (flags.length) h += detailCard('Broadcast', `<div class="flex gap-2">${flags.join('')}</div>`);
     if (e.properties?.length) h += detailCard('Payload Properties', `<div class="flex flex-wrap gap-2">${e.properties.map(p => pill(p)).join('')}</div>`);
     return h;
@@ -3792,7 +4153,7 @@ function renderObserver(o) {
     const colors = {created:'bg-green-50 text-green-700',updated:'bg-blue-50 text-blue-700',deleted:'bg-red-50 text-red-700',saved:'bg-teal-50 text-teal-700',creating:'bg-emerald-50 text-emerald-700',updating:'bg-sky-50 text-sky-700',deleting:'bg-rose-50 text-rose-700',saving:'bg-cyan-50 text-cyan-700'};
     let h = `<div class="flex items-center gap-3 mb-6">${avatar(o.name[0],'bg-orange-100','text-orange-600')}
         <div><h2 class="text-xl font-bold">${o.name}</h2><p class="text-sm text-slate-400 font-mono">${o.namespace}</p></div></div>`;
-    h += detailCard('Observes', `<p class="font-medium text-slate-700">${o.observes || 'Unknown'}</p>`);
+    h += detailCard('Observes', `<p class="font-medium text-slate-700">${o.model || 'Unknown'}</p>`);
     if (o.events?.length) h += detailCard('Lifecycle Events', `<div class="flex flex-wrap gap-2">${o.events.map(e => pill(e, colors[e] || 'bg-slate-100 text-slate-600')).join('')}</div>`);
     return h;
 }
@@ -3960,20 +4321,7 @@ function setMapTab(tab) {
         renderModelTree();
     }
     if (tab === 'er' && !erRendered) {
-        erRendered = true;
-        const modelCount = (APP.models || []).length;
-        if (modelCount > erLargeThreshold) {
-            // Auto-focus on first model that has relationships
-            const first = (APP.models || []).find(m => (m.relationships || []).length > 0);
-            if (first) {
-                const sel = document.getElementById('er-focus-select');
-                if (sel) sel.value = first.name;
-                erFocus(first.name);
-                return;
-            }
-        }
-        const el = document.getElementById('er-diagram');
-        if (el && typeof mermaid !== 'undefined') mermaid.run({ nodes: [el] });
+        setTimeout(initER, 100);
     }
 }
 
@@ -4006,6 +4354,11 @@ function initRelGraph() {
     _rgW = svg.clientWidth  || 900;
     _rgH = svg.clientHeight || 600;
     const W = _rgW, H = _rgH;
+    // Virtual canvas: large enough to spread nodes, small enough to stay navigable
+    const N  = models.length;
+    const _vSpan = Math.ceil(Math.sqrt(N * 1.6));
+    const VW = Math.max(W, _vSpan * 165);
+    const VH = Math.max(H, _vSpan * 120);
     const edgesG = document.getElementById('rg-edges-g');
     const nodesG = document.getElementById('rg-nodes-g');
 
@@ -4019,21 +4372,28 @@ function initRelGraph() {
         return;
     }
 
-    // Build node data from APP.models
+    // Build node data from APP.models — deduplicate by full_class to avoid
+    // duplicate nodes when two files share the same class basename (e.g. User)
     const nById = {};
-    const nodes = models.map((m, i) => {
-        const angle = (i / Math.max(models.length, 1)) * 2 * Math.PI - Math.PI / 2;
-        const r     = Math.min(W, H) * 0.32;
+    const seenClass = new Set();
+    const nodes = [];
+    models.forEach((m, i) => {
+        const key = m.full_class || m.name;
+        if (seenClass.has(key)) return;
+        seenClass.add(key);
+        const idx   = nodes.length;
+        const angle = (idx / Math.max(models.length, 1)) * 2 * Math.PI - Math.PI / 2;
+        const r     = Math.min(VW, VH) * 0.40;
         const node  = {
             id:    m.name,
             table: m.table || m.name.toLowerCase() + 's',
             rels:  (m.relationships || []).length,
-            x: W/2 + r * Math.cos(angle),
-            y: H/2 + r * Math.sin(angle),
+            x: VW/2 + r * Math.cos(angle),
+            y: VH/2 + r * Math.sin(angle),
             vx: 0, vy: 0,
         };
         nById[m.name] = node;
-        return node;
+        nodes.push(node);
     });
 
     // Build deduplicated edge list
@@ -4048,9 +4408,10 @@ function initRelGraph() {
     });
     const edges = [...edgeSet.values()];
 
-    // Force simulation (same constants as report.blade.php)
-    const REPEL = 7000, IDEAL = 200, SPRING = 0.06, GRAV = 0.003, DAMP = 0.78;
-    for (let it = 0; it < 350; it++) {
+    // Force constants: IDEAL capped at 220 so nodes don't spread unreadably far
+    const REPEL = Math.max(9000, N * 150), IDEAL = Math.max(180, Math.min(220, Math.sqrt(N) * 18));
+    const SPRING = 0.05, GRAV = 0.0015, DAMP = 0.80;
+    for (let it = 0; it < 400; it++) {
         for (let a = 0; a < nodes.length; a++) {
             for (let b = a + 1; b < nodes.length; b++) {
                 const na = nodes[a], nb = nodes[b];
@@ -4069,15 +4430,15 @@ function initRelGraph() {
             nb.vx -= dx/d*f; nb.vy -= dy/d*f;
         });
         nodes.forEach(n => {
-            n.vx += (W/2 - n.x) * GRAV; n.vy += (H/2 - n.y) * GRAV;
+            n.vx += (VW/2 - n.x) * GRAV; n.vy += (VH/2 - n.y) * GRAV;
             n.vx *= DAMP; n.vy *= DAMP;
-            n.x = Math.max(RG_NW/2 + 20, Math.min(W - RG_NW/2 - 20, n.x + n.vx));
-            n.y = Math.max(RG_NH/2 + 20, Math.min(H - RG_NH/2 - 20, n.y + n.vy));
+            n.x = Math.max(RG_NW/2 + 20, Math.min(VW - RG_NW/2 - 20, n.x + n.vx));
+            n.y = Math.max(RG_NH/2 + 20, Math.min(VH - RG_NH/2 - 20, n.y + n.vy));
         });
     }
     _rgNodes = nodes;
 
-    // Draw edges via createElementNS (same as report.blade.php approach)
+    // Draw edges via createElementNS
     edges.forEach(e => {
         const na = nById[e.from], nb = nById[e.to];
         if (!na || !nb) return;
@@ -4204,9 +4565,9 @@ function initRelGraph() {
 
     svg.addEventListener('click', e => { if (e.target === svg) rgDiagClear(); });
 
-    _rgInitMinimap(nodes);
+    _rgInitMinimap(nodes, VW, VH);
     applyVp();
-    graphFit();
+    graphCenterView();
 }
 
 function _rgSetEdgePath(path, na, nb) {
@@ -4221,10 +4582,10 @@ function _rgSetEdgePath(path, na, nb) {
         ' ' + x2.toFixed(1) + ',' + y2.toFixed(1));
 }
 
-function _rgInitMinimap(nodes) {
+function _rgInitMinimap(nodes, vW, vH) {
     const mm = document.getElementById('rg-minimap');
     if (!mm) return;
-    const W = _rgW, H = _rgH, mmW = 160, mmH = 100;
+    const W = vW || _rgW, H = vH || _rgH, mmW = 160, mmH = 100;
     const scale = Math.min(mmW / W, mmH / H) * 0.88;
     const offX  = (mmW - W * scale) / 2, offY = (mmH - H * scale) / 2;
 
@@ -4401,6 +4762,25 @@ function graphFit() {
     _rgVp.z = Math.max(0.25, Math.min(4, Math.min(W / (maxX - minX), H / (maxY - minY))));
     _rgVp.x = minX - (W/_rgVp.z - (maxX - minX)) / 2;
     _rgVp.y = minY - (H/_rgVp.z - (maxY - minY)) / 2;
+    const vpEl = document.getElementById('rg-vp');
+    if (vpEl) vpEl.setAttribute('transform',
+        'translate(' + (-_rgVp.x * _rgVp.z) + ',' + (-_rgVp.y * _rgVp.z) + ') scale(' + _rgVp.z + ')');
+    _rgUpdateMinimap();
+}
+
+function graphCenterView() {
+    if (!_rgNodes.length || !_rgW) return;
+    const W = _rgW, H = _rgH;
+    const xs = _rgNodes.map(n => n.x), ys = _rgNodes.map(n => n.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const bx = maxX - minX + RG_NW + 40, by = maxY - minY + RG_NH + 40;
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    const fitZ = Math.min(W / bx, H / by);
+    // Start at min 0.75× so node text (~10px) stays legible; user can zoom/fit for overview
+    _rgVp.z = Math.max(0.75, Math.min(4, fitZ));
+    _rgVp.x = cx - W / (2 * _rgVp.z);
+    _rgVp.y = cy - H / (2 * _rgVp.z);
     const vpEl = document.getElementById('rg-vp');
     if (vpEl) vpEl.setAttribute('transform',
         'translate(' + (-_rgVp.x * _rgVp.z) + ',' + (-_rgVp.y * _rgVp.z) + ') scale(' + _rgVp.z + ')');
@@ -4674,66 +5054,91 @@ function _buildOvArchDiagram() {
     const host = document.getElementById('ovArchDiagram');
     if (!host) return;
 
-    const MAX_NODES = 10; // max controllers or models shown as individual nodes
-    const BOX_W = 200, BOX_H = 52;
+    const MAX_NODES = 8;
+    const BOX_W = 180, BOX_H = 52;
 
-    const allCtrls  = APP.controllers || [];
-    const allModels = APP.models || [];
-    const routes    = APP.routes || [];
-    const depEdges  = (APP.dependencies?.edges || []);
+    const allCtrls    = APP.controllers || [];
+    const allModels   = APP.models || [];
+    const allServices = APP.services || [];
+    const allRepos    = APP.repositories || [];
+    const routes      = APP.routes || [];
+    const depEdges    = (APP.dependencies?.edges || []);
+    const depNodes    = (APP.dependencies?.nodes || []);
 
-    // ── Controllers: deduplicate, sort by method count desc, cap at MAX_NODES ──
+    // Build node→layer lookup from dep graph metadata
+    const nodeLayerMap = {};
+    depNodes.forEach(n => { nodeLayerMap[n.name] = n.layer; });
+
+    // ── Controllers ──
     const seenCtrl = new Set();
     const sortedCtrls = [...allCtrls]
         .sort((a, b) => (b.method_count || 0) - (a.method_count || 0))
         .filter(c => { if (seenCtrl.has(c.name)) return false; seenCtrl.add(c.name); return true; });
-
     const visibleCtrls = sortedCtrls.slice(0, MAX_NODES);
     const extraCtrlCnt = sortedCtrls.length - visibleCtrls.length;
-
     const ctrlNodes = visibleCtrls.map((c, i) => ({
-        id: 'c-' + i,
-        label: c.name.replace(/Controller$/, ''),   // strip suffix for readability
-        sub: (c.method_count || 0) + ' methods',
-        rawName: c.name,
-        isMore: false,
+        id: 'c-' + i, label: c.name.replace(/Controller$/, ''), sub: (c.method_count || 0) + ' methods',
+        rawName: c.name, isMore: false,
     }));
-    if (extraCtrlCnt > 0) {
-        ctrlNodes.push({ id:'c-more', label:`+ ${extraCtrlCnt} more`, sub:'controllers', rawName:null, isMore:true });
-    }
-
-    // ── Build ctrl→model edges from real dependency data ──
+    if (extraCtrlCnt > 0) ctrlNodes.push({ id:'c-more', label:`+ ${extraCtrlCnt} more`, sub:'controllers', rawName:null, isMore:true });
     const ctrlNameToId = {};
     ctrlNodes.forEach(n => { if (n.rawName) ctrlNameToId[n.rawName] = n.id; });
 
-    const realCtrlModelEdges = []; // [ctrlId, modelName]
+    // ── Services (separate layer) ──
+    const visibleSvcs = allServices.slice(0, MAX_NODES);
+    const extraSvcCnt = allServices.length - visibleSvcs.length;
+    const svcOnlyNodes = visibleSvcs.map((s, i) => ({
+        id: 'sv-' + i, label: s.name, sub: 'service', rawName: s.name, isMore: false,
+    }));
+    if (extraSvcCnt > 0) svcOnlyNodes.push({ id:'sv-more', label:`+ ${extraSvcCnt} more`, sub:'services', rawName:null, isMore:true });
+    const svcNameToId = {};
+    svcOnlyNodes.forEach(n => { if (n.rawName) svcNameToId[n.rawName] = n.id; });
+    const hasServices = svcOnlyNodes.length > 0;
+
+    // ── Repositories (separate layer) ──
+    const visibleRepos = allRepos.slice(0, MAX_NODES);
+    const extraRepoCnt = allRepos.length - visibleRepos.length;
+    const repoOnlyNodes = visibleRepos.map((r, i) => ({
+        id: 'rp-' + i, label: r.name, sub: 'repository', rawName: r.name, isMore: false,
+    }));
+    if (extraRepoCnt > 0) repoOnlyNodes.push({ id:'rp-more', label:`+ ${extraRepoCnt} more`, sub:'repositories', rawName:null, isMore:true });
+    const repoNameToId = {};
+    repoOnlyNodes.forEach(n => { if (n.rawName) repoNameToId[n.rawName] = n.id; });
+    const hasRepos = repoOnlyNodes.length > 0;
+
+    // ── Categorise dep edges by target layer ──
+    const ctrlSvcEdgeList  = []; // [ctrlId, svcId]
+    const ctrlRepoEdgeList = []; // [ctrlId, repoId]
+    const ctrlModelEdgeList = []; // [ctrlId, modelName]
     const referencedModelNames = new Set();
     depEdges.forEach(e => {
         const cId = ctrlNameToId[e.from];
-        if (cId && e.to) {
-            realCtrlModelEdges.push([cId, e.to]);
+        if (!cId || !e.to) return;
+        const layer = nodeLayerMap[e.to] || '';
+        if (layer === 'service') {
+            const sId = svcNameToId[e.to]; if (sId) ctrlSvcEdgeList.push([cId, sId]);
+        } else if (layer === 'repository') {
+            const rId = repoNameToId[e.to]; if (rId) ctrlRepoEdgeList.push([cId, rId]);
+        } else {
             referencedModelNames.add(e.to);
+            ctrlModelEdgeList.push([cId, e.to]);
         }
     });
 
-    // ── Models: prioritise those referenced by dep edges, cap at MAX_NODES ──
+    // ── Models ──
     const allModelsSorted = [
         ...allModels.filter(m => referencedModelNames.has(m.name)),
         ...allModels.filter(m => !referencedModelNames.has(m.name)),
     ].slice(0, MAX_NODES);
-
     const extraModelCnt = allModels.length - allModelsSorted.length;
-
     const modelNodes = allModelsSorted.map((m, i) => ({
         id: 'm-' + i, label: m.name, sub: m.table || 'model', rawName: m.name, isMore: false,
     }));
-    if (extraModelCnt > 0) {
-        modelNodes.push({ id:'m-more', label:`+ ${extraModelCnt} more`, sub:'models', rawName:null, isMore:true });
-    }
+    if (extraModelCnt > 0) modelNodes.push({ id:'m-more', label:`+ ${extraModelCnt} more`, sub:'models', rawName:null, isMore:true });
     const modelNameToId = {};
     modelNodes.forEach(n => { if (n.rawName) modelNameToId[n.rawName] = n.id; });
 
-    // ── Route file nodes ──
+    // ── Route nodes ──
     const webCnt   = routes.filter(r => (r.middleware||[]).includes('web')).length;
     const apiCnt   = routes.filter(r => (r.middleware||[]).includes('api')).length;
     const otherCnt = routes.length - webCnt - apiCnt;
@@ -4743,21 +5148,29 @@ function _buildOvArchDiagram() {
     if (otherCnt > 0) routeNodes.push({ id:'r-other', label:'routes',    sub: otherCnt + ' routes' });
     if (!routeNodes.length) routeNodes.push({ id:'r-all', label:'Routes', sub: routes.length + ' total' });
 
+    // ── Build layer stack ──
     const LAYERS = [
-        { name:'Application', nodes: [{ id:'app', label:(APP.project?.name)||'Laravel App', sub:'HTTP Kernel' }] },
-        { name:'Routes',      nodes: routeNodes },
-        { name:'Controllers', nodes: ctrlNodes.length ? ctrlNodes : [{ id:'c-all', label:'Controllers', sub: allCtrls.length + ' total', isMore:true }] },
-        { name:'Models',      nodes: modelNodes.length ? modelNodes : [{ id:'m-all', label:'Models', sub: allModels.length + ' total', isMore:true }] },
+        { name:'Application',  nodes: [{ id:'app', label:(APP.project?.name)||'Laravel App', sub:'HTTP Kernel', isMore:false }] },
+        { name:'Routes',       nodes: routeNodes },
+        { name:'Controllers',  nodes: ctrlNodes.length ? ctrlNodes : [{ id:'c-all', label:'Controllers', sub: allCtrls.length + ' total', isMore:true }] },
     ];
+    if (hasServices)  LAYERS.push({ name:'Services',     nodes: svcOnlyNodes });
+    if (hasRepos)     LAYERS.push({ name:'Repositories', nodes: repoOnlyNodes });
+    LAYERS.push({ name:'Models',   nodes: modelNodes.length ? modelNodes : [{ id:'m-all', label:'Models', sub: allModels.length + ' total', isMore:true }] });
+    LAYERS.push({ name:'Database', nodes: [{ id:'db', label:'Database', sub: allModels.length + ' model(s)', isMore:false }] });
 
-    // ── Edge list ──
+    // ── Edges ──
     const EDGES = [];
+    const realCtrlNodes  = LAYERS[2].nodes.filter(n => !n.isMore);
+    const modelsLayerIdx = LAYERS.findIndex(l => l.name === 'Models');
+    const realModelNodes = LAYERS[modelsLayerIdx].nodes.filter(n => !n.isMore);
+    const realSvcNodes   = svcOnlyNodes.filter(n => !n.isMore);
+    const realRepoNodes  = repoOnlyNodes.filter(n => !n.isMore);
 
-    // App → each route file
+    // App → Routes
     LAYERS[1].nodes.forEach(r => EDGES.push(['app', r.id]));
 
-    // Routes → top 3 evenly-spread controllers (representative flow, not one-per-ctrl)
-    const realCtrlNodes = LAYERS[2].nodes.filter(n => !n.isMore);
+    // Routes → Controllers (representative: up to 3)
     if (realCtrlNodes.length) {
         LAYERS[1].nodes.forEach(r => {
             const picks = realCtrlNodes.length <= 3
@@ -4767,20 +5180,55 @@ function _buildOvArchDiagram() {
         });
     }
 
-    // Controllers → Models: real dependency edges first
-    realCtrlModelEdges.forEach(([cId, mName]) => {
-        const mId = modelNameToId[mName];
-        if (mId) EDGES.push([cId, mId]);
-    });
+    // Track which controllers already have a forward edge from real dep data
+    const connectedCtrls = new Set();
 
-    // Fallback: if no real edges, connect each visible ctrl to the model at same relative position
-    if (realCtrlModelEdges.length === 0 && realCtrlNodes.length && modelNodes.length) {
-        const realModelNodes = LAYERS[3].nodes.filter(n => !n.isMore);
-        realCtrlNodes.forEach((c, i) => {
-            const m = realModelNodes[i % realModelNodes.length];
-            if (m) EDGES.push([c.id, m.id]);
-        });
+    // Controllers → Services (real dep edges)
+    ctrlSvcEdgeList.forEach(([cId, sId]) => { EDGES.push([cId, sId]); connectedCtrls.add(cId); });
+
+    // Controllers → Repositories (real dep edges, direct)
+    ctrlRepoEdgeList.forEach(([cId, rId]) => { EDGES.push([cId, rId]); connectedCtrls.add(cId); });
+
+    // Any controller with no real forward edge gets a representative connection
+    const unconnectedCtrls = realCtrlNodes.filter(c => !connectedCtrls.has(c.id));
+    if (unconnectedCtrls.length > 0) {
+        if (hasServices && realSvcNodes.length) {
+            unconnectedCtrls.forEach((c, i) => EDGES.push([c.id, realSvcNodes[i % realSvcNodes.length].id]));
+        } else if (hasRepos && realRepoNodes.length) {
+            unconnectedCtrls.forEach((c, i) => EDGES.push([c.id, realRepoNodes[i % realRepoNodes.length].id]));
+        } else if (realModelNodes.length) {
+            unconnectedCtrls.forEach((c, i) => EDGES.push([c.id, realModelNodes[i % realModelNodes.length].id]));
+        }
     }
+
+    // Services → Repositories (always connect when both layers exist)
+    if (hasServices && hasRepos && realSvcNodes.length && realRepoNodes.length) {
+        realSvcNodes.forEach((sv, i) => EDGES.push([sv.id, realRepoNodes[i % realRepoNodes.length].id]));
+    }
+
+    // Repositories → Models (every visible repo gets at least one edge)
+    if (hasRepos && realRepoNodes.length && realModelNodes.length) {
+        realRepoNodes.forEach((rp, i) => EDGES.push([rp.id, realModelNodes[i % realModelNodes.length].id]));
+    }
+
+    // Services → Models (only when no repo layer sits between them)
+    if (hasServices && !hasRepos && realSvcNodes.length && realModelNodes.length) {
+        realSvcNodes.forEach((sv, i) => EDGES.push([sv.id, realModelNodes[i % realModelNodes.length].id]));
+    }
+
+    // Controllers → Models (only when no service or repo layers exist at all)
+    if (!hasServices && !hasRepos) {
+        if (ctrlModelEdgeList.length > 0) {
+            ctrlModelEdgeList.forEach(([cId, mName]) => {
+                const mId = modelNameToId[mName]; if (mId) EDGES.push([cId, mId]);
+            });
+        } else if (realCtrlNodes.length && realModelNodes.length) {
+            realCtrlNodes.forEach((c, i) => EDGES.push([c.id, realModelNodes[i % realModelNodes.length].id]));
+        }
+    }
+
+    // Models → Database (every visible model connects)
+    (realModelNodes.length ? realModelNodes : LAYERS[modelsLayerIdx].nodes).forEach(m => EDGES.push([m.id, 'db']));
 
     // ── Layout ──
     const n = LAYERS.length;
@@ -4788,7 +5236,7 @@ function _buildOvArchDiagram() {
     const NODE_SPACING = 64;
     const BAND_TOP = 60;
     const BAND_BTM = Math.max(420, BAND_TOP + (maxNodes - 1) * NODE_SPACING);
-    const VB_W = 1240, VB_H = BAND_BTM + 70;
+    const VB_W = Math.max(1240, n * 240 + 100), VB_H = BAND_BTM + 70;
     const colX = LAYERS.map((_, i) => 100 + i * ((VB_W - 220) / (n - 1)));
     const positions = {};
 
@@ -4916,16 +5364,58 @@ function _buildOvArchDiagram() {
     if (zoomOut) zoomOut.addEventListener('click', () => { _ovArchScale = Math.max(0.6, _ovArchScale-0.15); _applyOvZoom(); });
 }
 
-// Reveal animation for Architecture Explorer panel
+// Reveal animation with count-up and bar wipe
+function _countUp(el, target, duration) {
+    const start = performance.now();
+    (function step(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - (1 - t) * (1 - t);
+        el.textContent = Math.round(eased * target);
+        if (t < 1) requestAnimationFrame(step);
+    })(performance.now());
+}
+
 (function() {
-    if (!window.IntersectionObserver) {
-        document.querySelectorAll('[data-ov-reveal]').forEach(el => el.classList.add('ov-in'));
-        return;
+    function _animateBars(root) {
+        root.querySelectorAll('.atlas-score-fill[data-score-w]').forEach(b => {
+            b.style.transition = 'width 0.85s var(--ease)';
+            requestAnimationFrame(() => { b.style.width = b.dataset.scoreW + '%'; });
+        });
     }
-    const io = new IntersectionObserver(entries => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('ov-in'); io.unobserve(e.target); } });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('[data-ov-reveal]').forEach(el => io.observe(el));
+
+    if (!window.IntersectionObserver) {
+        document.querySelectorAll('[data-ov-reveal]').forEach(el => {
+            el.classList.add('ov-in');
+            _animateBars(el);
+            el.querySelectorAll('.kpi-card__num[data-count]').forEach(n => {
+                _countUp(n, +n.dataset.count, 900);
+            });
+        });
+    } else {
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                e.target.classList.add('ov-in');
+                io.unobserve(e.target);
+                e.target.querySelectorAll('.kpi-card__num[data-count]').forEach(n => {
+                    const target = +n.dataset.count;
+                    n.textContent = '0';
+                    _countUp(n, target, 900);
+                });
+                _animateBars(e.target);
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('[data-ov-reveal]').forEach(el => io.observe(el));
+    }
+
+    // Sidebar score bar — always visible, animate shortly after load
+    const sideBar = document.getElementById('sidebar-score-bar');
+    if (sideBar) {
+        setTimeout(() => {
+            sideBar.style.transition = 'width 1s var(--ease)';
+            sideBar.style.width = sideBar.dataset.scoreW + '%';
+        }, 500);
+    }
 })();
 
 _buildOvArchDiagram();
@@ -5146,6 +5636,7 @@ function initDepGraph() {
         _depDrag = null;
         if (canvas) canvas.style.cursor = 'grab';
     });
+    window.addEventListener('resize', depFit, { passive: true });
 }
 
 function _depApplyT() {
@@ -5162,7 +5653,9 @@ function depFit() {
     const minX = Math.min(...allX), maxX = Math.max(...allX) + _DEP_NW;
     const minY = Math.min(...allY), maxY = Math.max(...allY) + _DEP_NH;
     const gW = maxX - minX, gH = maxY - minY;
-    const cW = canvas.clientWidth, cH = canvas.clientHeight;
+    const par = canvas.parentElement;
+    const cW = (par && par.clientWidth  > 0 ? par.clientWidth  : null) || canvas.getBoundingClientRect().width  || 900;
+    const cH = (par && par.clientHeight > 0 ? par.clientHeight : null) || canvas.getBoundingClientRect().height || 600;
     const pad = 48;
 
     _depT.s  = Math.min((cW - pad*2) / gW, (cH - pad*2) / gH, 1.4);
@@ -5173,8 +5666,9 @@ function depFit() {
 
 function depZoom(delta) {
     const canvas = document.getElementById('dep-canvas');
-    const cW = canvas?.clientWidth || 800;
-    const cH = canvas?.clientHeight || 600;
+    const par = canvas?.parentElement;
+    const cW = (par && par.clientWidth  > 0 ? par.clientWidth  : null) || canvas?.getBoundingClientRect().width  || 900;
+    const cH = (par && par.clientHeight > 0 ? par.clientHeight : null) || canvas?.getBoundingClientRect().height || 600;
     const newS = Math.max(0.12, Math.min(3, _depT.s + delta));
     _depT.tx += (cW/2 - _depT.tx) * (1 - newS / _depT.s);
     _depT.ty += (cH/2 - _depT.ty) * (1 - newS / _depT.s);
@@ -5398,10 +5892,69 @@ function chatReplaceBubble(id, text, contextLabels = [], isError = false) {
 }
 
 function chatMarkdown(text) {
+    // Escape HTML
+    text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    // Normalize line endings
+    text = text.replace(/\r\n/g, '\n');
+
+    // Code blocks
+    text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+        code = code.trim();
+        // Reformat single-line flow diagrams: "A ↓ B ↓ C" → each step on its own line
+        if (/\S[ \t]*↓[ \t]*\S/.test(code)) {
+            code = code.split('↓').map(s => s.trim()).filter(Boolean).join('\n    ↓\n');
+        }
+        return `<pre class="bg-slate-800 text-green-300 rounded-lg p-3 mt-2 mb-2 text-xs" style="white-space:pre-wrap;word-break:break-word;overflow-x:auto;"><code>${code}</code></pre>`;
+    });
+
+    // Normalize inline tables — AI sometimes returns all rows on one line separated by "| |"
+    // e.g. "| Col1 | Col2 | |---|---| | val1 | val2 |" → split each row onto its own line
+    text = text.replace(/\|\s*\|/g, '|\n|');
+
+    // Tables — process line by line
+    const lines = text.split('\n');
+    const out   = [];
+    let inTable = false, headerDone = false, tableHtml = '';
+
+    for (const line of lines) {
+        const tr = line.trim();
+        if (tr.startsWith('|')) {
+            // Separator row (e.g. |---|---|)
+            if (/^\|[\s\-\|:]+\|?\s*$/.test(tr)) {
+                headerDone = true;
+                continue;
+            }
+            const cells = tr.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+            if (!inTable) {
+                inTable    = true;
+                headerDone = false;
+                tableHtml  = '<div style="overflow-x:auto;margin:8px 0"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+            }
+            if (!headerDone) {
+                tableHtml += '<thead><tr>' + cells.map(c =>
+                    `<th style="border:1px solid #e2e8f0;background:#f8fafc;padding:5px 10px;text-align:left;font-weight:700;color:#475569;white-space:nowrap">${c}</th>`
+                ).join('') + '</tr></thead><tbody>';
+                headerDone = true;
+            } else {
+                tableHtml += '<tr>' + cells.map(c =>
+                    `<td style="border:1px solid #e2e8f0;padding:5px 10px;color:#334155;vertical-align:top">${c}</td>`
+                ).join('') + '</tr>';
+            }
+        } else {
+            if (inTable) {
+                tableHtml += '</tbody></table></div>';
+                out.push(tableHtml);
+                tableHtml = ''; inTable = false; headerDone = false;
+            }
+            out.push(line);
+        }
+    }
+    if (inTable) { tableHtml += '</tbody></table></div>'; out.push(tableHtml); }
+    text = out.join('\n');
+
+    // Inline formatting
     return text
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
-            `<pre class="bg-slate-800 text-green-300 rounded-lg p-3 mt-2 mb-2 text-xs overflow-x-auto"><code>${code.trim()}</code></pre>`)
         .replace(/`([^`]+)`/g, '<code class="bg-slate-100 text-indigo-700 px-1 rounded text-xs">$1</code>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.+?)\*/g, '<em>$1</em>')
@@ -5446,6 +5999,20 @@ async function docsGenerate(type) {
         btn.disabled = false;
         dlBtn.style.display = 'inline-flex';
 
+        // Show preview + html download buttons
+        const previewBtn = document.getElementById('doc-preview-btn-' + type);
+        if (previewBtn) previewBtn.style.display = 'inline-flex';
+        const dlHtmlBtn = document.getElementById('doc-dl-html-btn-' + type);
+        if (dlHtmlBtn) dlHtmlBtn.style.display = 'inline-flex';
+
+        // Populate excerpt snippet
+        const excerptEl   = document.getElementById('doc-excerpt-' + type);
+        const excerptText = document.getElementById('doc-excerpt-text-' + type);
+        if (excerptEl && excerptText) {
+            excerptText.textContent = _mdExcerpt(json.content, 260);
+            excerptEl.style.display = 'block';
+        }
+
         // Show "Download All" if at least one doc is ready
         document.getElementById('docs-download-all-btn').style.display = 'inline-flex';
 
@@ -5463,10 +6030,67 @@ async function docsGenerateAll() {
     }
 }
 
+function _normalizeMdTables(md) {
+    const lines  = md.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+    const result = [];
+    let   block  = [];
+
+    const parseCells = r => r.trim().replace(/^\||\|[ \t]*$/g, '').split('|').map(c => c.trim());
+    const isSep      = r => /^\|?[\s|:=-]+\|?$/.test(r.trim());
+
+    // Fit an arbitrary-length cells array into exactly colCount columns.
+    // When there are MORE cells than columns, the extras are merged into column 1
+    // (the "middle" column) so no data is lost — e.g. per-route columns get
+    // joined with ", " into a single Routes cell.
+    const fitCells = (cells, colCount) => {
+        if (cells.length === colCount) return cells;
+        if (cells.length < colCount)  return Array.from({ length: colCount }, (_, i) => cells[i] ?? '');
+
+        // cells.length > colCount: merge the overflow into the second column
+        const extraCount  = cells.length - colCount;
+        const mergedSlice = cells.slice(1, 2 + extraCount).filter(Boolean).join(', ');
+        const tail        = cells.slice(2 + extraCount); // remaining columns after the merge
+        return [cells[0], mergedSlice, ...tail];
+    };
+
+    const flushBlock = () => {
+        if (!block.length) return;
+        const tableRows = block.filter(r => r.trim().startsWith('|'));
+        if (!tableRows.length) { result.push(...block); block = []; return; }
+
+        const dataRows = tableRows.filter(r => !isSep(r));
+        if (dataRows.length < 1) { result.push(...block); block = []; return; }
+
+        // Column count is authoritative from the header row (first data row)
+        const colCount = parseCells(dataRows[0]).length;
+
+        tableRows.forEach(row => {
+            if (isSep(row)) {
+                result.push('| ' + Array(colCount).fill('---').join(' | ') + ' |');
+            } else {
+                const normalised = fitCells(parseCells(row), colCount);
+                result.push('| ' + normalised.join(' | ') + ' |');
+            }
+        });
+        block = [];
+    };
+
+    for (const line of lines) {
+        if (line.trim().startsWith('|')) {
+            block.push(line);
+        } else {
+            flushBlock();
+            result.push(line);
+        }
+    }
+    flushBlock();
+    return result.join('\n');
+}
+
 function docsDownload(type) {
     const doc = _docsContent[type];
     if (!doc) return;
-    _downloadBlob(doc.content, doc.filename, 'text/markdown');
+    _downloadBlob(_normalizeMdTables(doc.content), doc.filename, 'text/markdown');
 }
 
 function docsDownloadAll() {
@@ -5568,35 +6192,79 @@ async function generateAIGraphicReport() {
 
 function _mdToHtml(md) {
     if (!md) return '';
-    let html = _esc(md);
-    // Code blocks (must be before inline code)
+    // Normalize line endings FIRST — AI responses may use \r\n (Windows) or \r (old Mac)
+    const normalized = md.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    let html = _esc(normalized);
+
+    // ── Code blocks (before inline code) ────────────────────────────────────
     html = html.replace(/```[\w]*\n?([\s\S]*?)```/g, (_, code) =>
         `<pre style="background:#1e293b;color:#e2e8f0;border-radius:10px;padding:16px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:13px;line-height:1.6;margin:12px 0">${code.trim()}</pre>`
     );
-    // Inline code
-    html = html.replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;color:#0f172a;padding:2px 6px;border-radius:4px;font-family:ui-monospace,monospace;font-size:0.9em">$1</code>');
-    // Headings
+    // ── Inline code ──────────────────────────────────────────────────────────
+    html = html.replace(/`([^`\n]+)`/g,
+        '<code style="background:#f1f5f9;color:#0f172a;padding:2px 6px;border-radius:4px;font-family:ui-monospace,monospace;font-size:0.9em">$1</code>'
+    );
+    // ── Headings ─────────────────────────────────────────────────────────────
     html = html.replace(/^### (.+)$/gm, '<h3 style="font-size:16px;font-weight:700;color:#1e293b;margin:20px 0 8px">$1</h3>');
     html = html.replace(/^## (.+)$/gm,  '<h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid #e2e8f0">$1</h2>');
     html = html.replace(/^# (.+)$/gm,   '<h1 style="font-size:26px;font-weight:900;color:#0f172a;margin:0 0 16px">$1</h1>');
-    // Bold / italic
-    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*([^*]+)\*/g,     '<em>$1</em>');
-    // Unordered lists
-    html = html.replace(/((?:^- .+\n?)+)/gm, (block) => {
-        const items = block.trim().split('\n').map(l => `<li style="margin-bottom:4px">${l.replace(/^- /,'')}</li>`).join('');
+
+    // ── Tables (line-by-line approach — immune to \r\n and trailing-pipe bugs) ─
+    const tableStyle  = 'width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden';
+    const thStyle     = 'background:#f8fafc;padding:9px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;border-bottom:2px solid #e2e8f0;white-space:nowrap';
+    const tdStyle     = 'padding:9px 12px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#334155;vertical-align:top';
+    const isSep       = r => /^\|?[\s|:=-]+\|?$/.test(r.trim());
+    const parseCells  = r => r.trim().replace(/^\||\|[ \t]*$/g, '').split('|').map(c => c.trim());
+
+    // Collect runs of lines that start with | and render each run as a table
+    const lines = html.split('\n');
+    const out   = [];
+    let tableLines = [];
+
+    const flushTable = () => {
+        if (!tableLines.length) return;
+        const dataRows = tableLines.filter(r => r.trim().startsWith('|') && !isSep(r));
+        if (dataRows.length < 1) { out.push(...tableLines); tableLines = []; return; }
+        const [hRow, ...bRows] = dataRows;
+        const ths = parseCells(hRow).map(h => `<th style="${thStyle}">${h}</th>`).join('');
+        const trs = bRows.map(r =>
+            `<tr>${parseCells(r).map(c => `<td style="${tdStyle}">${c}</td>`).join('')}</tr>`
+        ).join('');
+        out.push(`<div style="overflow-x:auto;margin:12px 0"><table style="${tableStyle}"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div>`);
+        tableLines = [];
+    };
+
+    for (const line of lines) {
+        if (line.trim().startsWith('|')) {
+            tableLines.push(line);
+        } else {
+            flushTable();
+            out.push(line);
+        }
+    }
+    flushTable();
+    html = out.join('\n');
+
+    // ── Bold / italic ────────────────────────────────────────────────────────
+    html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*([^*\n]+)\*/g,     '<em>$1</em>');
+    // ── Unordered lists ──────────────────────────────────────────────────────
+    html = html.replace(/((?:^[ \t]*[-*] .+\n?)+)/gm, (block) => {
+        const items = block.trim().split('\n')
+            .map(l => `<li style="margin-bottom:4px">${l.replace(/^[ \t]*[-*] /, '')}</li>`).join('');
         return `<ul style="list-style:disc;padding-left:20px;margin:8px 0">${items}</ul>`;
     });
-    // Ordered lists
+    // ── Ordered lists ────────────────────────────────────────────────────────
     html = html.replace(/((?:^\d+\. .+\n?)+)/gm, (block) => {
-        const items = block.trim().split('\n').map(l => `<li style="margin-bottom:4px">${l.replace(/^\d+\. /,'')}</li>`).join('');
+        const items = block.trim().split('\n')
+            .map(l => `<li style="margin-bottom:4px">${l.replace(/^\d+\. /, '')}</li>`).join('');
         return `<ol style="list-style:decimal;padding-left:20px;margin:8px 0">${items}</ol>`;
     });
-    // Horizontal rule
+    // ── Horizontal rule ──────────────────────────────────────────────────────
     html = html.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0"/>');
-    // Paragraphs
-    html = html.split(/\n\n+/).map(block => {
-        if (block.match(/^<(h[1-3]|ul|ol|pre|hr)/)) return block;
+    // ── Paragraphs ───────────────────────────────────────────────────────────
+    html = html.split(/\n{2,}/).map(block => {
+        if (/^<(h[1-3]|ul|ol|pre|hr|div)/.test(block.trimStart())) return block;
         const trimmed = block.trim();
         return trimmed ? `<p style="margin:0 0 12px;color:#334155;line-height:1.7">${trimmed}</p>` : '';
     }).join('\n');
@@ -6203,7 +6871,7 @@ table tr:hover{background:#f1f5f9}
     ${depSvg ? `<section>
         ${secHeader('Dependency Graph', `${depNodes.length} nodes · ${depEdges.length} edges`, '#6366f1')}
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
-            <div style="overflow-x:auto;padding:20px">${depSvg}</div>
+            <div style="padding:20px">${depSvg}</div>
         </div>
     </section>` : ''}
 
@@ -6244,62 +6912,88 @@ function _buildDepSvg(nodes, edges) {
         listener:   { fill:'#FEE4FA', stroke:'#DA62AC', text:'#172B4D' },
     };
 
-    const NW = 140, NH = 56, GAP_X = 18, GAP_Y = 90, PAD = 30;
+    // Wrap each layer into rows so the SVG stays a reasonable width
+    const MAX_PER_ROW = 6;
+    const NW = 140, NH = 52, GAP_X = 16, GAP_Y = 68, ROW_GAP = 10, PAD = 28;
+
     const byLayer = {};
     nodes.forEach(n => {
         const l = n.layer ?? 'model';
         (byLayer[l] = byLayer[l] || []).push(n);
     });
-
     const lKeys = layerOrder.filter(l => byLayer[l]?.length);
-    const maxW  = Math.max(...lKeys.map(l => byLayer[l].length * NW + (byLayer[l].length - 1) * GAP_X));
-    const CW    = Math.max(maxW + PAD * 2, 480);
-    const CH    = lKeys.length * (NH + GAP_Y) - GAP_Y + PAD * 2;
 
+    // Canvas width = widest possible row
+    const maxColsAll = Math.max(...lKeys.map(l => Math.min(byLayer[l].length, MAX_PER_ROW)));
+    const CW = maxColsAll * NW + (maxColsAll - 1) * GAP_X + PAD * 2;
+
+    // Build positions with row-wrapping per layer
     const nameToPos = {};
-    lKeys.forEach((l, li) => {
-        const row  = byLayer[l];
-        const rowW = row.length * NW + (row.length - 1) * GAP_X;
-        let x = (CW - rowW) / 2;
-        const y = PAD + li * (NH + GAP_Y);
-        row.forEach(n => {
-            nameToPos[n.name] = { x, y, cx: x + NW / 2, cy: y + NH / 2 };
-            x += NW + GAP_X;
-        });
-    });
+    let curY = PAD;
+    const bands = [];
 
-    const edgesSvg = edges.slice(0, 120).map(e => {
+    lKeys.forEach(l => {
+        const layerNodes = byLayer[l];
+        const rows = [];
+        for (let i = 0; i < layerNodes.length; i += MAX_PER_ROW) {
+            rows.push(layerNodes.slice(i, i + MAX_PER_ROW));
+        }
+        const bandY1 = curY;
+        rows.forEach((row, ri) => {
+            const rowW = row.length * NW + (row.length - 1) * GAP_X;
+            let x = (CW - rowW) / 2;
+            row.forEach(n => {
+                nameToPos[n.name] = { x, y: curY, cx: x + NW / 2 };
+                x += NW + GAP_X;
+            });
+            curY += NH + (ri < rows.length - 1 ? ROW_GAP : 0);
+        });
+        bands.push({ l, y1: bandY1, y2: curY });
+        curY += GAP_Y;
+    });
+    const CH = curY - GAP_Y + PAD;
+
+    // Layer band backgrounds + labels
+    const bandsSvg = bands.map(b => {
+        const c = layerColors[b.l] ?? { fill:'#F4F5F7', stroke:'#6B778C' };
+        const label = b.l.charAt(0).toUpperCase() + b.l.slice(1) + 's';
+        const bh = b.y2 - b.y1 + 16;
+        return `<rect x="${PAD / 2}" y="${b.y1 - 8}" width="${CW - PAD}" height="${bh}" rx="8" fill="${c.stroke}" opacity="0.06"/>
+                <text x="${PAD}" y="${b.y1 - 8 + bh / 2 + 4}" font-size="9" font-weight="700" fill="${c.stroke}" opacity="0.55" font-family="ui-monospace,monospace" letter-spacing="0.08em">${label.toUpperCase()}</text>`;
+    }).join('');
+
+    // Edges (skip back-edges for readability in a static render)
+    const edgesSvg = edges.slice(0, 200).map(e => {
         const f = nameToPos[e.from], t = nameToPos[e.to];
         if (!f || !t) return '';
         const x1 = f.cx, y1 = f.y + NH, x2 = t.cx, y2 = t.y;
-        const cp = Math.abs(y2 - y1) * 0.4;
-        return `<path d="M${x1},${y1} C${x1},${y1+cp} ${x2},${y2-cp} ${x2},${y2}"
-            fill="none" stroke="rgba(148,178,222,0.35)" stroke-width="1.5" marker-end="url(#dep-arr)"/>`;
+        if (y2 <= y1 + 4) return '';
+        const cp = (y2 - y1) * 0.45;
+        return `<path d="M${x1},${y1} C${x1},${y1+cp} ${x2},${y2-cp} ${x2},${y2}" fill="none" stroke="rgba(0,82,204,0.18)" stroke-width="1.4" marker-end="url(#dep-arr)"/>`;
     }).join('');
 
+    // Nodes
     const nodesSvg = nodes.map(n => {
         const p = nameToPos[n.name]; if (!p) return '';
         const c  = layerColors[n.layer ?? ''] ?? { fill:'#F4F5F7', stroke:'#6B778C', text:'#172B4D' };
-        const nm = n.name.length > 18 ? n.name.slice(0, 17) + '…' : n.name;
+        const nm = n.name.length > 17 ? n.name.slice(0, 16) + '…' : n.name;
         const lb = (n.layer ?? '').toUpperCase();
         return `<g>
-            <rect x="${p.x}" y="${p.y}" width="${NW}" height="${NH}" rx="10" fill="${c.fill}" stroke="${c.stroke}" stroke-width="1.5"/>
-            <text x="${p.cx}" y="${p.y + 22}" text-anchor="middle" font-size="10" font-weight="700" fill="${c.stroke}" font-family="ui-monospace,monospace">${lb}</text>
-            <text x="${p.cx}" y="${p.y + 40}" text-anchor="middle" font-size="11" font-weight="600" fill="${c.text}" font-family="ui-monospace,monospace">${nm}</text>
+            <rect x="${p.x}" y="${p.y}" width="${NW}" height="${NH}" rx="8" fill="${c.fill}" stroke="${c.stroke}" stroke-width="1.5"/>
+            <text x="${p.cx}" y="${p.y + 18}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${c.stroke}" font-family="ui-monospace,monospace" letter-spacing="0.07em">${lb}</text>
+            <text x="${p.cx}" y="${p.y + 36}" text-anchor="middle" font-size="11" font-weight="600" fill="${c.text}" font-family="ui-monospace,monospace">${nm}</text>
         </g>`;
     }).join('');
 
-    return `<svg width="${CW}" height="${CH}" style="display:block;max-width:100%">
+    // viewBox + max-width:100% + height:auto ensures the SVG scales to any container
+    return `<svg viewBox="0 0 ${CW} ${CH}" width="${CW}" height="${CH}" style="display:block;max-width:100%;height:auto">
         <defs>
-            <pattern id="dep-dot" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="1" cy="1" r="0.7" fill="rgba(148,178,222,0.1)"/>
-            </pattern>
-            <marker id="dep-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-                <polygon points="0 0,8 3,0 6" fill="#6B778C"/>
+            <marker id="dep-arr" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+                <polygon points="0 0,7 3,0 6" fill="#94a3b8"/>
             </marker>
         </defs>
-        <rect width="${CW}" height="${CH}" fill="#F7F8F9"/>
-        <rect width="${CW}" height="${CH}" fill="url(#dep-dot)"/>
+        <rect width="${CW}" height="${CH}" fill="#F7F8F9" rx="12"/>
+        ${bandsSvg}
         ${edgesSvg}
         ${nodesSvg}
     </svg>`;
@@ -6451,6 +7145,79 @@ function aiRenderResults(data) {
     document.getElementById('ai-results').style.display = 'block';
 }
 
+// ── Doc preview helpers ───────────────────────────────────────────────────────
+
+function _mdExcerpt(md, maxLen) {
+    const plain = md
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/^#{1,6}\s+/gm, '')
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        .replace(/\*([^*]+)\*/g, '$1')
+        .replace(/^\|.+\|$/gm, '')
+        .replace(/^[-*]\s+/gm, '• ')
+        .replace(/`[^`]+`/g, '')
+        .replace(/\n{2,}/g, ' ')
+        .trim();
+    return plain.slice(0, maxLen) + (plain.length > maxLen ? '…' : '');
+}
+
+function docsPreview(type) {
+    const doc = _docsContent[type];
+    if (!doc) return;
+    document.getElementById('doc-modal-title').textContent = doc.filename;
+    document.getElementById('doc-modal-body').innerHTML    = _mdToHtml(doc.content);
+    document.getElementById('doc-modal-dl-md').onclick    = () => docsDownload(type);
+    document.getElementById('doc-modal-dl-html').onclick  = () => docsDownloadHtml(type);
+    document.getElementById('doc-modal').style.display    = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDocModal() {
+    document.getElementById('doc-modal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function docsDownloadHtml(type) {
+    const doc = _docsContent[type];
+    if (!doc) return;
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${doc.filename.replace('.md','')}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b;padding:40px 20px;line-height:1.6}
+.wrap{max-width:820px;margin:0 auto;background:#fff;border-radius:16px;padding:40px 48px;box-shadow:0 4px 24px rgba(0,0,0,.07);border:1px solid #e2e8f0}
+h1{font-size:28px;font-weight:800;color:#0f172a;margin-bottom:20px;padding-bottom:12px;border-bottom:3px solid #e2e8f0}
+h2{font-size:20px;font-weight:700;color:#0f172a;margin:32px 0 10px;padding-bottom:6px;border-bottom:2px solid #f1f5f9}
+h3{font-size:16px;font-weight:700;color:#1e293b;margin:20px 0 8px}
+p{font-size:14px;color:#334155;line-height:1.75;margin-bottom:12px}
+ul,ol{padding-left:22px;margin:8px 0 14px}
+li{font-size:14px;color:#334155;margin-bottom:5px;line-height:1.65}
+strong{color:#0f172a;font-weight:700}
+em{font-style:italic}
+code{font-family:ui-monospace,monospace;font-size:12.5px;background:#f1f5f9;color:#0052cc;padding:2px 7px;border-radius:4px;border:1px solid #e2e8f0}
+pre{background:#1e293b;color:#e2e8f0;border-radius:10px;padding:18px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:13px;line-height:1.6;margin:14px 0}
+hr{border:none;border-top:1px solid #e2e8f0;margin:24px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0}
+th{background:#f8fafc;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;border-bottom:2px solid #e2e8f0}
+td{padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#334155;font-size:13.5px}
+tr:last-child td{border-bottom:none}
+.footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+${_mdToHtml(doc.content)}
+<div class="footer">Generated by Laradar &middot; ${new Date().toLocaleDateString()}</div>
+</div>
+</body>
+</html>`;
+    _downloadBlob(html, doc.filename.replace(/\.md$/i, '.html'), 'text/html;charset=utf-8');
+}
+
 function _esc(str) {
     return String(str)
         .replace(/&/g, '&amp;')
@@ -6470,6 +7237,149 @@ function _downloadBlob(content, filename, mime, isBlob = false) {
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
+
+// ── Scrollytelling Architecture Story ────────────────────────────────────────
+(function () {
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    const clamp  = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+    const map01  = (p, s, e)   => clamp((p - s) / (e - s), 0, 1);
+    const easeOut = t => 1 - Math.pow(1 - t, 3);
+    const easeInOut = t => t < .5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+
+    // ── Scene themes ───────────────────────────────────────────────────────────
+    const ST_THEME = [
+        { bg:'#FAFBFF', orb:'rgba(79,70,229,0.13)',  orb2:'rgba(79,70,229,0.07)',  num:'rgba(79,70,229,0.055)',  tab:'#4F46E5' },
+        { bg:'#FAF5FF', orb:'rgba(124,58,237,0.13)', orb2:'rgba(124,58,237,0.07)', num:'rgba(124,58,237,0.055)', tab:'#7C3AED' },
+        { bg:'#F0F9FF', orb:'rgba(14,165,233,0.13)', orb2:'rgba(14,165,233,0.07)', num:'rgba(14,165,233,0.055)', tab:'#0EA5E9' },
+        { bg:'#FFFBEB', orb:'rgba(245,158,11,0.13)', orb2:'rgba(245,158,11,0.07)', num:'rgba(245,158,11,0.055)', tab:'#D97706' },
+    ];
+
+    // ── Scene scroll windows (with cross-fade overlap) ─────────────────────────
+    const SCENES = [
+        { enter:-0.10, peak:0.00, hold:0.18, fade:0.25, exit:0.33 },
+        { enter:0.23,  peak:0.29, hold:0.43, fade:0.50, exit:0.58 },
+        { enter:0.48,  peak:0.54, hold:0.68, fade:0.75, exit:0.83 },
+        { enter:0.73,  peak:0.79, hold:1.00, fade:1.20, exit:1.30 },
+    ];
+
+    let _elData = [];
+    let _scenes = [];
+
+    function buildElData() {
+        _scenes = [...document.querySelectorAll('.arch-scene')];
+        _elData = [];
+        _scenes.forEach((scene, si) => {
+            const S = SCENES[si];
+            [...scene.querySelectorAll('.ast')].forEach((el, ei) => {
+                const dir = el.classList.contains('ast-l') ? 'l' :
+                            el.classList.contains('ast-r') ? 'r' : 'u';
+                const staggerBase = si === 0 ? S.peak - 0.18 : S.peak;
+                const elEnter = staggerBase + ei * 0.014;
+                const elFull  = elEnter + 0.055;
+                const elFade  = S.fade;
+                const elExit  = S.exit;
+                _elData.push({ el, dir, si, elEnter, elFull, elFade, elExit });
+                el.style.transition = 'none';
+                el.style.willChange = 'opacity, transform';
+            });
+        });
+    }
+
+    let _lastTheme = -1;
+    function applyTheme(si) {
+        if (si === _lastTheme) return;
+        _lastTheme = si;
+        const T = ST_THEME[si];
+        const sticky = document.getElementById('arch-story-sticky');
+        const orb    = document.getElementById('arch-orb');
+        const orb2   = document.getElementById('arch-orb2');
+        const bgNum  = document.getElementById('arch-bg-num');
+        if (sticky) sticky.style.background = T.bg;
+        if (orb)   orb.style.background   = `radial-gradient(circle,${T.orb} 0%,transparent 70%)`;
+        if (orb2)  orb2.style.background  = `radial-gradient(circle,${T.orb2} 0%,transparent 70%)`;
+        if (bgNum) { bgNum.textContent = String(si + 1).padStart(2, '0'); bgNum.style.color = T.num; }
+        for (let i = 0; i < 4; i++) {
+            const tab = document.getElementById('arch-tab-' + i);
+            if (!tab) continue;
+            tab.style.color       = i === si ? ST_THEME[i].tab : '#9CA3AF';
+            tab.style.borderColor = i === si ? ST_THEME[i].tab : 'transparent';
+        }
+    }
+
+    function frame(p) {
+        const bar = document.getElementById('arch-progress-bar');
+        if (bar) bar.style.width = (p * 100).toFixed(2) + '%';
+
+        let maxVis = 0, dominant = 0;
+        _scenes.forEach((el, i) => {
+            const S   = SCENES[i];
+            const vis = easeOut(map01(p, S.enter, S.peak))
+                      * (1 - easeOut(map01(p, S.fade, S.exit)));
+            el.style.opacity       = vis;
+            el.style.pointerEvents = vis > 0.05 ? '' : 'none';
+            if (vis > maxVis) { maxVis = vis; dominant = i; }
+        });
+
+        applyTheme(dominant);
+
+        _elData.forEach(({ el, dir, elEnter, elFull, elFade, elExit }) => {
+            const inP  = easeOut(map01(p, elEnter, elFull));
+            const outP = 1 - easeOut(map01(p, elFade, elExit));
+            const vis  = inP * outP;
+            const slide = (1 - inP) * 56;
+            el.style.opacity   = vis;
+            el.style.transform = dir === 'l' ? `translateX(${-slide}px)` :
+                                 dir === 'r' ? `translateX(${slide}px)`  :
+                                              `translateY(${(1-inP)*36}px)`;
+        });
+    }
+
+    function archJumpTo(scene) {
+        const content = document.querySelector('.content');
+        const wrap    = document.getElementById('arch-story-wrap');
+        if (!content || !wrap) return;
+        const scrollable = Math.max(1, wrap.offsetHeight - content.clientHeight);
+        content.scrollTo({ top: wrap.offsetTop + (SCENES[scene].peak * scrollable), behavior: 'smooth' });
+    }
+
+    function archSkip() {
+        const content = document.querySelector('.content');
+        const wrap    = document.getElementById('arch-story-wrap');
+        if (!content || !wrap) return;
+        content.scrollTo({ top: wrap.offsetTop + wrap.offsetHeight, behavior: 'smooth' });
+    }
+
+    window.archJumpTo = archJumpTo;
+    window.archSkip   = archSkip;
+
+    function initArchStory() {
+        const content = document.querySelector('.content');
+        const wrap    = document.getElementById('arch-story-wrap');
+        if (!content || !wrap) return;
+
+        buildElData();
+
+        let _ticking = false, _p = 0;
+
+        function onScroll() {
+            const wrapTop    = wrap.offsetTop;
+            const scrollable = Math.max(1, wrap.offsetHeight - content.clientHeight);
+            _p = clamp((content.scrollTop - wrapTop) / scrollable, 0, 1);
+            if (!_ticking) {
+                _ticking = true;
+                requestAnimationFrame(() => { frame(_p); _ticking = false; });
+            }
+        }
+
+        content.addEventListener('scroll', onScroll, { passive: true });
+        frame(0);
+    }
+
+    document.addEventListener('DOMContentLoaded', initArchStory);
+})();
 </script>
+
+
 </body>
 </html>

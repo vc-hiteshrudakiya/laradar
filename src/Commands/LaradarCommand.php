@@ -3,12 +3,12 @@
 namespace Vcian\Laradar\Commands;
 
 use Illuminate\Console\Command;
-use Vcian\Laradar\ArchitectureDiscovery;
+use Vcian\Laradar\Laradar;
 use Vcian\Laradar\Services\ReportExporter;
 
-class DiscoverArchitectureCommand extends Command
+class LaradarCommand extends Command
 {
-    protected $signature = 'architecture:discover
+    protected $signature = 'laradar:scan
                             {--format= : Override output format — json, html, markdown, or svg}
                             {--output= : Custom output path (single-format runs only)}';
 
@@ -19,7 +19,7 @@ class DiscoverArchitectureCommand extends Command
         'Excellent' => 'green', 'Good' => 'cyan', 'Fair' => 'yellow', 'Needs Work' => 'red',
     ];
 
-    public function handle(ArchitectureDiscovery $discovery, ReportExporter $exporter): int
+    public function handle(Laradar $discovery, ReportExporter $exporter): int
     {
         // Resolve output formats — explicit flag overrides config
         $formatFlag = strtolower(trim($this->option('format') ?? ''));
@@ -47,7 +47,7 @@ class DiscoverArchitectureCommand extends Command
         $report  = $discovery->discover();
         $data    = $report->getReport();
         $summary = $data['summary'];
-        $score   = $data['score'];
+        $score   = $data['score'] ?? [];
 
         $this->line('  <fg=green>✓</> ' . str_pad('Models', 18) . '<fg=white;options=bold>' . $summary['models'] . '</>');
         $this->line('  <fg=green>✓</> ' . str_pad('Controllers', 18) . '<fg=white;options=bold>' . $summary['controllers'] . '</>');
@@ -59,11 +59,13 @@ class DiscoverArchitectureCommand extends Command
         $this->newLine();
 
         // Score line
-        $gradeColor = self::GRADE_COLORS[$score['grade'] ?? 'Needs Work'] ?? 'white';
+        $scoreVal   = $score['score'] ?? 0;
+        $scoreGrade = $score['grade'] ?? 'Needs Work';
+        $gradeColor = self::GRADE_COLORS[$scoreGrade] ?? 'white';
         $this->line(
             '  ' . str_pad('Architecture Score', 18) .
-            "<fg=white;options=bold>{$score['score']}</>/100  " .
-            "<fg={$gradeColor};options=bold>{$score['grade']}</>"
+            "<fg=white;options=bold>{$scoreVal}</>/100  " .
+            "<fg={$gradeColor};options=bold>{$scoreGrade}</>"
         );
         $this->newLine();
 

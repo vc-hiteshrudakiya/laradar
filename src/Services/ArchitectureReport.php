@@ -2,7 +2,7 @@
 
 namespace Vcian\Laradar\Services;
 
-use Vcian\Laradar\ArchitectureDiscovery;
+use Vcian\Laradar\Laradar;
 
 class ArchitectureReport
 {
@@ -67,7 +67,7 @@ class ArchitectureReport
     public function getReport(): array
     {
         return [
-            'package_version' => ArchitectureDiscovery::VERSION,
+            'package_version' => Laradar::VERSION,
             'laravel_version' => app()->version(),
             'php_version'     => PHP_VERSION,
             'generated_at'    => now()->toIso8601String(),
@@ -126,6 +126,7 @@ class ArchitectureReport
             'total'            => count($this->routes),
             'web'              => 0,
             'api'              => 0,
+            'by_group'         => [],
             'by_method'        => [],
             'middleware_usage' => [],
             'named_count'      => 0,
@@ -137,6 +138,10 @@ class ArchitectureReport
 
             if (in_array('web', $middlewares)) $summary['web']++;
             if (in_array('api', $middlewares)) $summary['api']++;
+
+            // Group by primary middleware (first entry, strip parameters e.g. throttle:60,1 → throttle)
+            $primary = !empty($middlewares) ? strtolower(explode(':', $middlewares[0])[0]) : 'none';
+            $summary['by_group'][$primary] = ($summary['by_group'][$primary] ?? 0) + 1;
 
             // Named routes
             if (!empty($route['name'])) {
@@ -165,6 +170,7 @@ class ArchitectureReport
 
         // Sort middleware by usage descending
         arsort($summary['middleware_usage']);
+        arsort($summary['by_group']);
 
         return $summary;
     }

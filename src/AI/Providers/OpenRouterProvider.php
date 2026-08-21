@@ -21,7 +21,7 @@ use RuntimeException;
 class OpenRouterProvider extends OpenAICompatibleProvider
 {
     private const API_BASE   = 'https://openrouter.ai/api/v1';
-    private const SITE_TITLE = 'Laravel Architecture Discovery';
+    private const SITE_TITLE = 'Laradar';
 
     protected function apiBase(): string { return self::API_BASE; }
     protected function name(): string    { return 'openrouter'; }

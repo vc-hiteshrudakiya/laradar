@@ -3,12 +3,12 @@
 namespace Vcian\Laradar\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Vcian\Laradar\ArchitectureDiscovery;
+use Vcian\Laradar\Laradar;
 use Vcian\Laradar\Services\ReportExporter;
 
 class ExportController extends Controller
 {
-    public function __invoke(ArchitectureDiscovery $discovery, ReportExporter $exporter, string $format)
+    public function __invoke(Laradar $discovery, ReportExporter $exporter, string $format)
     {
         $allowed = ['html', 'svg'];
 

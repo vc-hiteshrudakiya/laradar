@@ -1,9 +1,9 @@
 <?php
 
-namespace Hitesh\LaravelArchitectureDiscovery\Tests\Analyzers;
+namespace Vcian\Laradar\Tests\Analyzers;
 
-use Hitesh\LaravelArchitectureDiscovery\Analyzers\ModelAnalyzer;
-use Hitesh\LaravelArchitectureDiscovery\Tests\TestCase;
+use Vcian\Laradar\Analyzers\ModelAnalyzer;
+use Vcian\Laradar\Tests\TestCase;
 use Illuminate\Support\Facades\File;
 
 class ModelAnalyzerTest extends TestCase

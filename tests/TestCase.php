@@ -1,16 +1,16 @@
 <?php
 
-namespace Hitesh\LaravelArchitectureDiscovery\Tests;
+namespace Vcian\Laradar\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
-use Hitesh\LaravelArchitectureDiscovery\ArchitectureDiscoveryServiceProvider;
+use Vcian\Laradar\LaradarServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
 {
     protected function getPackageProviders($app): array
     {
         return [
-            ArchitectureDiscoveryServiceProvider::class,
+            LaradarServiceProvider::class,
         ];
     }
 }

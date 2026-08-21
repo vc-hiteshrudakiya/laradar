@@ -23,7 +23,6 @@ return [
         'models'       => true,
         'controllers'  => true,
         'routes'       => true,
-        'migrations'   => true,
         'dependencies' => true,
         'jobs'         => true,
         'events'       => true,
