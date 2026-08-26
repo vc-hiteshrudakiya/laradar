@@ -16,11 +16,8 @@ Automatically **discover, visualize, and document** your Laravel application arc
 
 ![Routes Explorer](art/routes.png)
 
-![Dependency Graph](art/dependency-graph.png)
-
-- Interactive dashboard with dependency graph, ER diagram, and route explorer
-- Exportable reports in **HTML**, **JSON**, and **Markdown**
-- Scans models, controllers, routes, jobs, events, services, repositories, observers, policies, modules, and packages
+- Interactive dashboard with architecture overview, flowchart, and route explorer
+- Scans models, controllers, routes, jobs, events, services, repositories, observers, policies, middleware, modules, and packages
 - Optional **AI-powered architecture review** (OpenAI, Anthropic, Gemini, Groq, Mistral, Ollama, OpenRouter)
 
 ---
@@ -50,20 +47,18 @@ php artisan vendor:publish --tag=laradar-config
 
 ## Interactive Dashboard
 
-Visit `/architecture` in your browser (only available when `APP_ENV=local` or `APP_ENV=development` by default):
+Visit `/laradar` in your browser (only available when `APP_ENV=local` or `APP_ENV=development` by default):
 
 ```
-http://your-app.test/architecture
+http://your-app.test/laradar
 ```
 
 The dashboard provides:
-- **Overview** — component counts, architecture score, and health checks
+- **Overview** — component counts, architecture score, health checks, and architecture flowchart
 - **Models** — relationships, fillable fields, table mappings
-- **Controllers** — methods, routes, dependency graph
+- **Controllers** — methods, route bindings, dependencies
 - **Routes** — full route list with methods, middleware, and controllers
-- **Dependency Graph** — interactive SVG graph showing class-level dependencies
-- **ER Diagram** — auto-generated entity-relationship diagram from Eloquent models
-- **Jobs / Events / Services / Repositories / Observers / Policies** — per-component explorer
+- **Jobs / Events / Services / Repositories / Observers / Policies / Middleware / Modules / Packages** — per-component explorer
 - **AI Insights** — AI-powered review of your architecture (requires AI config)
 
 ---
@@ -94,7 +89,7 @@ Reports are saved to `storage/architecture/`.
 return [
     'dashboard' => [
         'enabled'    => true,
-        'path'       => 'architecture',   // URL path
+        'path'       => 'laradar',         // URL path
         'middleware' => ['web'],
     ],
 
@@ -102,7 +97,6 @@ return [
         'models'       => true,
         'controllers'  => true,
         'routes'       => true,
-        'dependencies' => true,
         'jobs'         => true,
         'events'       => true,
         'services'     => true,
@@ -111,7 +105,6 @@ return [
         'policies'     => true,
         'modules'      => true,
         'packages'     => true,
-        'api_docs'     => true,
     ],
 
     // AI analysis (optional)
@@ -184,7 +177,8 @@ OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
 | **Repositories** | Repository classes in `App\Repositories` |
 | **Observers** | Observed models, event hooks |
 | **Policies** | Guarded models, defined abilities |
-| **Modules** | Laravel module detection (nwidart/laravel-modules compatible) |
+| **Middleware** | Registered middleware and aliases |
+| **Modules** | Module detection from `Modules/` directory |
 | **Packages** | Installed Composer packages with version info |
 
 ---

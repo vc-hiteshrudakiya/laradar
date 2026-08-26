@@ -26,13 +26,15 @@ class DependencyAnalyzer
                 if ($layer === 'other') continue;
 
                 $nodes[$name] = [
-                    'name'        => $name,
-                    'layer'       => $layer,
-                    'file'        => ltrim(str_replace(base_path(), '', $file), DIRECTORY_SEPARATOR),
-                    '_ctorDeps'   => $this->extractConstructorDeps($content),
-                    '_handleDeps' => $this->extractHandleDeps($content),
-                    '_usedModels' => $this->extractUsedClasses($content),
-                    '_methodDeps' => $this->extractMethodBodyDeps($content),
+                    'name'         => $name,
+                    'layer'        => $layer,
+                    'file'         => ltrim(str_replace(base_path(), '', $file), DIRECTORY_SEPARATOR),
+                    '_ctorDeps'    => $this->extractConstructorDeps($content),
+                    '_handleDeps'  => $this->extractHandleDeps($content),
+                    '_usedModels'  => $this->extractUsedClasses($content),
+                    '_methodDeps'  => $this->extractMethodBodyDeps($content),
+                    '_implements'  => $this->extractImplemented($content),
+                    '_useTraits'   => $this->extractUsedTraits($content),
                 ];
             } catch (\Throwable $e) {
                 $errors[] = ['file' => $file, 'message' => $e->getMessage()];
@@ -100,6 +102,20 @@ class DependencyAnalyzer
             if ($node['layer'] === 'model' && $hasModels) {
                 $this->addEdge($edgeSet, $name, 'Database', 'persists');
             }
+
+            // Class implements Interface → implements edge
+            foreach ($node['_implements'] as $iface) {
+                if (isset($nodes[$iface]) && $nodes[$iface]['layer'] === 'interface') {
+                    $this->addEdge($edgeSet, $name, $iface, 'implements');
+                }
+            }
+
+            // Class uses Trait → uses_trait edge
+            foreach ($node['_useTraits'] as $trait) {
+                if (isset($nodes[$trait]) && $nodes[$trait]['layer'] === 'trait') {
+                    $this->addEdge($edgeSet, $name, $trait, 'uses_trait');
+                }
+            }
         }
 
         // Strip internal fields before returning
@@ -109,6 +125,8 @@ class DependencyAnalyzer
                 $nodes[$name]['_handleDeps'],
                 $nodes[$name]['_usedModels'],
                 $nodes[$name]['_methodDeps'],
+                $nodes[$name]['_implements'],
+                $nodes[$name]['_useTraits'],
             );
         }
 
@@ -141,12 +159,16 @@ class DependencyAnalyzer
 
     private function className(string $content): ?string
     {
-        return preg_match('/\bclass\s+(\w+)/', $content, $m) ? $m[1] : null;
+        return preg_match('/\b(?:class|interface|trait)\s+(\w+)/', $content, $m) ? $m[1] : null;
     }
 
     private function detectLayer(string $name, string $file, string $content): string
     {
         $sep = DIRECTORY_SEPARATOR;
+
+        // Interfaces and traits — detect before class-name heuristics
+        if (preg_match('/\binterface\s+' . preg_quote($name, '/') . '\b/', $content)) return 'interface';
+        if (preg_match('/\btrait\s+' . preg_quote($name, '/') . '\b/', $content))     return 'trait';
 
         // Services & repositories — check first (most specific)
         if (str_ends_with($name, 'Service'))    return 'service';
@@ -218,6 +240,38 @@ class DependencyAnalyzer
         array_push($found, ...($m[1] ?? []));
 
         return array_unique(array_filter($found, fn($c) => !in_array($c, ['DB', 'Schema', 'Carbon', 'Str', 'Arr', 'Log', 'Cache', 'Config', 'Request', 'Response', 'Auth', 'Gate', 'Hash', 'Storage', 'Mail', 'Event', 'Queue', 'Redirect', 'Route', 'Session', 'Validator'])));
+    }
+
+    private function extractImplemented(string $content): array
+    {
+        // Match: class Foo implements Bar, Baz {
+        if (!preg_match('/\bimplements\s+([\w,\s\\\\]+?)(?:\s*\{|\s+extends)/s', $content, $m)) {
+            return [];
+        }
+        $parts = preg_split('/\s*,\s*/', trim($m[1]));
+        return array_values(array_filter(array_map(
+            fn($p) => class_basename(trim($p)),
+            $parts
+        )));
+    }
+
+    private function extractUsedTraits(string $content): array
+    {
+        // Find first { to locate class body
+        $classPos = strpos($content, '{');
+        if ($classPos === false) return [];
+        $body = substr($content, $classPos);
+
+        $traits = [];
+        if (preg_match('/\buse\s+([\w,\s\\\\]+?)\s*;/s', $body, $m)) {
+            foreach (preg_split('/\s*,\s*/', $m[1]) as $part) {
+                $part = trim($part);
+                if ($part !== '') {
+                    $traits[] = class_basename($part);
+                }
+            }
+        }
+        return $traits;
     }
 
     private function extractMethodBodyDeps(string $content): array

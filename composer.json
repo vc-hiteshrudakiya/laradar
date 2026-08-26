@@ -17,10 +17,7 @@
     ],
     "authors": [
         {
-            "name": "Hitesh Rudakiya",
-            "email": "hitesh.rudakiya@viitor.cloud",
-            "homepage": "https://viitorcloud.com",
-            "role": "Developer"
+            "name": "Vcian - ViitorCloud"
         }
     ],
     "homepage": "https://github.com/vcian/laradar",
