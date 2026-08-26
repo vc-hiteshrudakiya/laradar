@@ -116,6 +116,12 @@ class LaradarServiceProvider extends ServiceProvider
                 );
             }
 
+            // Dead code detector — opt-out default so it runs even on published configs
+            // that pre-date this key. Set dead_code => false in config to disable.
+            if ($scan['dead_code'] ?? true) {
+                $analyzers['dead_code'] = true;
+            }
+
             return new ArchitectureScanner($analyzers);
         });
 

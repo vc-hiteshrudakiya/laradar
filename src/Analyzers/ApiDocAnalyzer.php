@@ -52,7 +52,9 @@ class ApiDocAnalyzer
     {
         $uri = $route->uri();
         $mw  = $route->gatherMiddleware();
-        return str_starts_with($uri, 'api/') || str_starts_with($uri, 'api') || in_array('api', $mw);
+        // URI-based: starts with api/ or api (catches both api/users and api without trailing slash)
+        // Middleware-based: catches routes assigned the 'api' group without an /api/ prefix
+        return str_starts_with($uri, 'api') || in_array('api', $mw);
     }
 
     private function isVendorRoute(string $action): bool
@@ -84,10 +86,15 @@ class ApiDocAnalyzer
             ? $this->detectFormRequest($class, $method)
             : [null, []];
 
+        $openapi = ($class && $class !== 'Closure' && $method)
+            ? $this->detectOpenApiSummary($class, $method, $httpMethod)
+            : null;
+
         return [
             'method'        => $httpMethod,
             'uri'           => $uri,
             'name'          => $route->getName() ?? '',
+            'version'       => $this->extractVersion($uri),
             'group'         => $this->deriveGroup($uri),
             'controller'    => $class !== 'Closure' ? class_basename($class) : 'Closure',
             'action'        => $method ?? '',
@@ -97,7 +104,51 @@ class ApiDocAnalyzer
             'request_class' => $requestClass,
             'body_params'   => $bodyParams,
             'responses'     => $this->guessResponses($httpMethod),
+            'openapi'       => $openapi,
         ];
+    }
+
+    private function extractVersion(string $uri): ?string
+    {
+        $segments = array_values(array_filter(explode('/', ltrim($uri, '/'))));
+        // Skip leading 'api' segment
+        if (!empty($segments) && strtolower($segments[0]) === 'api') {
+            array_shift($segments);
+        }
+        if (!empty($segments) && preg_match('/^v(\d+)$/i', $segments[0], $m)) {
+            return 'v' . $m[1];
+        }
+        return null;
+    }
+
+    private function detectOpenApiSummary(string $class, string $method, string $httpMethod): ?array
+    {
+        $file = $this->classToFile($class);
+        if (!$file) return null;
+
+        $content = @file_get_contents($file);
+        if (!$content) return null;
+
+        // Match PHP 8 attribute: #[OA\Get(...summary: 'Foo'...)] or #[OAT\...]
+        $verb = ucfirst(strtolower($httpMethod));
+        if (preg_match(
+            '/#\[(?:OA|OpenApi)\\\\' . $verb . '\s*\([^)]*summary\s*:\s*[\'"]([^\'"]+)[\'"]/i',
+            $content,
+            $m
+        )) {
+            return ['verb' => $httpMethod, 'summary' => $m[1]];
+        }
+
+        // Match docblock @OA\Get annotation (swagger-php style)
+        if (preg_match(
+            '/@OA\\\\' . $verb . '\s*\([^)]*summary\s*=\s*[\'"]([^\'"]+)[\'"]/i',
+            $content,
+            $m
+        )) {
+            return ['verb' => $httpMethod, 'summary' => $m[1]];
+        }
+
+        return null;
     }
 
     private function deriveGroup(string $uri): string

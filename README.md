@@ -19,6 +19,7 @@ Automatically **discover, visualize, and document** your Laravel application arc
 ![Dependency Graph](art/dependency-graph.png)
 
 - Interactive dashboard with dependency graph, ER diagram, and route explorer
+- **Dead code detection** — finds debug statements, commented-out code, unused models, orphan methods, undispatched jobs, unfired events, and unused services
 - Exportable reports in **HTML**, **JSON**, and **Markdown**
 - Scans models, controllers, routes, jobs, events, services, repositories, observers, policies, modules, and packages
 - Optional **AI-powered architecture review** (OpenAI, Anthropic, Gemini, Groq, Mistral, Ollama, OpenRouter)
@@ -64,6 +65,7 @@ The dashboard provides:
 - **Dependency Graph** — interactive SVG graph showing class-level dependencies
 - **ER Diagram** — auto-generated entity-relationship diagram from Eloquent models
 - **Jobs / Events / Services / Repositories / Observers / Policies** — per-component explorer
+- **Dead Code** — 7 detection types: debug statements (`dd`, `dump`, `var_dump`), commented-out code blocks, unused models, orphan controller methods, undispatched jobs, unfired events, unused services — with severity levels (High / Medium / Low)
 - **AI Insights** — AI-powered review of your architecture (requires AI config)
 
 ---
@@ -112,6 +114,7 @@ return [
         'modules'      => true,
         'packages'     => true,
         'api_docs'     => true,
+        'dead_code'    => true,   // set false to disable dead code detection
     ],
 
     // AI analysis (optional)
@@ -186,6 +189,7 @@ OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
 | **Policies** | Guarded models, defined abilities |
 | **Modules** | Laravel module detection (nwidart/laravel-modules compatible) |
 | **Packages** | Installed Composer packages with version info |
+| **Dead Code** | Debug calls, commented-out code, unused models/jobs/events/services, orphan methods |
 
 ---
 

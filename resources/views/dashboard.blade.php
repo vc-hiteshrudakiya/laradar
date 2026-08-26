@@ -6,19 +6,20 @@
 <title>{{ $data['project']['name'] }} — Architecture Dashboard</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <style>
-/* ── Atlassian Light Theme CSS Variables ── */
+/* ── Laravel Theme CSS Variables ── */
 :root{
-  --bg:#F7F8F9; --bg-elevated:#FFFFFF; --bg-sunken:#F4F5F7; --bg-hover:#F4F5F7;
-  --border:#DFE1E6; --border-strong:#B3BAC5; --grid-line:transparent;
-  --text:#172B4D; --text-dim:#42526E; --text-faint:#6B778C;
-  --cyan:#0052CC; --cyan-bright:#4C9AFF; --emerald:#00875A; --amber:#FF8B00; --rose:#DE350B; --violet:#6554C0; --sky:#0065FF;
-  --shadow:0 4px 16px rgba(23,43,77,0.08),0 1px 3px rgba(23,43,77,0.06);
-  --shadow-hover:0 8px 32px rgba(23,43,77,0.12),0 2px 8px rgba(23,43,77,0.08);
-  --font-sans:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --bg:#FFFFFF; --bg-elevated:#FFFFFF; --bg-sunken:#F9F6EF; --bg-hover:#EEF2FF;
+  --border:#E5E7EB; --border-strong:#D1D5DB; --grid-line:transparent;
+  --text:#1D1D1F; --text-dim:#374151; --text-faint:#6B7280;
+  --cyan:#6366F1; --cyan-bright:#818CF8; --emerald:#16A34A; --amber:#D97706; --rose:#DC2626; --violet:#7C3AED; --sky:#2563EB;
+  --red:#6366F1; --red-dim:rgba(99,102,241,0.08); --red-border:rgba(99,102,241,0.25);
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
+  --shadow-hover:0 4px 24px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.08);
+  --font-sans:'Figtree',sans-serif; --font-mono:'JetBrains Mono',monospace;
   --ease:cubic-bezier(.22,.61,.36,1);
 }
 
@@ -37,7 +38,7 @@ body{
 .radar__ring{position:absolute;inset:0;border:1px solid var(--cyan);border-radius:50%;animation:radarPulse 2.4s var(--ease) infinite;}
 .radar__ring--delay{animation-delay:1.2s;}
 .radar__dot{position:absolute;inset:0;margin:auto;width:4px;height:4px;border-radius:50%;background:var(--cyan);}
-.radar__sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(0,82,204,0.45),transparent 40%);animation:radarSpin 2.2s linear infinite;}
+.radar__sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(99,102,241,0.45),transparent 40%);animation:radarSpin 2.2s linear infinite;}
 @keyframes radarPulse{0%{transform:scale(.5);opacity:.7;}100%{transform:scale(1.9);opacity:0;}}
 @keyframes radarSpin{to{transform:rotate(360deg);}}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -49,7 +50,7 @@ body{
 .sidebar{background:var(--bg-elevated);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:90;transition:transform .35s var(--ease);overflow-y:auto;}
 .sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
 .sidebar__brand{display:flex;align-items:center;gap:10px;padding:6px 8px 22px;}
-.sidebar__brand .mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(155deg,#0052CC,#4C9AFF);border:1px solid rgba(0,82,204,0.3);display:flex;align-items:center;justify-content:center;flex:none;}
+.sidebar__brand .mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(155deg,#6366F1,#818CF8);border:1px solid rgba(99,102,241,0.25);display:flex;align-items:center;justify-content:center;flex:none;}
 .sidebar__brand div{line-height:1.25;}
 .sidebar__brand strong{font-size:17px;letter-spacing:0.02em;color:var(--text);}
 .sidebar__brand span{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-faint);text-transform:uppercase;}
@@ -58,10 +59,11 @@ body{
 .nav-group__label{font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);padding:0 10px;margin-bottom:9px;display:block;}
 .nav-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:7px;margin-bottom:2px;color:var(--text-dim);font-size:13.5px;font-weight:600;position:relative;transition:background .2s,color .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left;}
 .nav-item svg{width:17px;height:17px;flex:none;stroke:currentColor;}
-.nav-item:hover{background:rgba(0,82,204,0.06);color:var(--cyan);}
-.nav-item.nav-active{background:rgba(0,82,204,0.08);color:var(--cyan);}
-.nav-item.nav-active::before{content:"";position:absolute;left:-16px;top:8px;bottom:8px;width:3px;background:var(--cyan);border-radius:2px;}
-.nav-badge{margin-left:auto;font-family:var(--font-mono);font-size:10px;background:rgba(0,82,204,0.08);color:var(--cyan);padding:2px 7px;border-radius:20px;border:1px solid rgba(0,82,204,0.2);}
+.nav-item:hover{background:rgba(99,102,241,0.04);color:var(--cyan);}
+.nav-item.nav-active{background:rgba(99,102,241,0.06);color:var(--cyan);box-shadow:inset 3px 0 0 var(--cyan),inset 4px 0 12px rgba(99,102,241,0.06);}
+#nav-indicator{position:fixed;left:0;width:3px;background:linear-gradient(180deg,transparent 0%,var(--cyan) 30%,var(--cyan) 70%,transparent 100%);border-radius:0 3px 3px 0;pointer-events:none;z-index:200;transition:top .38s cubic-bezier(.34,1.56,.64,1),height .22s var(--ease);box-shadow:1px 0 10px rgba(99,102,241,0.5),2px 0 4px rgba(99,102,241,0.2);}
+#nav-indicator::after{content:'';position:absolute;left:3px;top:50%;transform:translateY(-50%);width:6px;height:6px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px rgba(99,102,241,0.8);}
+.nav-badge{margin-left:auto;font-family:var(--font-mono);font-size:10px;background:rgba(0,0,0,0.05);color:var(--text-faint);padding:2px 7px;border-radius:20px;border:1px solid rgba(0,0,0,0.08);}
 .sidebar__scan{border-top:1px solid var(--border);padding-top:16px;display:flex;align-items:center;gap:10px;margin-top:auto;}
 .sidebar__scan div{line-height:1.3;}
 .sidebar__scan strong{font-size:12.5px;display:block;color:var(--text);}
@@ -89,14 +91,14 @@ body{
 .kpi-card__num{font-family:var(--font-mono);font-size:28px;letter-spacing:-0.01em;margin-top:4px;display:block;}
 
 /* ── Back Button ── */
-.back-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--cyan);background:rgba(0,82,204,0.06);border:1px solid rgba(0,82,204,0.22);border-radius:8px;padding:8px 14px;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);transition:background .18s,border-color .18s,transform .18s;}
-.back-btn:hover{background:rgba(0,82,204,0.12);border-color:rgba(0,82,204,0.4);transform:translateX(-2px);}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--cyan);background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.22);border-radius:8px;padding:8px 14px;cursor:pointer;margin-bottom:24px;font-family:var(--font-sans);transition:background .18s,border-color .18s,transform .18s;}
+.back-btn:hover{background:rgba(99,102,241,0.12);border-color:rgba(99,102,241,0.4);transform:translateX(-2px);}
 .back-btn svg{width:15px;height:15px;flex:none;transition:transform .18s;}
 .back-btn:hover svg{transform:translateX(-2px);}
 
 /* ── Controller Cards ── */
-.ctrl-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:22px;cursor:pointer;transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s;box-shadow:var(--shadow);}
-.ctrl-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:rgba(255,139,0,0.4);}
+.ctrl-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:22px;cursor:pointer;transition:box-shadow .25s var(--ease),border-color .25s;box-shadow:var(--shadow);}
+.ctrl-card:hover{box-shadow:var(--shadow-hover);border-color:rgba(255,139,0,0.4);}
 .ctrl-card__icon{width:38px;height:38px;border-radius:9px;background:rgba(255,139,0,0.10);color:var(--amber);display:flex;align-items:center;justify-content:center;flex:none;}
 .ctrl-card__icon svg{width:18px;height:18px;stroke:currentColor;fill:none;}
 .ctrl-card__name{font-family:var(--font-mono);font-size:15px;font-weight:600;color:var(--text);}
@@ -107,7 +109,7 @@ body{
 .ctrl-chip{font-family:var(--font-mono);font-size:10px;padding:3px 7px;border-radius:5px;background:var(--bg-sunken);color:var(--text-dim);border:1px solid var(--border);}
 
 /* ── Method Badges ── */
-.method-get{background:rgba(0,82,204,0.10)!important;color:var(--cyan)!important;}
+.method-get{background:rgba(37,99,235,0.10)!important;color:var(--sky)!important;}
 .method-post{background:rgba(0,135,90,0.10)!important;color:var(--emerald)!important;}
 .method-put,.method-patch{background:rgba(101,84,192,0.10)!important;color:var(--violet)!important;}
 .method-delete{background:rgba(222,53,11,0.10)!important;color:var(--rose)!important;}
@@ -115,7 +117,7 @@ body{
 
 /* ── Grade Badges ── */
 .grade-a{background:rgba(0,135,90,0.10);color:var(--emerald);border:1px solid rgba(0,135,90,0.25);}
-.grade-b{background:rgba(0,82,204,0.10);color:var(--cyan);border:1px solid rgba(0,82,204,0.25);}
+.grade-b{background:rgba(37,99,235,0.10);color:var(--sky);border:1px solid rgba(37,99,235,0.25);}
 .grade-c{background:rgba(255,139,0,0.10);color:var(--amber);border:1px solid rgba(255,139,0,0.25);}
 .grade-d{background:rgba(255,139,0,0.12);color:#c05c00;border:1px solid rgba(255,139,0,0.3);}
 .grade-f{background:rgba(222,53,11,0.10);color:var(--rose);border:1px solid rgba(222,53,11,0.25);}
@@ -149,30 +151,38 @@ input[type="search"]::placeholder,input[type="text"]::placeholder{color:var(--te
 select option{background:#FFFFFF;color:var(--text);}
 
 /* ── Table rows ── */
-tr.route-row:hover{background:rgba(0,82,204,0.04)!important;}
+tr.route-row:hover{background:rgba(99,102,241,0.04)!important;}
 thead tr{background:var(--bg-sunken)!important;}
 
 /* ── Buttons ── */
-.atlas-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;font-family:var(--font-mono);font-size:12px;font-weight:600;border:1px solid var(--border);background:#FFFFFF;color:var(--text-dim);cursor:pointer;transition:border-color .2s,color .2s,background .2s,box-shadow .2s;}
+.atlas-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;font-family:var(--font-mono);font-size:12px;font-weight:600;border:1px solid var(--border);background:#FFFFFF;color:var(--text-dim);cursor:pointer;transition:border-color .2s,color .2s,background .2s,box-shadow .2s,transform .1s;}
 .atlas-btn:hover{border-color:var(--border-strong);color:var(--text);box-shadow:var(--shadow);}
-.atlas-btn--cyan{border-color:rgba(0,82,204,0.4);color:var(--cyan);background:rgba(0,82,204,0.06);}
-.atlas-btn--cyan:hover{border-color:var(--cyan);background:rgba(0,82,204,0.10);}
+.atlas-btn:active{transform:scale(0.96);}
+.atlas-btn--cyan{border-color:rgba(99,102,241,0.35);color:var(--cyan);background:rgba(99,102,241,0.06);}
+.atlas-btn--cyan:hover{border-color:var(--cyan);background:rgba(99,102,241,0.10);}
 
 /* ── Score bar ── */
 .atlas-score-bar{height:4px;border-radius:2px;background:var(--bg-sunken);overflow:hidden;}
-.atlas-score-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--emerald));}
+.atlas-score-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#6366F1,#818CF8);}
 
 /* ── Section headings ── */
 .sec-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.01em;}
 .sec-sub{font-size:13px;color:var(--text-faint);font-family:var(--font-mono);margin-top:4px;}
+
+/* ── Shared Section Header ── */
+.sec-header{display:flex;align-items:center;gap:14px;padding-left:16px;border-left:3px solid var(--cyan);margin-bottom:24px;}
+.sec-header__icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;}
+.sec-header__icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.sec-header__title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.01em;margin:0;}
+.sec-header__sub{font-size:13px;color:var(--text-faint);font-family:var(--font-mono);margin-top:3px;}
 
 /* ── Relation graph canvas ── */
 #rg-canvas{background:var(--bg-sunken)!important;}
 .relative.rounded-2xl.border{background:var(--bg-elevated)!important;border-color:var(--border)!important;}
 
 /* ── Tailwind color overrides for JS-rendered detail panels ── */
-.bg-indigo-50{background:rgba(79,70,229,0.12)!important;}
-.bg-indigo-100{background:rgba(79,70,229,0.18)!important;}
+.bg-indigo-50{background:rgba(99,102,241,0.06)!important;}
+.bg-indigo-100{background:rgba(99,102,241,0.10)!important;}
 .bg-blue-50{background:rgba(59,130,246,0.12)!important;}
 .bg-blue-100{background:rgba(59,130,246,0.18)!important;}
 .bg-green-50{background:rgba(34,197,94,0.12)!important;}
@@ -192,7 +202,7 @@ thead tr{background:var(--bg-sunken)!important;}
 .bg-sky-50{background:rgba(14,165,233,0.12)!important;}
 
 /* color overrides for text on these light backgrounds */
-.text-indigo-600,.text-indigo-700{color:#818cf8!important;}
+.text-indigo-600,.text-indigo-700{color:#6366F1!important;}
 .text-blue-600,.text-blue-700{color:var(--sky)!important;}
 .text-green-600,.text-green-700{color:var(--emerald)!important;}
 .text-teal-600,.text-teal-700{color:#2dd4bf!important;}
@@ -208,7 +218,7 @@ thead tr{background:var(--bg-sunken)!important;}
 .text-red-800,.text-red-900{color:var(--rose)!important;}
 
 /* border color overrides */
-.border-indigo-200{border-color:rgba(79,70,229,0.3)!important;}
+.border-indigo-200{border-color:rgba(99,102,241,0.25)!important;}
 .border-blue-200{border-color:rgba(59,130,246,0.3)!important;}
 .border-green-200{border-color:rgba(34,197,94,0.3)!important;}
 .border-amber-200{border-color:rgba(245,158,11,0.3)!important;}
@@ -221,11 +231,68 @@ thead tr{background:var(--bg-sunken)!important;}
 /* hover state overrides */
 .hover\:bg-slate-50:hover{background:var(--bg-hover)!important;}
 .hover\:bg-slate-100:hover{background:var(--bg-hover)!important;}
-.hover\:bg-indigo-50:hover{background:rgba(79,70,229,0.18)!important;}
-.hover\:bg-indigo-100:hover{background:rgba(79,70,229,0.25)!important;}
+.hover\:bg-indigo-50:hover{background:rgba(99,102,241,0.08)!important;}
+.hover\:bg-indigo-100:hover{background:rgba(99,102,241,0.12)!important;}
 
 /* focused ring overrides (Tailwind focus:ring) */
-.focus\:ring-indigo-300:focus{--tw-ring-color:rgba(0,82,204,0.4);}
+.focus\:ring-indigo-300:focus{--tw-ring-color:rgba(99,102,241,0.35);}
+
+/* ── Tailwind layout/spacing utility shims (for JS-rendered HTML) ── */
+.flex{display:flex!important;}.inline-flex{display:inline-flex!important;}
+.grid{display:grid!important;}.grid-cols-1{grid-template-columns:1fr!important;}
+.flex-wrap{flex-wrap:wrap!important;}
+.items-center{align-items:center!important;}.items-start{align-items:flex-start!important;}
+.justify-center{justify-content:center!important;}.justify-start{justify-content:flex-start!important;}.justify-end{justify-content:flex-end!important;}
+.gap-1{gap:4px!important;}.gap-2{gap:8px!important;}.gap-2\.5{gap:10px!important;}.gap-3{gap:12px!important;}.gap-4{gap:16px!important;}
+.shrink-0{flex-shrink:0!important;}.min-w-0{min-width:0!important;}
+.text-xs{font-size:11px!important;}.text-sm{font-size:13px!important;}.text-base{font-size:15px!important;}.text-lg{font-size:17px!important;}
+.font-medium{font-weight:500!important;}.font-semibold{font-weight:600!important;}.font-bold{font-weight:700!important;}
+.leading-relaxed{line-height:1.6!important;}.uppercase{text-transform:uppercase!important;}.tracking-wide{letter-spacing:.05em!important;}
+.italic{font-style:italic!important;}.list-disc{list-style-type:disc!important;}
+.p-3{padding:12px!important;}.p-5{padding:20px!important;}
+.px-1\.5{padding-left:6px!important;padding-right:6px!important;}.px-2{padding-left:8px!important;padding-right:8px!important;}
+.px-4{padding-left:16px!important;padding-right:16px!important;}.px-5{padding-left:20px!important;padding-right:20px!important;}
+.py-0\.5{padding-top:2px!important;padding-bottom:2px!important;}.py-1\.5{padding-top:6px!important;padding-bottom:6px!important;}
+.py-2\.5{padding-top:10px!important;padding-bottom:10px!important;}.py-3{padding-top:12px!important;padding-bottom:12px!important;}
+.py-4{padding-top:16px!important;padding-bottom:16px!important;}
+.mt-0\.5{margin-top:2px!important;}.mt-1{margin-top:4px!important;}.mt-2{margin-top:8px!important;}.mt-3{margin-top:12px!important;}
+.mb-1{margin-bottom:4px!important;}.mb-2{margin-bottom:8px!important;}.mb-4{margin-bottom:16px!important;}.mb-6{margin-bottom:24px!important;}
+.ml-2{margin-left:8px!important;}.ml-4{margin-left:16px!important;}.pt-2{padding-top:8px!important;}
+.w-4{width:16px!important;}.w-7{width:28px!important;}.w-8{width:32px!important;}.w-full{width:100%!important;}
+.h-4{height:16px!important;}.h-7{height:28px!important;}.h-8{height:32px!important;}.h-fit{height:fit-content!important;}
+.max-w-\[80\%\]{max-width:80%!important;}
+.rounded{border-radius:4px!important;}.rounded-lg{border-radius:8px!important;}.rounded-xl{border-radius:12px!important;}
+.rounded-2xl{border-radius:16px!important;}.rounded-full{border-radius:9999px!important;}
+.rounded-tl-sm{border-top-left-radius:2px!important;}.rounded-tr-sm{border-top-right-radius:2px!important;}
+.border{border:1px solid var(--border)!important;}.border-t{border-top:1px solid var(--border)!important;}
+.border-b{border-bottom:1px solid var(--border)!important;}.last\:border-0:last-child{border:0!important;}
+.border-purple-100{border-color:rgba(168,85,247,.2)!important;}.border-emerald-100{border-color:rgba(16,185,129,.2)!important;}
+.border-violet-100{border-color:rgba(139,92,246,.2)!important;}.border-red-100{border-color:rgba(239,68,68,.2)!important;}
+.border-amber-100{border-color:rgba(245,158,11,.2)!important;}.border-blue-100{border-color:rgba(59,130,246,.2)!important;}
+.border-slate-50{border-color:rgba(148,163,184,.1)!important;}
+.bg-indigo-600{background:#4f46e5!important;}.bg-purple-200{background:rgba(168,85,247,.35)!important;}
+.bg-emerald-200{background:rgba(16,185,129,.35)!important;}.bg-violet-200{background:rgba(139,92,246,.35)!important;}
+.text-white{color:#fff!important;}.text-slate-700{color:#334155!important;}
+.text-green-300{color:#86efac!important;}.text-green-500{color:#22c55e!important;}
+.text-emerald-500{color:var(--emerald)!important;}.text-violet-500{color:var(--violet)!important;}
+.text-purple-700{color:var(--violet)!important;}.text-emerald-700{color:var(--emerald)!important;}
+.flex-col{flex-direction:column!important;}.text-center{text-align:center!important;}.text-left{text-align:left!important;}
+.inline-block{display:inline-block!important;}.block{display:block!important;}
+.mt-1\.5{margin-top:6px!important;}.leading-tight{line-height:1.25!important;}
+.text-xl{font-size:19px!important;}.font-mono{font-family:var(--font-mono)!important;}
+.py-1{padding-top:4px!important;padding-bottom:4px!important;}
+.text-blue-500{color:var(--sky)!important;}
+.border-green-200{border-color:rgba(0,135,90,.25)!important;}
+/* border-color overrides after .border so they win the cascade */
+.border-amber-200{border-color:rgba(245,158,11,0.3)!important;}.border-red-200{border-color:rgba(239,68,68,0.3)!important;}
+.border-indigo-200{border-color:rgba(99,102,241,0.25)!important;}.border-blue-200{border-color:rgba(59,130,246,0.3)!important;}
+.border-orange-200{border-color:rgba(251,146,60,0.3)!important;}.border-purple-200{border-color:rgba(168,85,247,0.3)!important;}
+.border-emerald-200{border-color:rgba(52,211,153,0.3)!important;}.border-violet-200{border-color:rgba(139,92,246,0.3)!important;}
+@media(min-width:640px){.sm\:grid-cols-2{grid-template-columns:repeat(2,1fr)!important;}}
+@media(min-width:768px){.md\:grid-cols-3{grid-template-columns:repeat(3,1fr)!important;}}
+.overflow-hidden{overflow:hidden!important;}.overflow-x-auto{overflow-x:auto!important;}
+.transition-colors{transition:background .15s,color .15s,border-color .15s!important;}
+.shadow-sm{box-shadow:0 1px 3px rgba(0,0,0,.06)!important;}
 
 /* rounded bg code elements */
 code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:.9em;}
@@ -241,8 +308,8 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .mds-view-btn.active{background:var(--bg-elevated);color:var(--text);border:1px solid var(--border);box-shadow:var(--shadow);}
 /* Card grid */
 .mds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;}
-.mds-card{border-radius:16px;border:1px solid var(--border);background:var(--bg-elevated);cursor:pointer;overflow:hidden;transition:transform .25s var(--ease),border-color .25s,box-shadow .25s;position:relative;box-shadow:var(--shadow);}
-.mds-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--border-strong);}
+.mds-card{border-radius:16px;border:1px solid var(--border);background:var(--bg-elevated);cursor:pointer;overflow:hidden;transition:border-color .25s,box-shadow .25s;position:relative;box-shadow:var(--shadow);}
+.mds-card:hover{box-shadow:var(--shadow-hover);border-color:var(--border-strong);}
 .mds-card-glow{position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0;}
 .mds-card-head{padding:20px 20px 14px;display:flex;align-items:flex-start;gap:14px;}
 .mds-card-av{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;flex:none;border:1px solid;}
@@ -258,7 +325,7 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .mds-card-stat-num{font-size:18px;font-weight:800;font-family:var(--font-sans);line-height:1;}
 .mds-card-stat-lbl{font-size:9.5px;font-family:var(--font-mono);color:var(--text-faint);margin-top:3px;text-transform:uppercase;letter-spacing:.06em;}
 .mds-rel-bar{height:4px;border-radius:4px;display:flex;gap:1px;overflow:hidden;margin-bottom:10px;}
-.mds-rel-seg{border-radius:4px;transition:flex .3s;}
+.mds-rel-seg{border-radius:4px;transition:flex .6s ease-out;}
 .mds-rel-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
 .mds-rel-dot{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:var(--font-mono);color:var(--text-faint);}
 .mds-rel-dot i{width:6px;height:6px;border-radius:50%;display:inline-block;flex:none;}
@@ -280,7 +347,7 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .mds-side-ns{font-size:10.5px;font-family:var(--font-mono);color:var(--text-faint);opacity:.65;word-break:break-all;line-height:1.5;}
 .mds-side-stats{padding:14px 22px;border-bottom:1px solid var(--border);}
 .mds-side-stat{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .15s;}
-.mds-side-stat:hover{background:rgba(0,82,204,.05);}
+.mds-side-stat:hover{background:rgba(99,102,241,.04);}
 .mds-side-stat-lbl{font-size:13px;color:var(--text-dim);}
 .mds-side-stat-val{font-size:15px;font-weight:800;font-family:var(--font-mono);}
 .mds-side-meta{padding:16px 22px;display:flex;flex-direction:column;gap:7px;}
@@ -298,10 +365,10 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .mds-schema-tbl th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);font-family:var(--font-mono);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg-sunken);}
 .mds-schema-tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .mds-schema-tbl tr:last-child td{border-bottom:none;}
-.mds-schema-tbl tr:hover td{background:rgba(0,82,204,.03);}
+.mds-schema-tbl tr:hover td{background:rgba(99,102,241,.02);}
 .mds-field-name{font-family:var(--font-mono);font-weight:600;font-size:13px;color:var(--text);}
 .mds-fbadge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);border:1px solid;margin-right:4px;white-space:nowrap;display:inline-block;}
-.mds-fbadge.fill{background:rgba(0,82,204,.08);color:var(--cyan);border-color:rgba(0,82,204,.2);}
+.mds-fbadge.fill{background:rgba(99,102,241,.08);color:var(--cyan);border-color:rgba(99,102,241,.2);}
 .mds-fbadge.hide{background:rgba(222,53,11,.08);color:var(--rose);border-color:rgba(222,53,11,.2);}
 .mds-cast-val{font-family:var(--font-mono);font-size:11px;color:var(--amber);}
 /* Relationship cards */
@@ -314,7 +381,7 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .mds-nav-btn{font-size:11px;padding:5px 12px;border-radius:7px;border:1px solid;cursor:pointer;font-family:var(--font-sans);white-space:nowrap;transition:all .2s;flex:none;}
 /* Used by */
 .mds-usedby-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;gap:14px;transition:border-color .2s,box-shadow .2s;box-shadow:var(--shadow);}
-.mds-usedby-card:hover{border-color:rgba(0,82,204,.3);box-shadow:var(--shadow-hover);}
+.mds-usedby-card:hover{border-color:rgba(99,102,241,.25);box-shadow:var(--shadow-hover);}
 .mds-flag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
 .mds-flag{font-size:11px;padding:5px 13px;border-radius:7px;font-family:var(--font-mono);font-weight:600;border:1px solid;}
 
@@ -326,17 +393,144 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .ov-panel-body{padding:20px 22px;}
 .ov-diag-shell{overflow-x:auto;border-radius:10px;background:var(--bg-sunken);border:1px solid var(--border);}
 .ov-arch-node rect{transition:filter .3s;}
-.ov-arch-node:hover rect{filter:drop-shadow(0 0 10px rgba(0,82,204,.4));}
+.ov-arch-node:hover rect{filter:drop-shadow(0 0 10px rgba(99,102,241,.35));}
 .ov-btn-icon{width:34px;height:34px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;background:var(--bg-sunken);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:all .25s;flex-shrink:0;font-size:16px;line-height:1;}
-.ov-btn-icon:hover{background:rgba(0,82,204,.08);border-color:rgba(0,82,204,.3);color:var(--cyan);}
+.ov-btn-icon:hover{background:rgba(99,102,241,.06);border-color:rgba(99,102,241,.25);color:var(--cyan);}
 .ov-reveal{opacity:0;transform:translateY(14px);transition:opacity .55s var(--ease),transform .55s var(--ease);}
 .ov-reveal.ov-in{opacity:1;transform:none;}
-@keyframes secIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.sec-fade{animation:secIn .38s var(--ease) both;}
+@keyframes secIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes secOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-10px) scale(0.98)}}
+.sec-fade{animation:secIn .30s cubic-bezier(.22,1,.36,1) both;}
+.sec-out{animation:secOut .18s ease-in both;pointer-events:none;}
+
+@property --rg-angle{syntax:'<angle>';inherits:false;initial-value:0deg;}
+@keyframes borderSpin{to{--rg-angle:360deg;}}
+.score-spin-border{border:2px solid transparent;background:var(--bg-hover) padding-box,conic-gradient(from var(--rg-angle),#6366F1,#818CF8,#C7D2FE,#818CF8,#6366F1) border-box;animation:borderSpin 3s linear infinite;}
+@keyframes hcIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
+@keyframes pkgBadgePulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.pkg-ver-badge{animation:pkgBadgePulse 2s ease-in-out infinite;}
+@keyframes pkgCardIn{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+.pkg-card{animation:pkgCardIn .38s var(--ease,cubic-bezier(.4,0,.2,1)) both;animation-delay:calc(var(--pkg-i,0)*60ms);}
+.pkg-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.1);}
+.pkg-docs-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid;cursor:pointer;text-decoration:none;transition:background .15s,opacity .15s;}
+.pkg-copy-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text-dim);cursor:pointer;font-family:var(--font-mono);transition:background .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
+.pkg-copy-btn:hover{background:var(--border);}
+.pkg-stat-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;}
+.pkg-cat-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;margin-bottom:14px;border-left:4px solid;}
+.hc-row{opacity:0;}
+.ov-in .hc-row{animation:hcIn .32s var(--ease) both;animation-delay:calc(var(--hc-i,0) * 80ms);}
+/* ── Controller Flow Diagram ── */
+@keyframes cfNodeIn{from{opacity:0;transform:scale(0.82) translateY(12px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.cf-node{animation:cfNodeIn 0.45s cubic-bezier(.34,1.56,.64,1) both;}
+/* ── Phase 4: AI / Chat / Export ── */
+@keyframes aiPulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,0.45);}50%{box-shadow:0 0 0 8px rgba(99,102,241,0);}}
+@keyframes aiSpin{to{transform:rotate(360deg);}}
+@keyframes typeCursor{0%,100%{opacity:1;}50%{opacity:0;}}
+@keyframes exportCardIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+@keyframes chatBounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-5px);}}
+@keyframes chatBubbleIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+@keyframes deadCardIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+@keyframes severityPulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+@keyframes checkDraw{from{stroke-dashoffset:100;}to{stroke-dashoffset:0;}}
+@keyframes modalScaleIn{from{opacity:0;transform:scale(.93) translateY(16px);}to{opacity:1;transform:none;}}
+@keyframes modalBdIn{from{opacity:0;backdrop-filter:blur(0px);}to{opacity:1;backdrop-filter:blur(4px);}}
+@keyframes modalScaleOut{from{opacity:1;transform:none;}to{opacity:0;transform:scale(.95) translateY(8px);}}
+@keyframes deadStatIn{from{opacity:0;transform:translateY(10px) scale(.96);}to{opacity:1;transform:none;}}
+@keyframes shimmerSweep{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+@keyframes tabPop{0%{transform:scale(1);}40%{transform:scale(0.93);}100%{transform:scale(1);}}
+.ai-analyze-btn{display:inline-flex;align-items:center;gap:10px;padding:12px 24px;background:var(--cyan);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:var(--font-mono);transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 4px 16px rgba(99,102,241,0.35);}
+.ai-analyze-btn:hover{background:#DC1F13;transform:translateY(-1px);box-shadow:0 6px 24px rgba(99,102,241,0.5);}
+.ai-analyze-btn:disabled{background:var(--border-strong);box-shadow:none;cursor:not-allowed;transform:none;color:var(--text-faint);}
+.ai-analyze-btn:not(:disabled):hover{animation:aiPulseGlow 1.5s ease infinite;}
+.ai-analyze-btn:not(:disabled):active{transform:translateY(1px) scale(0.97)!important;}
+.chat-send-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--cyan);border:none;border-radius:9px;color:#fff;cursor:pointer;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 2px 8px rgba(99,102,241,0.3);flex:none;}
+.chat-send-btn:hover{background:#DC1F13;transform:scale(1.08);box-shadow:0 4px 14px rgba(99,102,241,0.5);}
+.chat-send-btn:disabled{background:var(--border);box-shadow:none;cursor:not-allowed;transform:none;}
+.chat-suggestion-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;color:var(--text-dim);cursor:pointer;transition:background .15s,border-color .15s,color .15s;font-family:var(--font-sans);}
+.chat-suggestion-chip:hover{background:rgba(99,102,241,.06);border-color:rgba(99,102,241,.3);color:var(--cyan);}
+.export-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;animation:exportCardIn .4s var(--ease) both;animation-delay:calc(var(--ei,0)*80ms);transition:border-color .2s,box-shadow .2s;}
+.export-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-hover);}
+/* ── Dead Code legacy (keep for is-hiding transition) ── */
+.dead-item{background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;transition:border-color .2s,box-shadow .2s,opacity .22s,transform .22s;}
+.dead-item:hover{border-color:var(--border-strong);box-shadow:var(--shadow-hover);}
+.dead-item.is-hiding{opacity:0;transform:scale(0.95) translateY(-4px);pointer-events:none;}
+
+/* ── Dead Code — dc-* ── */
+.dc-sev-bar{height:6px;border-radius:3px;overflow:hidden;display:flex;gap:2px;margin-top:8px;width:100%;}
+.dc-sev-bar__seg{height:100%;border-radius:3px;}
+/* Type grid */
+.dc-type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
+.dc-type-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s,background .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:var(--shadow);}
+.dc-type-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);border-color:var(--border-strong);}
+.dc-type-card:active{transform:scale(0.96);}
+.dc-type-card .tc-emoji{font-size:22px;line-height:1;}
+.dc-type-card .tc-label{font-size:11.5px;font-weight:600;color:var(--text-dim);}
+.dc-type-card .tc-count{font-family:var(--font-mono);font-size:20px;font-weight:800;color:var(--text);line-height:1;}
+.dc-type-card.dc-type-active{border-color:var(--cyan);background:rgba(99,102,241,0.06);box-shadow:0 0 0 2px rgba(99,102,241,0.15),var(--shadow);}
+.dc-type-card.dc-type-active .tc-label{color:var(--cyan);}
+.dc-type-card.dc-type-active .tc-count{color:var(--cyan);}
+.dc-type-card.dc-type-zero{opacity:.5;}
+.dc-type-card.dc-type-zero:hover{opacity:1;}
+/* Severity filter row */
+.dc-filter-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.dc-sev-tab{padding:7px 16px;border-radius:20px;font-size:12.5px;font-weight:600;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text-dim);cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .1s;display:inline-flex;align-items:center;gap:5px;}
+.dc-sev-tab:hover{background:var(--bg-hover);border-color:var(--border-strong);}
+.dc-sev-tab:active{animation:tabPop .2s var(--ease);}
+.dc-sev-tab--active{background:rgba(99,102,241,0.08);border-color:rgba(99,102,241,0.35);color:var(--cyan);box-shadow:0 2px 8px rgba(99,102,241,0.12);}
+.dc-sev-tab--high.dc-sev-tab--active{background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.35);color:#DC2626;box-shadow:0 2px 8px rgba(220,38,38,0.12);}
+.dc-sev-tab--medium.dc-sev-tab--active{background:rgba(217,119,6,0.10);border-color:rgba(217,119,6,0.4);color:#D97706;box-shadow:0 2px 8px rgba(217,119,6,0.12);}
+.dc-sev-tab--low.dc-sev-tab--active{background:rgba(37,99,235,0.08);border-color:rgba(37,99,235,0.3);color:var(--sky);box-shadow:0 2px 8px rgba(37,99,235,0.10);}
+/* Item cards */
+.dc-item{display:flex;background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s,box-shadow .2s,opacity .22s,transform .22s;animation:deadCardIn .35s var(--ease) both;animation-delay:calc(var(--di,0)*30ms);}
+.dc-item:hover{border-color:var(--border-strong);box-shadow:var(--shadow-hover);}
+.dc-item.is-hiding{opacity:0;transform:scale(0.96) translateY(-4px);pointer-events:none;}
+.dc-item__accent{width:4px;flex:none;}
+.dc-item__body{flex:1;padding:14px 16px;min-width:0;}
+.dc-item__head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.dc-item__badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.dc-item__name{font-family:var(--font-mono);font-size:14px;font-weight:800;color:var(--text);margin-bottom:4px;word-break:break-all;}
+.dc-item__loc{display:flex;align-items:center;gap:5px;margin-bottom:5px;}
+.dc-item__loc svg{width:11px;height:11px;flex:none;color:var(--text-faint);}
+.dc-item__loc span{font-family:var(--font-mono);font-size:11px;color:var(--cyan);word-break:break-all;}
+.dc-item__detail{font-size:12px;color:var(--text-faint);margin-bottom:6px;}
+.dc-item__snippet{margin:0;background:var(--bg-sunken);border:1px solid var(--border);border-left:3px solid;border-radius:0 6px 6px 0;padding:8px 12px;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:80px;overflow-y:auto;}
+.dc-copy-btn{flex:none;display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg-sunken);color:var(--text-faint);font-size:10.5px;font-family:var(--font-mono);cursor:pointer;transition:background .15s,color .15s,border-color .15s;white-space:nowrap;}
+.dc-copy-btn:hover{background:rgba(99,102,241,0.06);border-color:rgba(99,102,241,0.25);color:var(--cyan);}
+.dc-copy-btn.copied{background:rgba(16,185,129,0.10);border-color:rgba(16,185,129,0.4);color:#10B981;}
+@keyframes dcTypeIn{from{opacity:0;transform:scale(0.92) translateY(8px);}to{opacity:1;transform:none;}}
+.ai-score-ring{transform:rotate(-90deg);transform-origin:50% 50%;}
+.type-cursor::after{content:'|';animation:typeCursor .7s step-end infinite;color:var(--cyan);}
+/* ── Phase 3: Controllers / Repositories / Routes ── */
+@keyframes ctrlCardIn{from{opacity:0;transform:translateX(-18px);}to{opacity:1;transform:none;}}
+.ctrl-card{animation:ctrlCardIn .38s var(--ease) both;animation-delay:calc(var(--ci,0)*55ms);}
+.ctrl-complexity-track{height:4px;background:var(--bg-sunken);border-radius:2px;overflow:hidden;margin-top:10px;}
+.ctrl-complexity-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--amber),#fb923c);transition:width .8s cubic-bezier(.4,0,.2,1);}
+@keyframes routeRowIn{from{opacity:0;transform:translateX(-12px);}to{opacity:1;transform:none;}}
+.route-row-anim{animation:routeRowIn .3s var(--ease) both;animation-delay:calc(var(--ri,0)*18ms);}
+.method-dist-bar{display:flex;height:10px;border-radius:6px;overflow:hidden;gap:1px;margin-bottom:20px;}
+.method-dist-seg{height:100%;transition:opacity .2s;cursor:pointer;}
+.method-dist-seg:hover{opacity:.75;}
+@keyframes repoCardIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+.repo-card{animation:repoCardIn .38s var(--ease) both;animation-delay:calc(var(--ci,0)*55ms);}
+.repo-dep-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);opacity:.7;}
+/* ── Phase 2: Section card shared styles ── */
+.sec-stats-banner{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:24px;}
+.sec-stat-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);}
+.sec-stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none;}
+.sec-stat-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;}
+.sec-stat-num{font-size:22px;font-weight:800;line-height:1;color:var(--text);}
+.sec-stat-lbl{font-size:11px;color:var(--text-faint);margin-top:2px;font-family:var(--font-mono);}
+.sec2-card{background:var(--bg-elevated);border:1px solid var(--border);border-left-width:3px;border-radius:0 12px 12px 0;padding:18px;cursor:pointer;transition:box-shadow .2s,border-color .2s,transform .2s;box-shadow:var(--shadow);animation:pkgCardIn .38s var(--ease) both;animation-delay:calc(var(--ci,0)*55ms);}
+.sec2-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);}
+.sec2-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none;}
+.sec2-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;}
+.sec2-name{font-weight:700;font-size:14px;color:var(--text);margin:0 0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sec2-sub{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sec2-chip{font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid;}
 @keyframes backBtnIn{from{opacity:0;transform:translateX(-14px) scale(.94);}to{opacity:1;transform:none;}}
-@keyframes backBtnPulse{0%{box-shadow:0 0 0 0 rgba(0,101,255,0.45);}60%{box-shadow:0 0 0 7px rgba(0,101,255,0);}100%{box-shadow:0 0 0 0 rgba(0,101,255,0);}}
-.topbar-back-btn{display:none;align-items:center;gap:8px;background:rgba(0,101,255,0.10);border:1px solid rgba(0,101,255,0.30);border-radius:9px;padding:6px 13px 6px 10px;cursor:pointer;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#0065FF;transition:background .15s,border-color .15s,transform .15s;}
-.topbar-back-btn:hover{background:rgba(0,101,255,0.18);border-color:rgba(0,101,255,0.55);transform:translateX(-2px);}
+@keyframes backBtnPulse{0%{box-shadow:0 0 0 0 rgba(99,102,241,0.4);}60%{box-shadow:0 0 0 7px rgba(99,102,241,0);}100%{box-shadow:0 0 0 0 rgba(99,102,241,0);}}
+.topbar-back-btn{display:none;align-items:center;gap:8px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:9px;padding:6px 13px 6px 10px;cursor:pointer;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#6366F1;transition:background .15s,border-color .15s,transform .15s;}
+.topbar-back-btn:hover{background:rgba(99,102,241,0.14);border-color:rgba(99,102,241,0.45);transform:translateX(-2px);}
 .topbar-back-btn.is-visible{display:inline-flex;animation:backBtnIn .26s var(--ease) both,backBtnPulse 1.4s ease .26s infinite;}
 /* ── Doc Preview Modal ── */
 .doc-modal-ov{position:fixed;inset:0;z-index:300;background:rgba(23,43,77,0.52);backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:32px 20px;overflow-y:auto;}
@@ -360,11 +554,82 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .doc-r th{background:var(--bg-sunken);padding:9px 12px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);border-bottom:2px solid var(--border);}
 .doc-r td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-dim);}
 .doc-r tr:last-child td{border-bottom:none;}
-.doc-r tr:hover td{background:rgba(0,82,204,.03);}
+.doc-r tr:hover td{background:rgba(99,102,241,.02);}
+/* ── Hero Section ── */
+@keyframes heroBadgeDot{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.8);opacity:.4;}}
+@keyframes heroCardIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.hero-dot-grid{position:absolute;inset:0;background-image:radial-gradient(rgba(99,102,241,0.05) 1.2px,transparent 1.2px);background-size:28px 28px;pointer-events:none;z-index:0;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.22);border-radius:20px;padding:5px 16px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#6366F1;text-transform:uppercase;box-shadow:0 2px 12px rgba(99,102,241,0.08);}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:#6366F1;display:inline-block;animation:heroBadgeDot 2.2s ease-in-out infinite;}
+.hero-title{font-size:42px;font-weight:900;margin:0;line-height:1.1;letter-spacing:-0.025em;color:#1D1D1F;}
+.hero-sub{font-size:12px;color:#6B7280;margin:8px 0 0;font-family:ui-monospace,monospace;letter-spacing:.04em;line-height:1.7;}
+.hero-stat-card{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:22px 20px;border:1px solid rgba(255,255,255,0.85);position:relative;transition:box-shadow .25s ease;cursor:default;}
+.hero-stat-card:hover{box-shadow:0 10px 36px rgba(0,0,0,0.12);}
+.hero-stat-card::before{display:none;}
+/* C — glowing border on hover */
+@keyframes heroRotBorder{to{--hero-ba:360deg;}}
+.hero-stat-card{transition:box-shadow .3s ease,border-color .3s ease,transform .3s ease;}
+.hero-stat-card:hover{border-color:rgba(99,102,241,0.35)!important;box-shadow:0 0 0 2px rgba(99,102,241,0.10),0 12px 36px rgba(99,102,241,0.10)!important;}
+.hero-stat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;}
+.hero-stat-icon svg{width:17px;height:17px;flex:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.hero-stat-num{font-size:32px;font-weight:900;line-height:1;display:block;color:#6366F1;min-width:48px;}
+.hero-stat-lbl{font-size:13px;font-weight:600;color:#1D1D1F;display:block;margin-top:1px;}
+.hero-stat-sub{font-size:11px;color:#9CA3AF;display:block;margin-top:1px;}
 /* Scrollytelling — opacity/transform driven by JS rAF, no CSS transitions on elements */
-.arch-scene { will-change: opacity; }
-.ast { opacity:0; will-change: opacity, transform; }
-@keyframes archEdgeDraw { from{stroke-dashoffset:1} to{stroke-dashoffset:0} }
+.arch-scene{will-change:opacity;}
+.ast{opacity:0;will-change:opacity,transform;}
+@keyframes archEdgeDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.hero-title-letter{display:inline-block;animation:heroLetterDrop .55s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes heroLetterDrop{from{opacity:0;transform:translateY(-16px) scale(.78);}to{opacity:1;transform:none;}}
+@keyframes heroStreakAnim{0%{left:-70px;opacity:0}20%{opacity:1}80%{opacity:.6}100%{left:100%;opacity:0}}
+#hero-streak{position:absolute;top:0;bottom:0;left:0;width:70px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.52),transparent);pointer-events:none;z-index:3;animation:heroStreakAnim .9s cubic-bezier(.25,.46,.45,.94) .45s both;}
+
+/* ── Responsive Hamburger ── */
+#menu-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--bg-hover);cursor:pointer;flex:none;transition:background .15s;}
+#menu-toggle:hover{background:var(--border);}
+#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:150;backdrop-filter:blur(2px);}
+#sidebar-overlay.is-open{display:block;}
+
+/* ── Responsive Breakpoints ── */
+@media(max-width:1280px){
+    .atlas-layout{grid-template-columns:220px 1fr;}
+    .mds-det-wrap{grid-template-columns:220px 1fr;}
+}
+@media(max-width:1060px){
+    .atlas-layout{grid-template-columns:178px 1fr;}
+    .sidebar{padding:20px 10px;}
+    .nav-item{font-size:12.5px;gap:8px;padding:8px 8px;}
+    .mds-top-stats{grid-template-columns:repeat(2,1fr);}
+    .mds-det-wrap{grid-template-columns:1fr;}
+    .mds-list-head,.mds-list-row{grid-template-columns:36px 1fr 60px 80px;}
+    .mds-list-head>:nth-child(3),.mds-list-row>:nth-child(3){display:none;}
+}
+@media(max-width:860px){
+    .atlas-layout{grid-template-columns:1fr;}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:248px;transform:translateX(-260px);z-index:200;box-shadow:6px 0 28px rgba(0,0,0,.14);}
+    .sidebar.is-open{transform:translateX(0);}
+    #menu-toggle{display:flex;}
+    .kpi-grid{grid-template-columns:repeat(2,1fr);}
+    .mds-top-stats{grid-template-columns:repeat(2,1fr);}
+    .sec-stats-banner{grid-template-columns:repeat(2,1fr);}
+    .topbar{padding:12px 16px;gap:10px;}
+    .resp-grid-4{grid-template-columns:repeat(2,1fr)!important;}
+    .resp-grid-3{grid-template-columns:repeat(2,1fr)!important;}
+    /* Collapse arch-story to fixed height — no scroll-story on mobile */
+    #arch-story-wrap{height:auto!important;margin:-24px -16px 20px!important;}
+    #arch-story-sticky{position:relative!important;height:440px!important;}
+}
+@media(max-width:560px){
+    .kpi-grid{grid-template-columns:1fr 1fr;}
+    .mds-grid{grid-template-columns:1fr;}
+    .mds-top-stats{grid-template-columns:repeat(2,1fr);}
+    .sec-stats-banner{grid-template-columns:repeat(2,1fr);}
+    .resp-grid-4{grid-template-columns:repeat(2,1fr)!important;}
+    .resp-grid-3{grid-template-columns:1fr!important;}
+    .resp-grid-2{grid-template-columns:1fr!important;}
+    .topbar{padding:10px 14px;}
+    #arch-story-sticky{height:360px!important;}
+}
 </style>
 </head>
 <body class="atlas-layout">
@@ -381,6 +646,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 {{-- ══ SIDEBAR ══ --}}
 <aside class="sidebar" id="sidebar">
+    <div id="nav-indicator"></div>
     <div class="sidebar__brand">
         <div class="mark">
             <span class="radar"><span class="radar__ring"></span><span class="radar__ring radar__ring--delay"></span><span class="radar__sweep"></span><span class="radar__dot"></span></span>
@@ -389,7 +655,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     </div>
 
     @if(!empty($score))
-    <div style="margin-bottom:20px;padding:14px 10px;background:var(--bg-hover);border-radius:10px;border:1px solid var(--border);">
+    <div class="score-spin-border" style="margin-bottom:20px;padding:14px 10px;border-radius:10px;">
         <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);display:block;margin-bottom:8px;">Score</span>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
             <span style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--text);">{{ $score['score'] }}<span style="font-size:13px;color:var(--text-faint);">/{{ $score['max'] }}</span></span>
@@ -405,6 +671,21 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                 Overview
             </button>
+            <button onclick="navigate('ai')" id="nav-ai" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                AI Insights
+                @if(config('laradar.ai.enabled', false))
+                <span style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 3px rgba(52,211,153,0.18);flex:none;"></span>
+                @endif
+            </button>
+            <button onclick="navigate('chat')" id="nav-chat" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                AI Chat
+            </button>
+            <button onclick="navigate('aidocs')" id="nav-aidocs" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                AI Docs
+            </button>
             @if(($summary['modules']??0)>0)
             <button onclick="navigate('modules')" id="nav-modules" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
@@ -412,11 +693,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 <span class="nav-badge">{{ $summary['modules'] }}</span>
             </button>
             @endif
-            <button onclick="navigate('packages')" id="nav-packages" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                Packages
-                @if(($summary['packages']??0)>0)<span class="nav-badge">{{ $summary['packages'] }}</span>@endif
-            </button>
         </div>
 
         <div class="nav-group">
@@ -480,6 +756,11 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 Policies
                 @if(($summary['policies']??0)>0)<span class="nav-badge">{{ $summary['policies'] }}</span>@endif
             </button>
+            <button onclick="navigate('packages')" id="nav-packages" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                Packages
+                @if(($summary['packages']??0)>0)<span class="nav-badge">{{ $summary['packages'] }}</span>@endif
+            </button>
         </div>
 
         <div class="nav-group">
@@ -489,30 +770,18 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 Dependencies
                 @if(!empty($data['dependencies']['edges']))<span class="nav-badge">{{ count($data['dependencies']['edges']) }}</span>@endif
             </button>
+            @php $deadTotal = $data['dead_code']['summary']['total'] ?? 0; @endphp
+            <button onclick="navigate('deadcode')" id="nav-deadcode" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                Dead Code
+                @if($deadTotal > 0)<span class="nav-badge" style="background:rgba(239,68,68,0.15);color:#EF4444;">{{ $deadTotal }}</span>@endif
+            </button>
             <button onclick="navigate('export')" id="nav-export" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Export
             </button>
         </div>
 
-        <div class="nav-group">
-            <span class="nav-group__label">AI</span>
-            <button onclick="navigate('ai')" id="nav-ai" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                AI Insights
-                @if(config('laradar.ai.enabled', false))
-                <span style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 3px rgba(52,211,153,0.18);flex:none;"></span>
-                @endif
-            </button>
-            <button onclick="navigate('chat')" id="nav-chat" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                AI Chat
-            </button>
-            <button onclick="navigate('aidocs')" id="nav-aidocs" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                AI Docs
-            </button>
-        </div>
     </nav>
 
     <div class="sidebar__scan">
@@ -528,7 +797,11 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 <main class="content" style="display:flex;flex-direction:column;">
 
 {{-- ══ TOPBAR ══ --}}
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 <header class="topbar">
+    <button id="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
     <div class="breadcrumb">
         <b id="topbar-section">Overview</b>
         <button id="topbar-back-btn" onclick="topbarGoBack()" class="topbar-back-btn">
@@ -551,80 +824,117 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     @php
         $stModels      = array_slice($data['models']??[], 0, 5);
         $stControllers = array_slice($data['controllers']??[], 0, 4);
+        $bgCount       = ($summary['jobs']??0)+($summary['events']??0)+($summary['services']??0);
     @endphp
-    <div id="arch-story-wrap" style="position:relative;height:400vh;margin:-24px -24px 40px -24px;">
-        <div id="arch-story-sticky" style="position:sticky;top:0;height:100vh;overflow:hidden;background:#FAFBFF;display:flex;flex-direction:column;transition:background 0.7s ease;">
+    <div id="arch-story-wrap" style="position:relative;height:400vh;margin:-24px -24px 28px -24px;">
+        <div id="arch-story-sticky" style="position:sticky;top:0;height:100vh;overflow:hidden;background:linear-gradient(145deg,#ECEEFF 0%,#F7F8FF 50%,#EDFFF8 100%);display:flex;flex-direction:column;transition:background 0.7s ease;">
 
-            {{-- Decorative orb (top-right, changes color per scene) --}}
-            <div id="arch-orb" style="position:absolute;top:-120px;right:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.12) 0%,transparent 70%);pointer-events:none;transition:background 0.8s ease;z-index:0;"></div>
-            {{-- Decorative orb bottom-left --}}
-            <div id="arch-orb2" style="position:absolute;bottom:-100px;left:-80px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.07) 0%,transparent 70%);pointer-events:none;transition:background 0.8s ease;z-index:0;"></div>
-
+            {{-- Dot grid background --}}
+            <div class="hero-dot-grid"></div>
+            {{-- Particle mesh canvas --}}
+            <canvas id="hero-particles" style="position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0.65;"></canvas>
+            {{-- Light streak --}}
+            <div id="hero-streak"></div>
+            {{-- Orb top-right --}}
+            <div id="arch-orb" style="position:absolute;top:-120px;right:-100px;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.22) 0%,transparent 70%);pointer-events:none;transition:background 0.8s ease;z-index:0;"></div>
+            {{-- Orb bottom-left --}}
+            <div id="arch-orb2" style="position:absolute;bottom:-100px;left:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.14) 0%,transparent 70%);pointer-events:none;transition:background 0.8s ease;z-index:0;"></div>
             {{-- Faint large scene number --}}
-            <div id="arch-bg-num" style="position:absolute;right:5%;bottom:-10px;font-size:200px;font-weight:900;color:rgba(79,70,229,0.06);line-height:1;pointer-events:none;user-select:none;font-family:ui-monospace,monospace;transition:color 0.7s ease,transform 0.5s ease;z-index:0;">01</div>
+            <div id="arch-bg-num" style="position:absolute;right:4%;bottom:24px;font-size:180px;font-weight:900;color:rgba(79,70,229,0.07);line-height:1;pointer-events:none;user-select:none;font-family:ui-monospace,monospace;transition:color 0.7s ease,transform 0.5s ease;z-index:0;">01</div>
 
             {{-- Single centered content area --}}
-            <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px 40px;overflow:hidden;position:relative;z-index:1;">
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px 60px;overflow:hidden;position:relative;z-index:1;">
                 <div style="width:100%;max-width:760px;position:relative;">
-
-                    {{-- All 4 scenes stacked (absolute, only one visible at a time) --}}
 
                     {{-- Scene 0: Overview --}}
                     <div id="arch-scene-0" class="arch-scene" style="position:relative;">
                         <div class="ast ast-l" style="transition-delay:0ms">
-                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(79,70,229,0.1);border:1px solid rgba(79,70,229,0.2);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#4F46E5;text-transform:uppercase;">
-                                <span style="width:6px;height:6px;border-radius:50%;background:#4F46E5;display:inline-block;"></span>
-                                Architecture Overview
-                            </span>
+                            <span class="hero-badge"><span class="hero-badge-dot"></span>Architecture Overview</span>
                         </div>
                         <div class="ast ast-u" style="transition-delay:100ms;margin-top:14px;">
-                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">{{ $data['project']['name'] }}</h2>
-                            <p style="font-size:12.5px;color:#6B7280;margin:6px 0 0;font-family:ui-monospace,monospace;letter-spacing:.04em;">Laravel {{ $data['laravel_version'] }} · Scroll down to explore each layer</p>
+                            <h2 class="hero-title">{{ $data['project']['name'] }}</h2>
+                            <p class="hero-sub">Laravel {{ $data['laravel_version'] }} &nbsp;·&nbsp; PHP {{ $data['php_version'] }} &nbsp;·&nbsp; Scroll to explore each layer</p>
                         </div>
-                        <div style="margin-top:24px;display:grid;grid-template-columns:repeat(2,1fr);gap:14px;">
-                            <div class="ast ast-l" style="transition-delay:200ms;display:flex;align-items:center;gap:16px;background:#FFFFFF;border-radius:16px;padding:16px 20px;border:1px solid rgba(79,70,229,0.15);box-shadow:0 2px 12px rgba(79,70,229,0.06);">
-                                <span style="font-size:34px;font-weight:900;color:#4F46E5;line-height:1;flex:none;">{{ $summary['models']??0 }}</span>
-                                <div><span style="font-size:13px;font-weight:600;color:#1E1B4B;display:block;">Models</span><span style="font-size:11px;color:#9CA3AF;">Eloquent classes</span></div>
+                        <div style="margin-top:22px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+                            <div class="ast ast-l hero-stat-card" style="transition-delay:200ms;box-shadow:0 6px 24px rgba(99,102,241,0.18);">
+                                <div class="hero-stat-icon" style="background:rgba(99,102,241,0.10);">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#6366F1"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                                </div>
+                                <div>
+                                    <span class="hero-stat-num" data-target="{{ $summary['models']??0 }}">{{ $summary['models']??0 }}</span>
+                                    <span class="hero-stat-lbl">Models</span>
+                                    <span class="hero-stat-sub">Eloquent classes</span>
+                                </div>
                             </div>
-                            <div class="ast ast-r" style="transition-delay:260ms;display:flex;align-items:center;gap:16px;background:#FFFFFF;border-radius:16px;padding:16px 20px;border:1px solid rgba(14,165,233,0.15);box-shadow:0 2px 12px rgba(14,165,233,0.06);">
-                                <span style="font-size:34px;font-weight:900;color:#0EA5E9;line-height:1;flex:none;">{{ $summary['controllers']??0 }}</span>
-                                <div><span style="font-size:13px;font-weight:600;color:#1E1B4B;display:block;">Controllers</span><span style="font-size:11px;color:#9CA3AF;">Request handlers</span></div>
+                            <div class="ast ast-l hero-stat-card" style="transition-delay:260ms;box-shadow:0 4px 20px rgba(124,58,237,0.14);">
+                                <div class="hero-stat-icon" style="background:rgba(124,58,237,0.10);">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+                                </div>
+                                <div>
+                                    <span class="hero-stat-num" data-target="{{ $summary['controllers']??0 }}">{{ $summary['controllers']??0 }}</span>
+                                    <span class="hero-stat-lbl">Controllers</span>
+                                    <span class="hero-stat-sub">Request handlers</span>
+                                </div>
                             </div>
-                            <div class="ast ast-l" style="transition-delay:320ms;display:flex;align-items:center;gap:16px;background:#FFFFFF;border-radius:16px;padding:16px 20px;border:1px solid rgba(16,185,129,0.15);box-shadow:0 2px 12px rgba(16,185,129,0.06);">
-                                <span style="font-size:34px;font-weight:900;color:#10B981;line-height:1;flex:none;">{{ $rs['total']??0 }}</span>
-                                <div><span style="font-size:13px;font-weight:600;color:#1E1B4B;display:block;">Routes</span><span style="font-size:11px;color:#9CA3AF;">Web &amp; API</span></div>
+                            <div class="ast ast-r hero-stat-card" style="transition-delay:320ms;box-shadow:0 4px 20px rgba(5,150,105,0.12);">
+                                <div class="hero-stat-icon" style="background:rgba(16,185,129,0.10);">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#059669"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                <div>
+                                    <span class="hero-stat-num" data-target="{{ $rs['total']??0 }}">{{ $rs['total']??0 }}</span>
+                                    <span class="hero-stat-lbl">Routes</span>
+                                    <span class="hero-stat-sub">Web &amp; API</span>
+                                </div>
                             </div>
-                            <div class="ast ast-r" style="transition-delay:380ms;display:flex;align-items:center;gap:16px;background:#FFFFFF;border-radius:16px;padding:16px 20px;border:1px solid rgba(245,158,11,0.15);box-shadow:0 2px 12px rgba(245,158,11,0.06);">
-                                <span style="font-size:34px;font-weight:900;color:#F59E0B;line-height:1;flex:none;">{{ ($summary['jobs']??0)+($summary['events']??0)+($summary['services']??0) }}</span>
-                                <div><span style="font-size:13px;font-weight:600;color:#1E1B4B;display:block;">Background</span><span style="font-size:11px;color:#9CA3AF;">Jobs · Events · Services</span></div>
+                            <div class="ast ast-r hero-stat-card" style="transition-delay:380ms;box-shadow:0 4px 20px rgba(219,39,119,0.12);">
+                                <div class="hero-stat-icon" style="background:rgba(219,39,119,0.10);">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#DB2777"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                </div>
+                                <div>
+                                    <span class="hero-stat-num" data-target="{{ $bgCount }}">{{ $bgCount }}</span>
+                                    <span class="hero-stat-lbl">Background</span>
+                                    <span class="hero-stat-sub">Jobs · Events · Services</span>
+                                </div>
                             </div>
+                        </div>
+                        <div class="ast ast-u" style="transition-delay:440ms;margin-top:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            @foreach(array_slice($rs['by_group']??[], 0, 3) as $group => $cnt)
+                            <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:20px;padding:6px 14px;font-size:11px;color:#374151;font-family:ui-monospace,monospace;">
+                                <span style="font-weight:700;color:#6366F1;">{{ $cnt }}</span><span>{{ ucfirst($group) }}</span>
+                            </span>
+                            @endforeach
+                            @if($summary['packages']??0)
+                            <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:20px;padding:6px 14px;font-size:11px;color:#374151;font-family:ui-monospace,monospace;">
+                                <span style="font-weight:700;color:#7C3AED;">{{ $summary['packages'] }}</span><span>Packages</span>
+                            </span>
+                            @endif
                         </div>
                     </div>
 
                     {{-- Scene 1: Data Layer --}}
                     <div id="arch-scene-1" class="arch-scene" style="position:absolute;inset:0;opacity:0;pointer-events:none;">
                         <div class="ast ast-l" style="transition-delay:0ms">
-                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#7C3AED;text-transform:uppercase;">
+                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.25);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#7C3AED;text-transform:uppercase;">
                                 <span style="width:6px;height:6px;border-radius:50%;background:#7C3AED;display:inline-block;"></span>
                                 Data Layer
                             </span>
                         </div>
                         <div class="ast ast-u" style="transition-delay:80ms;margin-top:16px;">
                             <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Eloquent Models</h2>
-                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;"><strong style="color:#7C3AED">{{ $summary['models']??0 }} models</strong> mapping to your database tables.</p>
+                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;">Your data layer — <strong style="color:#7C3AED">{{ $summary['models']??0 }} models</strong> mapped to database tables with relationships.</p>
                         </div>
-                        <div style="margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div style="margin-top:20px;display:flex;flex-direction:column;gap:8px;">
                             @foreach($stModels as $i => $m)
                             @php $fromDir = $i % 2 === 0 ? 'l' : 'r'; @endphp
                             <div class="ast ast-{{ $fromDir }}" style="transition-delay:{{ 160 + $i*70 }}ms;display:flex;align-items:center;gap:10px;background:#FFFFFF;border-radius:12px;padding:10px 14px;border:1px solid rgba(124,58,237,0.12);border-left:3px solid #7C3AED;box-shadow:0 1px 6px rgba(124,58,237,0.06);">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" style="flex:none"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
-                                <span style="font-size:12px;font-weight:700;color:#1E1B4B;font-family:ui-monospace,monospace;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $m['name'] }}</span>
-                                @if(!empty($m['table']))<span style="font-size:9.5px;color:#9CA3AF;font-family:ui-monospace,monospace;flex:none;">{{ $m['table'] }}</span>@endif
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" style="width:14px;height:14px;flex:none;"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                                <span style="font-size:12px;font-weight:700;color:#1E1B4B;font-family:ui-monospace,monospace;">{{ $m['name'] }}</span>
+                                @if(!empty($m['table']))<span style="font-size:10px;color:#9CA3AF;margin-left:auto;">{{ $m['table'] }}</span>@endif
                             </div>
                             @endforeach
                             @if(count($data['models']??[]) > 5)
                             <div class="ast ast-u" style="transition-delay:{{ 160 + 5*70 }}ms;display:flex;align-items:center;justify-content:center;background:rgba(124,58,237,0.05);border-radius:12px;padding:10px;border:1px dashed rgba(124,58,237,0.2);">
-                                <span style="font-size:11px;color:#7C3AED;font-family:ui-monospace,monospace;font-weight:600;">+ {{ count($data['models']??[]) - 5 }} more</span>
+                                <span style="font-size:11px;color:#7C3AED;font-weight:600;">+{{ count($data['models']??[]) - 5 }} more models</span>
                             </div>
                             @endif
                         </div>
@@ -633,29 +943,15 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                     {{-- Scene 2: HTTP Layer --}}
                     <div id="arch-scene-2" class="arch-scene" style="position:absolute;inset:0;opacity:0;pointer-events:none;">
                         <div class="ast ast-r" style="transition-delay:0ms">
-                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#0EA5E9;text-transform:uppercase;">
+                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(14,165,233,0.10);border:1px solid rgba(14,165,233,0.25);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#0EA5E9;text-transform:uppercase;">
                                 <span style="width:6px;height:6px;border-radius:50%;background:#0EA5E9;display:inline-block;"></span>
                                 HTTP Layer
                             </span>
                         </div>
                         <div class="ast ast-u" style="transition-delay:80ms;margin-top:16px;">
-                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Routes &amp; Controllers</h2>
-                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;"><strong style="color:#0EA5E9">{{ $rs['total']??0 }} routes</strong> across <strong style="color:#0EA5E9">{{ $summary['controllers']??0 }} controllers</strong>.</p>
+                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Request Handlers</h2>
+                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;"><strong style="color:#0EA5E9">{{ $summary['controllers']??0 }} controllers</strong> handling <strong style="color:#0369A1">{{ $rs['total']??0 }} routes</strong> across your application.</p>
                         </div>
-                        {{-- HTTP method badges --}}
-                        <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;">
-                            @foreach(($rs['by_method']??[]) as $method => $cnt)
-                            @php
-                                $mPalette = ['GET'=>['#10B981','rgba(16,185,129,0.1)'],'POST'=>['#0EA5E9','rgba(14,165,233,0.1)'],'PUT'=>['#F59E0B','rgba(245,158,11,0.1)'],'PATCH'=>['#F59E0B','rgba(245,158,11,0.1)'],'DELETE'=>['#EF4444','rgba(239,68,68,0.1)'],'HEAD'=>['#6B7280','rgba(107,114,128,0.1)'],'OPTIONS'=>['#6B7280','rgba(107,114,128,0.1)']][strtoupper($method)] ?? ['#6B7280','rgba(107,114,128,0.1)'];
-                            @endphp
-                            <div class="ast ast-{{ $loop->index % 2 === 0 ? 'l' : 'r' }}" style="transition-delay:{{ 160 + $loop->index*60 }}ms;text-align:center;background:{{ $mPalette[1] }};border:1.5px solid {{ $mPalette[0] }};border-radius:14px;padding:12px 20px;min-width:70px;">
-                                <span style="font-family:ui-monospace,monospace;font-size:10px;font-weight:800;color:{{ $mPalette[0] }};display:block;letter-spacing:.08em;">{{ $method }}</span>
-                                <span style="font-size:28px;font-weight:900;color:#1E1B4B;display:block;line-height:1.1;margin-top:3px;">{{ $cnt }}</span>
-                            </div>
-                            @endforeach
-                        </div>
-                        {{-- Controller chips --}}
-                        @if(!empty($stControllers))
                         <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:8px;">
                             @foreach($stControllers as $i => $c)
                             <div class="ast ast-{{ $i % 2 === 0 ? 'l' : 'r' }}" style="transition-delay:{{ 300 + $i*50 }}ms;display:inline-flex;align-items:center;gap:6px;background:#FFFFFF;border:1px solid rgba(14,165,233,0.2);border-radius:20px;padding:5px 12px;box-shadow:0 1px 4px rgba(14,165,233,0.08);">
@@ -664,13 +960,12 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                             </div>
                             @endforeach
                         </div>
-                        @endif
                     </div>
 
                     {{-- Scene 3: Background Layer --}}
                     <div id="arch-scene-3" class="arch-scene" style="position:absolute;inset:0;opacity:0;pointer-events:none;">
                         <div class="ast ast-l" style="transition-delay:0ms">
-                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#D97706;text-transform:uppercase;">
+                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#D97706;text-transform:uppercase;">
                                 <span style="width:6px;height:6px;border-radius:50%;background:#D97706;display:inline-block;"></span>
                                 Background Layer
                             </span>
@@ -679,7 +974,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                             <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Async Architecture</h2>
                             <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;">Keeping your app fast and scalable with background processing.</p>
                         </div>
-                        <div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+                        <div class="resp-grid-3" style="margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
                             <div class="ast ast-l" style="transition-delay:200ms;background:#FFFFFF;border-radius:18px;padding:24px 20px;border:1px solid rgba(245,158,11,0.2);border-top:4px solid #F59E0B;box-shadow:0 4px 16px rgba(245,158,11,0.08);text-align:center;">
                                 <span style="font-size:48px;font-weight:900;color:#F59E0B;display:block;line-height:1;">{{ $summary['jobs']??0 }}</span>
                                 <span style="font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:.12em;display:block;margin-top:8px;font-weight:600;">Jobs</span>
@@ -701,7 +996,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 </div>
             </div>
 
-            {{-- Bottom navigation bar --}}
+            {{-- Bottom tab navigation --}}
             <div style="background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,0.06);height:52px;display:flex;align-items:stretch;flex-shrink:0;z-index:2;position:relative;">
                 <div style="display:flex;align-items:stretch;gap:0;padding:0 20px;">
                     @php
@@ -727,10 +1022,17 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
     </div>
 
-    <div style="margin-bottom:24px;">
-        <h1 class="sec-title">Overview</h1>
-        <p class="sec-sub">{{ $data['project']['name'] }} · Laravel {{ $data['laravel_version'] }}</p>
+    <div class="sec-header" style="margin-bottom:20px;">
+        <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
+            <svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        </div>
+        <div>
+            <h1 class="sec-header__title">Overview</h1>
+            <p class="sec-header__sub">{{ $data['project']['name'] }} · Laravel {{ $data['laravel_version'] }}</p>
+        </div>
     </div>
+
+    <div style="position:relative;border-radius:16px;margin-bottom:28px;padding:20px 20px 4px;background:#FFFFFF;border:1px solid var(--border);box-shadow:var(--shadow);">
 
     @php
     $kpiIcons = [
@@ -753,10 +1055,10 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Jobs'         => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
         'Events'       => ['color'=>'var(--rose)',   'bg'=>'rgba(248,113,113,0.14)'],
         'Services'     => ['color'=>'var(--violet)', 'bg'=>'rgba(167,139,250,0.14)'],
-        'Repositories' => ['color'=>'var(--cyan)',   'bg'=>'rgba(0,82,204,0.14)'],
+        'Repositories' => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
         'Observers'    => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
         'Policies'     => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
-        'Modules'      => ['color'=>'var(--cyan)',   'bg'=>'rgba(0,82,204,0.14)'],
+        'Modules'      => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
         'Dep. Edges'   => ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)'],
     ];
     $stats = [
@@ -774,7 +1076,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     ];
     @endphp
 
-    <div class="kpi-grid" style="margin-bottom:28px;">
+    <div class="kpi-grid" style="margin-bottom:0;position:relative;z-index:1;">
         @foreach($stats as [$label,$count])
         @php $kc = $kpiColors[$label] ?? ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)']; $ki = $kpiIcons[$label] ?? ''; @endphp
         <div class="kpi-card ov-reveal" data-ov-reveal style="transition-delay:{{ $loop->index * 45 }}ms;">
@@ -786,6 +1088,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
         @endforeach
     </div>
+    </div>{{-- /orb-wrapper --}}
 
     {{-- Architecture Explorer --}}
     <div class="ov-panel ov-reveal" data-ov-reveal style="margin-bottom:24px;">
@@ -843,14 +1146,14 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         <span style="color:var(--text-faint);">Scan Time</span>
                         <span style="font-family:var(--font-mono);color:var(--cyan);">{{ $perf['execution_time_ms']??0 }} ms</span>
                     </div>
-                    <div class="atlas-score-bar"><div class="atlas-score-fill" data-score-w="{{ min(100,($perf['execution_time_ms']??0)/50) }}" style="width:0;background:linear-gradient(90deg,var(--cyan),var(--sky));"></div></div>
+                    <div class="atlas-score-bar"><div class="atlas-score-fill" data-score-w="{{ min(100,($perf['execution_time_ms']??0)/50) }}" style="width:0;background:linear-gradient(90deg,#6366F1,#818CF8);"></div></div>
                 </div>
                 <div>
                     <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
                         <span style="color:var(--text-faint);">Memory</span>
                         <span style="font-family:var(--font-mono);color:var(--emerald);">{{ $perf['memory_usage_mb']??0 }} MB</span>
                     </div>
-                    <div class="atlas-score-bar"><div class="atlas-score-fill" data-score-w="{{ min(100,($perf['memory_usage_mb']??0)/1.28) }}" style="width:0;background:linear-gradient(90deg,var(--emerald),var(--cyan));"></div></div>
+                    <div class="atlas-score-bar"><div class="atlas-score-fill" data-score-w="{{ min(100,($perf['memory_usage_mb']??0)/1.28) }}" style="width:0;background:var(--emerald);"></div></div>
                 </div>
             </div>
         </div>
@@ -865,7 +1168,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                     $icColor = match($check['status']??'fail'){'pass'=>'var(--emerald)','warn'=>'var(--amber)',default=>'var(--rose)'};
                     $icSymbol = match($check['status']??'fail'){'pass'=>'✔','warn'=>'⚠',default=>'✘'};
                 @endphp
-                <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div class="hc-row" style="--hc-i:{{ $loop->index }};display:flex;align-items:flex-start;gap:10px;">
                     <span style="font-weight:700;font-size:13px;color:{{ $icColor }};margin-top:1px;flex:none;">{{ $icSymbol }}</span>
                     <div>
                         <p style="font-size:13px;color:var(--text);">{{ $check['label'] }}</p>
@@ -886,14 +1189,14 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     $mWithObs      = collect($data['models'])->filter(fn($m) => !empty($m['observer']))->count();
     $mSoftDel      = collect($data['models'])->filter(fn($m) => collect($m['traits']??[])->contains(fn($t)=>str_contains($t,'SoftDeletes')))->count();
     $mPalette = [
-        ['color'=>'var(--cyan)',    'bg'=>'rgba(0,82,204,.15)',  'border'=>'rgba(0,82,204,.3)',  'hex'=>'#0052CC'],
+        ['color'=>'var(--cyan)',    'bg'=>'rgba(99,102,241,.15)',   'border'=>'rgba(99,102,241,.3)',   'hex'=>'#6366F1'],
         ['color'=>'var(--violet)',  'bg'=>'rgba(167,139,250,.15)', 'border'=>'rgba(167,139,250,.3)', 'hex'=>'#A78BFA'],
         ['color'=>'var(--emerald)', 'bg'=>'rgba(52,211,153,.15)',  'border'=>'rgba(52,211,153,.3)',  'hex'=>'#34D399'],
         ['color'=>'var(--amber)',   'bg'=>'rgba(251,191,36,.15)',  'border'=>'rgba(251,191,36,.3)',  'hex'=>'#FBBF24'],
         ['color'=>'var(--rose)',    'bg'=>'rgba(248,113,113,.15)', 'border'=>'rgba(248,113,113,.3)', 'hex'=>'#F87171'],
         ['color'=>'var(--sky)',     'bg'=>'rgba(96,165,250,.15)',  'border'=>'rgba(96,165,250,.3)',  'hex'=>'#60A5FA'],
     ];
-    $mRelColors = ['hasMany'=>'#34D399','hasOne'=>'#0052CC','belongsTo'=>'#60A5FA','belongsToMany'=>'#A78BFA','morphMany'=>'#F87171','morphTo'=>'#F87171','morphOne'=>'#F87171','hasManyThrough'=>'#FBBF24'];
+    $mRelColors = ['hasMany'=>'#34D399','hasOne'=>'#6366F1','belongsTo'=>'#60A5FA','belongsToMany'=>'#A78BFA','morphMany'=>'#F87171','morphTo'=>'#F87171','morphOne'=>'#F87171','hasManyThrough'=>'#FBBF24'];
     @endphp
 
     <div id="models-list">
@@ -980,7 +1283,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         <div class="mds-rel-bar">
                             @foreach($mRelGrp as $rType => $rItems)
                             @php $rw = round(count($rItems) / $mRelCnt * 100); $rCol = $mRelColors[$rType] ?? '#6B778C'; @endphp
-                            <div class="mds-rel-seg" style="flex:{{ $rw }};background:{{ $rCol }};opacity:.75;"></div>
+                            <div class="mds-rel-seg" data-flex="{{ $rw }}" style="flex:0;min-width:0;background:{{ $rCol }};opacity:.75;"></div>
                             @endforeach
                         </div>
                         <div class="mds-rel-legend">
@@ -1036,16 +1339,63 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Controllers --}}
 <section id="sec-controllers" class="p-6" style="display:none">
     <div id="controllers-list">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-            <div>
-                <h1 class="sec-title">Controllers</h1>
-                <p class="sec-sub">{{ count($data['controllers']) }} controllers discovered</p>
+
+        {{-- Header --}}
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <div class="sec-header" style="margin-bottom:0;">
+                <div class="sec-header__icon" style="background:rgba(255,139,0,.10);border:1px solid rgba(255,139,0,.20);color:var(--amber);">
+                    <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+                </div>
+                <div>
+                    <h1 class="sec-header__title">Controllers</h1>
+                    <p class="sec-header__sub">HTTP request handlers in your application</p>
+                </div>
             </div>
-            <input id="controllers-search" oninput="filterGrid('controllers')" type="search" placeholder="Search…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+            <input id="controllers-search" oninput="filterGrid('controllers')" type="search" placeholder="Search controllers…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
         </div>
-        <div id="controllers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+
+        {{-- Stats banner --}}
+        @php
+            $ctrlTotal      = count($data['controllers']);
+            $ctrlTotalMeth  = array_sum(array_column($data['controllers'], 'method_count'));
+            $ctrlWithMw     = count(array_filter($data['controllers'], fn($c) => !empty($c['middleware'])));
+            $ctrlResource   = count(array_filter($data['controllers'], fn($c) => !empty($c['is_resource'])));
+            $ctrlMaxMethods = max(array_column($data['controllers'], 'method_count') ?: [1]);
+        @endphp
+        <div class="sec-stats-banner" style="margin-bottom:24px;">
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(255,139,0,.12);color:var(--amber);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $ctrlTotal }}</div><div class="sec-stat-lbl">Controllers</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(255,139,0,.12);color:var(--amber);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $ctrlTotalMeth }}</div><div class="sec-stat-lbl">Total Methods</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(255,139,0,.12);color:var(--amber);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $ctrlResource }}</div><div class="sec-stat-lbl">Resource</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(255,139,0,.12);color:var(--amber);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $ctrlWithMw }}</div><div class="sec-stat-lbl">With Middleware</div></div>
+            </div>
+        </div>
+
+        <div id="controllers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;">
             @foreach($data['controllers'] as $i => $ctrl)
-            <div class="ctrl-card" onclick="showDetail('controllers',{{$i}})" data-name="{{ strtolower($ctrl['name']) }}">
+            @php
+                $ctrlRouteCount  = count(array_filter($data['routes'] ?? [], fn($r) => class_basename($r['controller']['class'] ?? '') === $ctrl['name']));
+                $ctrlComplexity  = $ctrlMaxMethods > 0 ? round(($ctrl['method_count']??0) / $ctrlMaxMethods * 100) : 0;
+            @endphp
+            <div class="ctrl-card" style="--ci:{{$i}};" onclick="showDetail('controllers',{{$i}})" data-name="{{ strtolower($ctrl['name']) }}">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:10px;">
                     <div style="display:flex;align-items:center;gap:12px;min-width:0;">
                         <div class="ctrl-card__icon" style="flex:none;">
@@ -1060,10 +1410,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         @if(!empty($ctrl['is_resource']))<span style="font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:12px;background:rgba(52,211,153,0.12);color:var(--emerald);border:1px solid rgba(52,211,153,0.25);">Resource</span>@endif
                     </div>
                 </div>
-                @php
-                $ctrlRouteCount = count(array_filter($data['routes'] ?? [], fn($r) => class_basename($r['controller']['class'] ?? '') === $ctrl['name']));
-                @endphp
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
+                <div class="resp-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
                     <div class="ctrl-stat"><b>{{ $ctrl['method_count']??0 }}</b><span>Methods</span></div>
                     <div class="ctrl-stat"><b>{{ $ctrlRouteCount }}</b><span>Routes</span></div>
                     <div class="ctrl-stat"><b>{{ count($ctrl['dependencies']??[]) }}</b><span>Deps</span></div>
@@ -1077,13 +1424,20 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 </div>
                 @endif
                 @if(!empty($ctrl['methods']))
-                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
                     @foreach(array_slice($ctrl['methods']??[],0,4) as $m)<span class="ctrl-chip">{{ $m }}</span>@endforeach
                     @if(count($ctrl['methods']??[])>4)<span style="font-size:10px;color:var(--text-faint);">+{{ count($ctrl['methods'])-4 }} more</span>@endif
                 </div>
                 @endif
+                {{-- Complexity bar --}}
                 <div style="border-top:1px solid var(--border);padding-top:10px;">
-                    <span style="font-size:12px;color:var(--cyan);font-family:var(--font-mono);cursor:pointer;">View details →</span>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                        <span style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);">complexity</span>
+                        <span style="font-size:10px;color:var(--amber);font-family:var(--font-mono);font-weight:700;">{{ $ctrlComplexity }}%</span>
+                    </div>
+                    <div class="ctrl-complexity-track">
+                        <div class="ctrl-complexity-fill" style="width:0;" data-target="{{ $ctrlComplexity }}"></div>
+                    </div>
                 </div>
             </div>
             @endforeach
@@ -1143,15 +1497,23 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     @endphp
 
     {{-- Header --}}
-    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;">
-        <div>
-            <h1 class="sec-title">Relation Graph</h1>
-            <p class="sec-sub">{{ count($data['models']) }} models · {{ count($mmErPairs) }} relationships</p>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#6366F1 0%,#818CF8 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(99,102,241,0.25);">
+                <svg viewBox="0 0 20 20" fill="none" style="width:20px;height:20px;" stroke-linecap="round"><circle cx="10" cy="10" r="2.5" fill="white"/><circle cx="3.5" cy="4" r="1.5" fill="white"/><circle cx="16.5" cy="4" r="1.5" fill="white"/><circle cx="3.5" cy="16" r="1.5" fill="white"/><circle cx="16.5" cy="16" r="1.5" fill="white"/><line x1="10" y1="7.5" x2="3.5" y2="4" stroke="white" stroke-width="1.2" opacity="0.7"/><line x1="10" y1="7.5" x2="16.5" y2="4" stroke="white" stroke-width="1.2" opacity="0.7"/><line x1="10" y1="12.5" x2="3.5" y2="16" stroke="white" stroke-width="1.2" opacity="0.7"/><line x1="10" y1="12.5" x2="16.5" y2="16" stroke="white" stroke-width="1.2" opacity="0.7"/></svg>
+            </div>
+            <div>
+                <h1 style="font-size:20px;font-weight:700;color:#111827;margin:0;line-height:1.2;letter-spacing:-0.3px;">Relation Graph</h1>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:5px;">
+                    <span style="display:inline-flex;align-items:center;background:rgba(99,102,241,.08);color:#6366F1;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;">{{ count($data['models']) }} models</span>
+                    <span style="display:inline-flex;align-items:center;background:#F0FDF4;color:#16A34A;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;">{{ count($mmErPairs) }} relationships</span>
+                </div>
+            </div>
         </div>
-        <div style="display:flex;background:var(--bg-hover);border-radius:8px;padding:4px;gap:3px;border:1px solid var(--border);">
-            <button id="map-tab-graph" onclick="setMapTab('graph')" style="padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;background:var(--bg-elevated);color:var(--text);border:1px solid var(--border);cursor:pointer;">Relation Graph</button>
-            <button id="map-tab-tree"  onclick="setMapTab('tree')"  style="padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;background:none;color:var(--text-dim);border:1px solid transparent;cursor:pointer;">Tree View</button>
-            <button id="map-tab-er"    onclick="setMapTab('er')"    style="padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;background:none;color:var(--text-dim);border:1px solid transparent;cursor:pointer;">ER Diagram</button>
+        <div style="display:flex;background:#F3F4F6;border-radius:8px;padding:3px;gap:2px;">
+            <button id="map-tab-graph" onclick="setMapTab('graph')" style="padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;background:#6366F1;color:#FFFFFF;border:none;cursor:pointer;transition:background .15s,color .15s;">Relation Graph</button>
+            <button id="map-tab-tree"  onclick="setMapTab('tree')"  style="padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;background:transparent;color:#6B7280;border:none;cursor:pointer;transition:background .15s,color .15s;">Tree View</button>
+            <button id="map-tab-er"    onclick="setMapTab('er')"    style="padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;background:transparent;color:#6B7280;border:none;cursor:pointer;transition:background .15s,color .15s;">ER Diagram</button>
         </div>
     </div>
 
@@ -1159,26 +1521,28 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     <div id="map-graph">
 
         {{-- Controls row --}}
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;min-height:36px;">
-            <input id="rg-search-input" type="text" placeholder="Search model…" oninput="graphSearch(this.value)"
-                style="font-size:12px;font-family:var(--font-mono);background:var(--bg-elevated);border:1px solid var(--border);border-radius:9px;padding:7px 12px;color:var(--text);outline:none;width:180px;">
-            <button id="rg-clear-btn" onclick="rgDiagClear()" style="display:none;font-size:11px;font-family:var(--font-mono);color:var(--text-faint);padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;">
-                ✕ Clear
-            </button>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;min-height:38px;flex-wrap:wrap;">
+            <div style="position:relative;">
+                <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;pointer-events:none;" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input id="rg-search-input" type="text" placeholder="Search model…" oninput="graphSearch(this.value)"
+                    style="font-size:13px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px 8px 32px;color:#111827;outline:none;width:200px;transition:border-color .15s,box-shadow .15s;"
+                    onfocus="this.style.borderColor='#6366F1';this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)'"
+                    onblur="this.style.borderColor='#E5E7EB';this.style.boxShadow='none'">
+            </div>
+            <button id="rg-clear-btn" onclick="rgDiagClear()" style="display:none;font-size:12px;color:#6B7280;padding:7px 14px;border-radius:8px;border:1px solid #E5E7EB;background:#FFFFFF;cursor:pointer;font-weight:500;">✕ Clear</button>
             {{-- Legend --}}
-            <div id="rg-legend" style="margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;">
-                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-faint);font-family:var(--font-mono);"><span style="display:inline-block;width:20px;height:1px;background:#818cf8;"></span>hasMany</span>
-                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-faint);font-family:var(--font-mono);"><span style="display:inline-block;width:20px;height:1px;background:#2dd4bf;"></span>hasOne</span>
-                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-faint);font-family:var(--font-mono);"><span style="display:inline-block;width:20px;height:1px;background:#34d399;"></span>belongsTo</span>
-                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-faint);font-family:var(--font-mono);"><span style="display:inline-block;width:20px;height:1px;background:#c084fc;"></span>M:M</span>
+            <div id="rg-legend" style="margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;">
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;font-weight:500;"><span style="display:inline-block;width:18px;height:2px;background:#818cf8;border-radius:2px;"></span>hasMany</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;font-weight:500;"><span style="display:inline-block;width:18px;height:2px;background:#2dd4bf;border-radius:2px;"></span>hasOne</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;font-weight:500;"><span style="display:inline-block;width:18px;height:2px;background:#34d399;border-radius:2px;"></span>belongsTo</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;font-weight:500;"><span style="display:inline-block;width:18px;height:2px;background:#c084fc;border-radius:2px;"></span>M:M</span>
             </div>
             {{-- Selected node info --}}
             <div id="rg-info-row" style="display:none;margin-left:auto;align-items:center;gap:8px;">
-                <span id="rg-info-name"  style="font-weight:800;color:var(--cyan);font-size:12px;font-family:var(--font-mono);"></span>
-                <span id="rg-info-table" style="font-size:11px;background:rgba(0,82,204,0.12);color:var(--cyan);padding:2px 8px;border-radius:6px;font-family:var(--font-mono);"></span>
+                <span id="rg-info-name"  style="font-weight:700;color:#6366F1;font-size:13px;"></span>
+                <span id="rg-info-table" style="font-size:11px;background:rgba(99,102,241,.08);color:#6366F1;padding:2px 8px;border-radius:6px;font-weight:500;"></span>
                 <button id="rg-rels-btn" onclick="rgToggleRels()"
-                    class="atlas-btn"
-                    style="font-size:11px;padding:5px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:4px;">
+                    style="font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid #E5E7EB;background:#FFFFFF;color:#374151;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:4px;">
                     <span id="rg-info-count"></span>
                     <svg id="rg-rels-chevron" style="width:10px;height:10px;transition:transform .2s;" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
                 </button>
@@ -1186,30 +1550,30 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
 
         {{-- Relationship cards panel --}}
-        <div id="rg-rels-panel" style="display:none;margin-bottom:12px;" class="atlas-card">
-            <p id="rg-rels-title" style="font-size:10px;font-weight:700;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;font-family:var(--font-mono);"></p>
+        <div id="rg-rels-panel" style="display:none;margin-bottom:14px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:16px 20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+            <p id="rg-rels-title" style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;"></p>
             <div id="rg-rels-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;"></div>
         </div>
 
         {{-- Canvas --}}
-        <div style="position:relative;border-radius:16px;border:1px solid var(--border);overflow:hidden;background:var(--bg-elevated);">
+        <div style="position:relative;border-radius:16px;border:1px solid #E5E7EB;overflow:hidden;background:#FFFFFF;box-shadow:0 4px 6px -1px rgba(0,0,0,0.07),0 2px 4px -1px rgba(0,0,0,0.04);">
             <svg id="rg-canvas" xmlns="http://www.w3.org/2000/svg"
                  style="width:100%;height:600px;display:block;cursor:grab;user-select:none">
                 <defs>
                     <pattern id="rg-dot-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-                        <circle cx="1" cy="1" r="1" fill="rgba(23,43,77,0.12)" opacity="1"/>
+                        <circle cx="1" cy="1" r="0.8" fill="rgba(0,0,0,0.06)" opacity="1"/>
                     </pattern>
                     <marker id="rg-arr-many"      viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
                     <marker id="rg-arr-one"       viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#2dd4bf" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
                     <marker id="rg-arr-belongs"   viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
                     <marker id="rg-arr-mm"        viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                    <marker id="rg-arr-many-a"    viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#0052CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                    <marker id="rg-arr-many-a"    viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
                     <marker id="rg-arr-one-a"     viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
                     <marker id="rg-arr-belongs-a" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
                     <marker id="rg-arr-mm-a"      viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                    <filter id="rg-f-node"     x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="4"  flood-color="rgba(23,43,77,0.10)"/></filter>
-                    <filter id="rg-f-node-sel" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="rgba(0,82,204,0.40)"/></filter>
-                    <filter id="rg-f-node-rel" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="7"  flood-color="rgba(52,211,153,0.35)"/></filter>
+                    <filter id="rg-f-node"     x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="1" stdDeviation="3"  flood-color="rgba(0,0,0,0.08)"/></filter>
+                    <filter id="rg-f-node-sel" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="rgba(99,102,241,0.35)"/></filter>
+                    <filter id="rg-f-node-rel" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="7"  flood-color="rgba(52,211,153,0.30)"/></filter>
                 </defs>
                 <rect width="100%" height="100%" fill="url(#rg-dot-grid)"/>
                 <g id="rg-vp">
@@ -1220,19 +1584,19 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
             {{-- Zoom controls --}}
             <div style="position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:4px;">
-                <button onclick="graphZoom(1.25)" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);font-weight:700;font-size:16px;cursor:pointer;" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='var(--bg-elevated)'">+</button>
-                <button onclick="graphZoom(0.8)"  style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);font-weight:700;font-size:16px;cursor:pointer;" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='var(--bg-elevated)'">−</button>
-                <button onclick="graphFit()"      style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);font-size:14px;cursor:pointer;" title="Fit to screen" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='var(--bg-elevated)'">⊡</button>
-                <button onclick="graphReset()"    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);font-size:14px;cursor:pointer;" title="Reset" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='var(--bg-elevated)'">⟳</button>
+                <button onclick="graphZoom(1.25)" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;color:#6B7280;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08);transition:border-color .15s,color .15s;" onmouseenter="this.style.borderColor='#6366F1';this.style.color='#6366F1'" onmouseleave="this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">+</button>
+                <button onclick="graphZoom(0.8)"  style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;color:#6B7280;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08);transition:border-color .15s,color .15s;" onmouseenter="this.style.borderColor='#6366F1';this.style.color='#6366F1'" onmouseleave="this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">−</button>
+                <button onclick="graphFit()"      style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;color:#6B7280;font-size:14px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08);transition:border-color .15s,color .15s;" title="Fit to screen" onmouseenter="this.style.borderColor='#6366F1';this.style.color='#6366F1'" onmouseleave="this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">⊡</button>
+                <button onclick="graphReset()"    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;color:#6B7280;font-size:14px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08);transition:border-color .15s,color .15s;" title="Reset" onmouseenter="this.style.borderColor='#6366F1';this.style.color='#6366F1'" onmouseleave="this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">⟳</button>
             </div>
 
             {{-- Minimap --}}
-            <div style="position:absolute;bottom:12px;right:12px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.92);overflow:hidden;width:160px;height:100px;">
+            <div style="position:absolute;bottom:12px;right:12px;border-radius:10px;border:1px solid #E5E7EB;background:rgba(255,255,255,0.95);overflow:hidden;width:160px;height:100px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
                 <svg id="rg-minimap" width="160" height="100" style="display:block"></svg>
             </div>
 
             {{-- Hint --}}
-            <div style="position:absolute;bottom:12px;left:12px;font-size:11px;color:var(--text-faint);background:rgba(255,255,255,0.88);padding:4px 10px;border-radius:8px;border:1px solid var(--border);pointer-events:none;">
+            <div style="position:absolute;bottom:12px;left:12px;font-size:11px;color:#9CA3AF;background:rgba(255,255,255,0.92);padding:4px 10px;border-radius:8px;border:1px solid #F3F4F6;pointer-events:none;font-weight:500;">
                 Click node · Drag to pan · Scroll to zoom
             </div>
         </div>
@@ -1257,7 +1621,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         @else
 
         {{-- Toolbar --}}
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
 
             {{-- Focus model selector --}}
             <div style="display:flex;align-items:center;gap:8px;">
@@ -1274,22 +1638,108 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
             {{-- Stats --}}
             <span style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($data['models']) }} models · {{ count($mmErPairs) }} relationships</span>
 
-            {{-- Large-project warning --}}
+            {{-- Large-project warning — compact inline badge with tooltip --}}
             @if(count($data['models']) > 20)
-            <div style="display:flex;align-items:center;gap:7px;padding:6px 12px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;font-size:11px;color:var(--amber);">
-                <svg viewBox="0 0 20 20" fill="currentColor" style="width:13px;height:13px;flex:none;"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                Large project — auto-focused on a single model. Select "All Models" to see everything.
-            </div>
+            <span title="Large project — auto-focused on a single model. Select All Models to see everything." style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:20px;font-size:10px;font-weight:600;color:var(--amber);cursor:default;white-space:nowrap;">
+                <svg viewBox="0 0 20 20" fill="currentColor" style="width:11px;height:11px;flex:none;"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                Large project
+            </span>
             @endif
 
+            {{-- Right-side controls --}}
+            <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+
+                {{-- Layout direction toggle --}}
+                <button id="er-layout-btn" onclick="erToggleLayout()"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;font-weight:600;color:#374151;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:background .15s;font-family:var(--font-sans);"
+                    onmouseenter="this.style.background='#F3F4F6'" onmouseleave="this.style.background='#F9FAFB'" title="Toggle layout direction">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex:none;"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
+                    TB
+                </button>
+
+                {{-- Zoom group --}}
+                <div style="display:flex;align-items:center;gap:2px;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:8px;padding:3px;">
+                    <button onclick="erZoom(1.2)" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:5px;color:#6B7280;font-weight:700;font-size:15px;cursor:pointer;transition:background .12s;" onmouseenter="this.style.background='#E5E7EB'" onmouseleave="this.style.background='transparent'">+</button>
+                    <span id="er-zoom-lbl" style="font-size:10px;color:#6B7280;font-family:ui-monospace,monospace;min-width:36px;text-align:center;line-height:1;">100%</span>
+                    <button onclick="erZoom(0.8)" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:5px;color:#6B7280;font-weight:700;font-size:15px;cursor:pointer;transition:background .12s;" onmouseenter="this.style.background='#E5E7EB'" onmouseleave="this.style.background='transparent'">−</button>
+                    <button onclick="erZoomFit()" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:5px;color:#6B7280;font-size:13px;cursor:pointer;transition:background .12s;" title="Reset zoom" onmouseenter="this.style.background='#E5E7EB'" onmouseleave="this.style.background='transparent'">⊡</button>
+                </div>
+
+                {{-- Fullscreen --}}
+                <button onclick="erFullScreen()"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;font-weight:600;color:#374151;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:background .15s;font-family:var(--font-sans);"
+                    onmouseenter="this.style.background='#F3F4F6'" onmouseleave="this.style.background='#F9FAFB'" title="Full-screen view">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex:none;"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                    Full
+                </button>
+
+                {{-- Divider --}}
+                <div style="width:1px;height:22px;background:#E5E7EB;"></div>
+
+                {{-- Download SVG --}}
+                <button id="er-dl-svg" onclick="erDownloadSVG()"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;font-weight:600;color:#6366F1;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,0.25);border-radius:8px;cursor:pointer;transition:background .15s;font-family:var(--font-sans);"
+                    onmouseenter="this.style.background='rgba(99,102,241,.14)'" onmouseleave="this.style.background='rgba(99,102,241,.08)'"
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex:none;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    SVG
+                </button>
+
+                {{-- Download PNG --}}
+                <button id="er-dl-png" onclick="erDownloadPNG()"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;font-weight:600;color:#374151;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:background .15s;font-family:var(--font-sans);"
+                    onmouseenter="this.style.background='#F3F4F6'" onmouseleave="this.style.background='#F9FAFB'">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex:none;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    PNG
+                </button>
+
+            </div>
+
         </div>
 
-        {{-- Mermaid ER container --}}
-        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:auto;max-height:640px;">
-            <div style="padding:20px;min-width:600px;">
-                <pre class="mermaid" id="er-mermaid">{{ $mmErCode }}</pre>
+        {{-- Canvas + Model info panel --}}
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+
+            {{-- Mermaid ER canvas — dot-grid background --}}
+            <div id="er-canvas-wrap" style="flex:1;min-width:0;background-color:#FAFAFA;background-image:radial-gradient(circle,rgba(99,102,241,.12) 1.5px,transparent 1.5px);background-size:24px 24px;border:1px solid var(--border);border-radius:14px;overflow:hidden;height:70vh;cursor:grab;position:relative;user-select:none;">
+                <div id="er-transform-wrap" style="padding:20px;display:inline-block;transform-origin:0 0;">
+                    <pre class="mermaid" id="er-mermaid">{{ $mmErCode }}</pre>
+                </div>
+            </div>
+
+            {{-- Model info panel --}}
+            <div id="er-info-panel" style="width:256px;flex:none;height:70vh;background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;">
+                <div style="padding:13px 16px 11px;border-bottom:1px solid var(--border);flex:none;">
+                    <p style="font-size:10px;font-weight:700;color:var(--text-faint);letter-spacing:0.08em;text-transform:uppercase;margin:0;">Model Details</p>
+                </div>
+                <div id="er-info-content" style="flex:1;padding:14px 16px;overflow-y:auto;">
+                    <p style="font-size:12px;color:var(--text-faint);text-align:center;margin-top:40px;">Select a model<br>to see details</p>
+                </div>
+            </div>
+
+        </div>
+
+        {{-- Fullscreen modal --}}
+        <div id="er-fs-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;flex-direction:column;">
+            <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#0F172A;border-bottom:1px solid rgba(255,255,255,0.08);">
+                <span style="color:#E2E8F0;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="10" cy="10" r="2.5"/><circle cx="3.5" cy="4" r="1.5"/><circle cx="16.5" cy="4" r="1.5"/><circle cx="3.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/><line x1="10" y1="7.5" x2="3.5" y2="4"/><line x1="10" y1="7.5" x2="16.5" y2="4"/><line x1="10" y1="12.5" x2="3.5" y2="16"/><line x1="10" y1="12.5" x2="16.5" y2="16"/></svg>
+                    ER Diagram — Full View
+                </span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:11px;color:#475569;font-family:ui-monospace,monospace;">Scroll to zoom · Drag to pan · Esc to close</span>
+                    <button onclick="erCloseFullScreen()"
+                        style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:12px;font-weight:600;color:#E2E8F0;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:8px;cursor:pointer;transition:background .15s;"
+                        onmouseenter="this.style.background='rgba(255,255,255,0.14)'" onmouseleave="this.style.background='rgba(255,255,255,0.08)'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        Close
+                    </button>
+                </div>
+            </div>
+            <div id="er-fs-content" style="flex:1;overflow:hidden;background:#F8FAFC;cursor:grab;position:relative;">
+                <div id="er-fs-transform" style="display:inline-block;padding:32px;transform-origin:0 0;"></div>
             </div>
         </div>
+
         @endif
     </div>
 
@@ -1312,6 +1762,18 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'PATCH'  => 'bg-orange-500 text-white',
         'DELETE' => 'bg-red-500 text-white',
     ];
+    $routeMethodColors = [
+        'GET'    => ['hex'=>'#34D399','bg'=>'rgba(52,211,153,.12)','border'=>'rgba(52,211,153,.3)'],
+        'POST'   => ['hex'=>'#60A5FA','bg'=>'rgba(96,165,250,.12)','border'=>'rgba(96,165,250,.3)'],
+        'PUT'    => ['hex'=>'#A78BFA','bg'=>'rgba(167,139,250,.12)','border'=>'rgba(167,139,250,.3)'],
+        'PATCH'  => ['hex'=>'#FB923C','bg'=>'rgba(251,146,60,.12)','border'=>'rgba(251,146,60,.3)'],
+        'DELETE' => ['hex'=>'#F87171','bg'=>'rgba(248,113,113,.12)','border'=>'rgba(248,113,113,.3)'],
+    ];
+    $routeTotal      = $rs['total'] ?? 0;
+    $routeAuthCount  = count(array_filter($data['routes'], fn($r) => in_array('auth', array_map('strtolower', $r['middleware']??[]))));
+    $routeApiCount   = count($data['api_docs'] ?? []);
+    $routePublic     = $routeTotal - $routeAuthCount;
+    $routeDistTotal  = max(array_sum($routeMethodCounts), 1);
     @endphp
 
     {{-- List view --}}
@@ -1319,9 +1781,14 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         {{-- Header --}}
         <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;">
-            <div>
-                <h1 class="sec-title">Route Explorer</h1>
-                <p class="sec-sub">{{ $rs['total']??0 }} routes · click any row to explore its full pipeline</p>
+            <div class="sec-header" style="margin-bottom:0;">
+                <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
+                    <svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <div>
+                    <h1 class="sec-header__title">Route Explorer</h1>
+                    <p class="sec-header__sub">Click any row to explore its full pipeline</p>
+                </div>
             </div>
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
                 <div style="position:relative;">
@@ -1344,21 +1811,64 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
             </div>
         </div>
 
-        {{-- Method stats pills --}}
+        {{-- Stats banner --}}
+        <div class="sec-stats-banner" style="margin-bottom:20px;">
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(99,102,241,.10);color:var(--cyan);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $routeTotal }}</div><div class="sec-stat-lbl">Total Routes</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(52,211,153,.12);color:var(--emerald);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $routeAuthCount }}</div><div class="sec-stat-lbl">Auth Protected</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $routeApiCount }}</div><div class="sec-stat-lbl">API Endpoints</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(248,113,113,.12);color:var(--rose);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $routePublic }}</div><div class="sec-stat-lbl">Public</div></div>
+            </div>
+        </div>
+
+        {{-- Method distribution stacked bar --}}
         @if(!empty($routeMethodCounts))
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
-            @foreach($routeMethodCounts as $method => $cnt)
-            <button onclick="document.getElementById('routes-method-filter').value='{{ $method }}'; filterRoutes();"
-                style="display:flex;align-items:center;gap:8px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:7px 14px;cursor:pointer;transition:border-color .2s;">
-                <span class="text-xs font-bold px-2 py-0.5 rounded-md method-{{ strtolower($method) }}" style="font-family:var(--font-mono);">{{ $method }}</span>
-                <span style="font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--text);">{{ $cnt }}</span>
-            </button>
-            @endforeach
-            <button onclick="document.getElementById('routes-method-filter').value=''; filterRoutes();"
-                style="display:flex;align-items:center;gap:8px;background:var(--bg-hover);border:1px solid var(--border-strong);border-radius:10px;padding:7px 14px;cursor:pointer;">
-                <span style="font-size:11px;font-weight:700;font-family:var(--font-mono);color:var(--text-faint);">ALL</span>
-                <span style="font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--text);">{{ $rs['total']??0 }}</span>
-            </button>
+        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <span style="font-size:12px;font-weight:700;color:var(--text);">Method Distribution</span>
+                <span style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">{{ $routeTotal }} routes total</span>
+            </div>
+            {{-- Stacked bar --}}
+            <div class="method-dist-bar" style="height:12px;margin-bottom:14px;">
+                @foreach($routeMethodCounts as $method => $cnt)
+                @php $mc = $routeMethodColors[$method] ?? ['hex'=>'#94A3B8','bg'=>'rgba(148,163,184,.12)','border'=>'rgba(148,163,184,.3)']; @endphp
+                <div class="method-dist-seg" style="width:{{ round($cnt/$routeDistTotal*100,1) }}%;background:{{ $mc['hex'] }};"
+                     onclick="document.getElementById('routes-method-filter').value='{{ $method }}'; filterRoutes();"
+                     title="{{ $method }}: {{ $cnt }} routes ({{ round($cnt/$routeDistTotal*100,1) }}%)"></div>
+                @endforeach
+            </div>
+            {{-- Legend --}}
+            <div style="display:flex;flex-wrap:wrap;gap:10px;">
+                @foreach($routeMethodCounts as $method => $cnt)
+                @php $mc = $routeMethodColors[$method] ?? ['hex'=>'#94A3B8','bg'=>'rgba(148,163,184,.12)','border'=>'rgba(148,163,184,.3)']; @endphp
+                <button onclick="document.getElementById('routes-method-filter').value='{{ $method }}'; filterRoutes();"
+                    style="display:flex;align-items:center;gap:7px;background:{{ $mc['bg'] }};border:1px solid {{ $mc['border'] }};border-radius:8px;padding:5px 12px;cursor:pointer;transition:opacity .15s;"
+                    onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
+                    <span style="width:8px;height:8px;border-radius:50%;background:{{ $mc['hex'] }};flex:none;"></span>
+                    <span style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:{{ $mc['hex'] }};">{{ $method }}</span>
+                    <span style="font-family:var(--font-mono);font-size:13px;font-weight:800;color:var(--text);">{{ $cnt }}</span>
+                    <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);">{{ round($cnt/$routeDistTotal*100) }}%</span>
+                </button>
+                @endforeach
+            </div>
         </div>
         @endif
 
@@ -1389,7 +1899,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         $fullMwTitle = implode(' · ', $allMws);
                         $routeName   = $route['name'] ?? '';
                     @endphp
-                    <tr class="route-row" style="border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;"
+                    <tr class="route-row route-row-anim" style="--ri:{{$i}};border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;"
                         onclick="showRouteDetail({{ $i }})"
                         data-uri="{{ strtolower($route['uri']??'') }}"
                         data-methods="{{ implode(',',array_map('strtoupper',$methods)) }}"
@@ -1497,7 +2007,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'boolean' => ['color'=>'#FBBF24','bg'=>'rgba(251,191,36,.12)'],
         'array'   => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.12)'],
         'file'    => ['color'=>'#F87171','bg'=>'rgba(248,113,113,.12)'],
-        'email'   => ['color'=>'#0052CC','bg'=>'rgba(0,82,204,.12)'],
+        'email'   => ['color'=>'#6366F1','bg'=>'rgba(99,102,241,.12)'],
         'url'     => ['color'=>'#60A5FA','bg'=>'rgba(96,165,250,.12)'],
         'date'    => ['color'=>'#FB923C','bg'=>'rgba(251,146,60,.12)'],
         'uuid'    => ['color'=>'#6B778C','bg'=>'rgba(142,155,184,.1)'],
@@ -1517,12 +2027,17 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     {{-- Page header --}}
     <div style="margin-bottom:24px;">
         <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;">
-            <div>
-                <h1 class="sec-title">API Documentation</h1>
-                <p class="sec-sub">
-                    {{ count($apiDocs) }} endpoint{{ count($apiDocs) !== 1 ? 's' : '' }} across
-                    {{ count($apiGroups) }} resource{{ count($apiGroups) !== 1 ? 's' : '' }} · auto-generated from routes
-                </p>
+            <div class="sec-header" style="margin-bottom:0;">
+                <div class="sec-header__icon" style="background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.20);color:#3b82f6;">
+                    <svg viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div>
+                    <h1 class="sec-header__title">API Documentation</h1>
+                    <p class="sec-header__sub">
+                        {{ count($apiDocs) }} endpoint{{ count($apiDocs) !== 1 ? 's' : '' }} across
+                        {{ count($apiGroups) }} resource{{ count($apiGroups) !== 1 ? 's' : '' }} · auto-generated from routes
+                    </p>
+                </div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                 {{-- Search input --}}
@@ -1570,8 +2085,8 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     @if(empty($apiDocs))
     {{-- Empty state --}}
     <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:16px;padding:64px 24px;text-align:center;">
-        <div style="width:56px;height:56px;background:rgba(0,82,204,.08);border:1px solid rgba(0,82,204,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-            <svg style="width:26px;height:26px;color:#0052CC;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style="width:56px;height:56px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg style="width:26px;height:26px;color:#6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
         </div>
@@ -1605,8 +2120,8 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
             {{-- Group header --}}
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-                <div style="width:32px;height:32px;background:rgba(0,82,204,.1);border:1px solid rgba(0,82,204,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg style="width:16px;height:16px;color:#0052CC;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div style="width:32px;height:32px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg style="width:16px;height:16px;color:#6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                     </svg>
                 </div>
@@ -1863,123 +2378,268 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Jobs --}}
 <section id="sec-jobs" class="p-6" style="display:none">
     <div id="jobs-list">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-            <div><h1 class="sec-title">Jobs</h1><p class="sec-sub">{{ count($data['jobs']) }} queued jobs</p></div>
-            <input id="jobs-search" oninput="filterGrid('jobs')" type="search" placeholder="Search…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        {{-- Header --}}
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <div class="sec-header" style="margin-bottom:0;">
+                <div class="sec-header__icon" style="background:rgba(255,139,0,.10);border:1px solid rgba(255,139,0,.20);color:var(--amber);">
+                    <svg viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                </div>
+                <div>
+                    <h1 class="sec-header__title">Jobs</h1>
+                    <p class="sec-header__sub">Background queue jobs in your application</p>
+                </div>
+            </div>
+            <input id="jobs-search" oninput="filterGrid('jobs')" type="search" placeholder="Search jobs…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        </div>
+        {{-- Stats --}}
+        @php
+            $jobsQueued  = count(array_filter($data['jobs'], fn($j) => $j['should_queue']??false));
+            $jobsTimeout = count(array_filter($data['jobs'], fn($j) => !empty($j['timeout'])));
+        @endphp
+        <div class="sec-stats-banner">
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ count($data['jobs']) }}</div><div class="sec-stat-lbl">Total Jobs</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $jobsQueued }}</div><div class="sec-stat-lbl">ShouldQueue</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $jobsTimeout }}</div><div class="sec-stat-lbl">With Timeout</div></div>
+            </div>
         </div>
         @if(empty($data['jobs']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No jobs found in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">app/Jobs</code></p></div>
+        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No jobs found in <code>app/Jobs</code></p></div>
         @else
-        <div id="jobs-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+        <div id="jobs-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['jobs'] as $i => $job)
-            <div class="card" style="padding:18px;cursor:pointer;" onclick="showDetail('jobs',{{$i}})" data-name="{{ strtolower($job['name']) }}">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;">
-                    <p style="font-weight:700;font-size:15px;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0;">{{ $job['name'] }}</p>
-                    @if($job['should_queue']??false)<span style="flex:none;font-family:var(--font-mono);font-size:10px;background:rgba(251,191,36,0.12);color:var(--amber);padding:3px 8px;border-radius:12px;border:1px solid rgba(251,191,36,0.25);">Queued</span>@endif
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:var(--amber);" onclick="showDetail('jobs',{{$i}})" data-name="{{ strtolower($job['name']) }}">
+                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+                    <div class="sec2-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <div style="min-width:0;flex:1;">
+                        <p class="sec2-name">{{ $job['name'] }}</p>
+                        <p class="sec2-sub">queue: {{ $job['queue']??'default' }}</p>
+                    </div>
+                    @if($job['should_queue']??false)
+                    <span class="sec2-chip" style="background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.25);flex:none;">queued</span>
+                    @endif
                 </div>
-                <p style="font-size:12px;color:var(--text-faint);margin-bottom:8px;">Queue: <span style="font-family:var(--font-mono);color:var(--text);">{{ $job['queue']??'default' }}</span></p>
-                <div style="display:flex;gap:12px;font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">
-                    @if($job['tries']??null)<span>Tries: {{ $job['tries'] }}</span>@endif
-                    @if($job['timeout']??null)<span>Timeout: {{ $job['timeout'] }}s</span>@endif
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    @if($job['tries']??null)<span class="sec2-chip" style="background:var(--bg-hover);color:var(--text-dim);border-color:var(--border);">{{ $job['tries'] }} tries</span>@endif
+                    @if($job['timeout']??null)<span class="sec2-chip" style="background:var(--bg-hover);color:var(--text-dim);border-color:var(--border);">{{ $job['timeout'] }}s timeout</span>@endif
                 </div>
             </div>
             @endforeach
         </div>
         @endif
     </div>
-    <div id="jobs-detail" style="display:none">
-        <div id="jobs-detail-content"></div>
-    </div>
+    <div id="jobs-detail" style="display:none"><div id="jobs-detail-content"></div></div>
 </section>
 
 {{-- Events --}}
 <section id="sec-events" class="p-6" style="display:none">
     <div id="events-list">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-            <div><h1 class="sec-title">Events</h1><p class="sec-sub">{{ count($data['events']) }} events</p></div>
-            <input id="events-search" oninput="filterGrid('events')" type="search" placeholder="Search…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <div class="sec-header" style="margin-bottom:0;">
+                <div class="sec-header__icon" style="background:rgba(101,84,192,.10);border:1px solid rgba(101,84,192,.20);color:var(--violet);">
+                    <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                </div>
+                <div>
+                    <h1 class="sec-header__title">Events</h1>
+                    <p class="sec-header__sub">Application events and broadcast listeners</p>
+                </div>
+            </div>
+            <input id="events-search" oninput="filterGrid('events')" type="search" placeholder="Search events…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        </div>
+        @php $evtBroadcast = count(array_filter($data['events'], fn($e) => $e['should_broadcast']??false)); @endphp
+        <div class="sec-stats-banner">
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(167,139,250,.12);color:var(--violet);">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ count($data['events']) }}</div><div class="sec-stat-lbl">Total Events</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(167,139,250,.12);color:var(--violet);">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $evtBroadcast }}</div><div class="sec-stat-lbl">Broadcast</div></div>
+            </div>
         </div>
         @if(empty($data['events']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No events found in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">app/Events</code></p></div>
+        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No events found in <code>app/Events</code></p></div>
         @else
-        <div id="events-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+        <div id="events-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['events'] as $i => $evt)
-            <div class="card" style="padding:18px;cursor:pointer;" onclick="showDetail('events',{{$i}})" data-name="{{ strtolower($evt['name']) }}">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
-                    <p style="font-weight:700;font-size:15px;color:var(--text);">{{ $evt['name'] }}</p>
-                    @if($evt['should_broadcast']??false)<span style="font-family:var(--font-mono);font-size:10px;background:rgba(248,113,113,0.12);color:var(--rose);padding:3px 8px;border-radius:12px;border:1px solid rgba(248,113,113,0.25);">Broadcast</span>@endif
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:var(--violet);" onclick="showDetail('events',{{$i}})" data-name="{{ strtolower($evt['name']) }}">
+                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;">
+                    <div class="sec2-icon" style="background:rgba(167,139,250,.12);color:var(--violet);">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    </div>
+                    <div style="min-width:0;flex:1;">
+                        <p class="sec2-name">{{ $evt['name'] }}</p>
+                        <p class="sec2-sub">{{ $evt['namespace'] }}</p>
+                    </div>
+                    @if($evt['should_broadcast']??false)
+                    <span class="sec2-chip" style="background:rgba(167,139,250,.1);color:var(--violet);border-color:rgba(167,139,250,.3);flex:none;">broadcast</span>
+                    @endif
                 </div>
-                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $evt['namespace'] }}</p>
-                @if(!empty($evt['properties']))<p style="font-size:12px;color:var(--text-dim);margin-top:8px;">{{ count($evt['properties']) }} payload props</p>@endif
+                @if(!empty($evt['properties']))
+                <div style="margin-top:8px;font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($evt['properties']) }} payload props</div>
+                @endif
             </div>
             @endforeach
         </div>
         @endif
     </div>
-    <div id="events-detail" style="display:none">
-        <div id="events-detail-content"></div>
-    </div>
+    <div id="events-detail" style="display:none"><div id="events-detail-content"></div></div>
 </section>
 
 {{-- Services --}}
 <section id="sec-services" class="p-6" style="display:none">
     <div id="services-list">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-            <div><h1 class="sec-title">Services</h1><p class="sec-sub">{{ count($data['services']) }} service classes</p></div>
-            <input id="services-search" oninput="filterGrid('services')" type="search" placeholder="Search…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <div class="sec-header" style="margin-bottom:0;">
+                <div class="sec-header__icon" style="background:rgba(0,135,90,.10);border:1px solid rgba(0,135,90,.20);color:var(--emerald);">
+                    <svg viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                    <h1 class="sec-header__title">Services</h1>
+                    <p class="sec-header__sub">Business logic service classes</p>
+                </div>
+            </div>
+            <input id="services-search" oninput="filterGrid('services')" type="search" placeholder="Search services…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        </div>
+        @php
+            $svcTotal   = count($data['services']);
+            $svcMethods = $svcTotal > 0 ? round(array_sum(array_map(fn($s) => count($s['methods']??[]), $data['services'])) / $svcTotal) : 0;
+        @endphp
+        <div class="sec-stats-banner">
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(45,212,191,.12);color:#2DD4BF;">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $svcTotal }}</div><div class="sec-stat-lbl">Total Services</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(45,212,191,.12);color:#2DD4BF;">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $svcMethods }}</div><div class="sec-stat-lbl">Avg Methods</div></div>
+            </div>
         </div>
         @if(empty($data['services']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No services found in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">app/Services</code></p></div>
+        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No services found in <code>app/Services</code></p></div>
         @else
-        <div id="services-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+        <div id="services-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['services'] as $i => $svc)
-            <div class="card" style="padding:18px;cursor:pointer;" onclick="showDetail('services',{{$i}})" data-name="{{ strtolower($svc['name']) }}">
-                <p style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px;">{{ $svc['name'] }}</p>
-                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:10px;">{{ $svc['namespace'] }}</p>
-                <div style="display:flex;gap:12px;font-size:12px;color:var(--text-dim);">
-                    <span>{{ count($svc['methods']??[]) }} methods</span>
-                    @if(!empty($svc['dependencies']))<span>{{ count($svc['dependencies']) }} deps</span>@endif
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#2DD4BF;" onclick="showDetail('services',{{$i}})" data-name="{{ strtolower($svc['name']) }}">
+                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+                    <div class="sec2-icon" style="background:rgba(45,212,191,.12);color:#2DD4BF;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <div style="min-width:0;flex:1;">
+                        <p class="sec2-name">{{ $svc['name'] }}</p>
+                        <p class="sec2-sub">{{ $svc['namespace'] }}</p>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <span class="sec2-chip" style="background:rgba(45,212,191,.1);color:#2DD4BF;border-color:rgba(45,212,191,.25);">{{ count($svc['methods']??[]) }} methods</span>
+                    @if(!empty($svc['dependencies']))<span class="sec2-chip" style="background:var(--bg-hover);color:var(--text-dim);border-color:var(--border);">{{ count($svc['dependencies']) }} deps</span>@endif
                 </div>
             </div>
             @endforeach
         </div>
         @endif
     </div>
-    <div id="services-detail" style="display:none">
-        <div id="services-detail-content"></div>
-    </div>
+    <div id="services-detail" style="display:none"><div id="services-detail-content"></div></div>
 </section>
 
 {{-- Repositories --}}
 <section id="sec-repositories" class="p-6" style="display:none">
     <div id="repositories-list">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-            <div><h1 class="sec-title">Repositories</h1><p class="sec-sub">{{ count($data['repositories']) }} repositories</p></div>
-            <input id="repositories-search" oninput="filterGrid('repositories')" type="search" placeholder="Search…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <div class="sec-header" style="margin-bottom:0;">
+                <div class="sec-header__icon" style="background:rgba(0,101,255,.10);border:1px solid rgba(0,101,255,.20);color:var(--sky);">
+                    <svg viewBox="0 0 24 24"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                </div>
+                <div>
+                    <h1 class="sec-header__title">Repositories</h1>
+                    <p class="sec-header__sub">Data access layer repository classes</p>
+                </div>
+            </div>
+            <input id="repositories-search" oninput="filterGrid('repositories')" type="search" placeholder="Search repositories…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        </div>
+        @php
+            $repoTotal    = count($data['repositories']);
+            $repoMethods  = $repoTotal > 0 ? round(array_sum(array_map(fn($r) => count($r['methods']??[]), $data['repositories'])) / $repoTotal) : 0;
+            $repoDeps     = array_sum(array_map(fn($r) => count($r['dependencies']??[]), $data['repositories']));
+        @endphp
+        <div class="sec-stats-banner">
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(99,102,241,.10);color:var(--cyan);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $repoTotal }}</div><div class="sec-stat-lbl">Repositories</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(99,102,241,.10);color:var(--cyan);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $repoMethods }}</div><div class="sec-stat-lbl">Avg Methods</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(99,102,241,.10);color:var(--cyan);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $repoDeps }}</div><div class="sec-stat-lbl">Total Deps</div></div>
+            </div>
         </div>
         @if(empty($data['repositories']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No repositories found in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">app/Repositories</code></p></div>
+        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No repositories found in <code>app/Repositories</code></p></div>
         @else
-        <div id="repositories-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+        <div id="repositories-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['repositories'] as $i => $repo)
-            <div class="card" style="padding:0;cursor:pointer;overflow:hidden;"
+            @php $repoDotCount = min(count($repo['dependencies']??[]), 8); @endphp
+            <div class="repo-card" style="--ci:{{$i}};background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s,border-color .2s;"
                  onclick="showDetail('repositories',{{$i}})" data-name="{{ strtolower($repo['name']) }}"
-                 onmouseenter="this.style.borderColor='rgba(0,101,255,0.4)';this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow-hover)'"
+                 onmouseenter="this.style.borderColor='rgba(99,102,241,0.4)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(99,102,241,0.10)'"
                  onmouseleave="this.style.borderColor='var(--border)';this.style.transform='';this.style.boxShadow='var(--shadow)'">
-                <div style="height:3px;background:linear-gradient(90deg,rgba(0,101,255,0.85),rgba(0,101,255,0.35));border-radius:12px 12px 0 0;"></div>
+                {{-- Top bar --}}
+                <div style="height:5px;background:linear-gradient(90deg,var(--cyan),var(--cyan-bright));"></div>
                 <div style="padding:18px;">
-                    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
-                        <div style="width:36px;height:36px;border-radius:9px;background:rgba(0,101,255,0.10);color:#0065FF;display:flex;align-items:center;justify-content:center;flex:none;">
+                    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
+                        <div style="width:38px;height:38px;border-radius:10px;background:rgba(99,102,241,.10);color:var(--cyan);display:flex;align-items:center;justify-content:center;flex:none;border:1px solid rgba(99,102,241,.2);">
                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                         </div>
                         <div style="min-width:0;flex:1;">
-                            <p style="font-weight:700;font-size:15px;color:var(--text);margin:0 0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $repo['name'] }}</p>
+                            <p style="font-weight:700;font-size:14px;color:var(--text);margin:0 0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $repo['name'] }}</p>
                             <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $repo['namespace'] }}</p>
                         </div>
                     </div>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;font-family:var(--font-mono);">
-                        <span style="background:rgba(0,101,255,0.08);color:#0065FF;padding:3px 9px;border-radius:6px;border:1px solid rgba(0,101,255,0.2);">{{ count($repo['methods']??[]) }} methods</span>
-                        @if(!empty($repo['dependencies']))<span style="color:var(--text-dim);padding:3px 6px;">{{ count($repo['dependencies']) }} deps</span>@endif
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                        <span class="sec2-chip" style="background:rgba(99,102,241,.08);color:var(--cyan);border-color:rgba(99,102,241,.20);">{{ count($repo['methods']??[]) }} methods</span>
+                        {{-- Dependency dots --}}
+                        @if($repoDotCount > 0)
+                        <div style="display:flex;align-items:center;gap:3px;" title="{{ count($repo['dependencies']??[]) }} dependencies">
+                            @for($d=0;$d<$repoDotCount;$d++)
+                            <div class="repo-dep-dot" style="opacity:{{ round(1 - ($d / max($repoDotCount,1)) * 0.5, 2) }};"></div>
+                            @endfor
+                            @if(count($repo['dependencies']??[]) > 8)
+                            <span style="font-size:9px;color:var(--text-faint);font-family:var(--font-mono);">+{{ count($repo['dependencies'])-8 }}</span>
+                            @endif
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -1995,63 +2655,138 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Observers --}}
 <section id="sec-observers" class="p-6" style="display:none">
     <div id="observers-list">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-            <div><h1 class="sec-title">Observers</h1><p class="sec-sub">{{ count($data['observers']) }} observers</p></div>
-            <input id="observers-search" oninput="filterGrid('observers')" type="search" placeholder="Search…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <div class="sec-header" style="margin-bottom:0;">
+                <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
+                    <svg viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </div>
+                <div>
+                    <h1 class="sec-header__title">Observers</h1>
+                    <p class="sec-header__sub">Model lifecycle event observers</p>
+                </div>
+            </div>
+            <input id="observers-search" oninput="filterGrid('observers')" type="search" placeholder="Search observers…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        </div>
+        @php
+            $obsModels = count(array_unique(array_filter(array_column($data['observers'], 'model'))));
+        @endphp
+        <div class="sec-stats-banner">
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(248,113,113,.12);color:var(--rose);">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ count($data['observers']) }}</div><div class="sec-stat-lbl">Total Observers</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(248,113,113,.12);color:var(--rose);">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $obsModels }}</div><div class="sec-stat-lbl">Models Covered</div></div>
+            </div>
         </div>
         @if(empty($data['observers']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No observers found in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">app/Observers</code></p></div>
+        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No observers found in <code>app/Observers</code></p></div>
         @else
-        <div id="observers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+        <div id="observers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['observers'] as $i => $obs)
-            <div class="card" style="padding:18px;cursor:pointer;" onclick="showDetail('observers',{{$i}})" data-name="{{ strtolower($obs['name']) }}">
-                <p style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">{{ $obs['name'] }}</p>
-                <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Observes: <span style="color:var(--text);font-family:var(--font-mono);">{{ $obs['model']??'Unknown' }}</span></p>
-                <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                    @foreach($obs['events']??[] as $e)<span style="font-size:10px;padding:3px 7px;border-radius:5px;background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.2);">{{ $e }}</span>@endforeach
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:var(--rose);" onclick="showDetail('observers',{{$i}})" data-name="{{ strtolower($obs['name']) }}">
+                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+                    <div class="sec2-icon" style="background:rgba(248,113,113,.12);color:var(--rose);">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </div>
+                    <div style="min-width:0;flex:1;">
+                        <p class="sec2-name">{{ $obs['name'] }}</p>
+                        <p class="sec2-sub">observes: <span style="color:var(--text);">{{ $obs['model']??'Unknown' }}</span></p>
+                    </div>
                 </div>
+                @if(!empty($obs['events']))
+                <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                    @foreach($obs['events'] as $e)
+                    <span class="sec2-chip" style="background:rgba(248,113,113,.1);color:var(--rose);border-color:rgba(248,113,113,.25);">{{ $e }}</span>
+                    @endforeach
+                </div>
+                @endif
             </div>
             @endforeach
         </div>
         @endif
     </div>
-    <div id="observers-detail" style="display:none">
-        <div id="observers-detail-content"></div>
-    </div>
+    <div id="observers-detail" style="display:none"><div id="observers-detail-content"></div></div>
 </section>
 
 {{-- Policies --}}
 <section id="sec-policies" class="p-6" style="display:none">
     <div id="policies-list">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-            <div><h1 class="sec-title">Policies</h1><p class="sec-sub">{{ count($data['policies']) }} policies</p></div>
-            <input id="policies-search" oninput="filterGrid('policies')" type="search" placeholder="Search…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <div class="sec-header" style="margin-bottom:0;">
+                <div class="sec-header__icon" style="background:rgba(222,53,11,.10);border:1px solid rgba(222,53,11,.20);color:var(--rose);">
+                    <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <div>
+                    <h1 class="sec-header__title">Policies</h1>
+                    <p class="sec-header__sub">Authorization policies for your models</p>
+                </div>
+            </div>
+            <input id="policies-search" oninput="filterGrid('policies')" type="search" placeholder="Search policies…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
+        </div>
+        @php
+            $polActions = array_sum(array_map(fn($p) => count($p['actions']??[]), $data['policies']));
+        @endphp
+        <div class="sec-stats-banner">
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(52,211,153,.12);color:var(--emerald);">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ count($data['policies']) }}</div><div class="sec-stat-lbl">Total Policies</div></div>
+            </div>
+            <div class="sec-stat-card">
+                <div class="sec-stat-icon" style="background:rgba(52,211,153,.12);color:var(--emerald);">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                </div>
+                <div><div class="sec-stat-num">{{ $polActions }}</div><div class="sec-stat-lbl">Total Actions</div></div>
+            </div>
         </div>
         @if(empty($data['policies']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No policies found in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">app/Policies</code></p></div>
+        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No policies found in <code>app/Policies</code></p></div>
         @else
-        <div id="policies-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+        <div id="policies-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['policies'] as $i => $pol)
-            <div class="card" style="padding:18px;cursor:pointer;" onclick="showDetail('policies',{{$i}})" data-name="{{ strtolower($pol['name']) }}">
-                <p style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">{{ $pol['name'] }}</p>
-                <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Guards: <span style="color:var(--text);font-family:var(--font-mono);">{{ $pol['model']??'Unknown' }}</span></p>
-                <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                    @foreach($pol['actions']??[] as $a)<span class="ctrl-chip">{{ $a }}</span>@endforeach
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:var(--emerald);" onclick="showDetail('policies',{{$i}})" data-name="{{ strtolower($pol['name']) }}">
+                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+                    <div class="sec2-icon" style="background:rgba(52,211,153,.12);color:var(--emerald);">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <div style="min-width:0;flex:1;">
+                        <p class="sec2-name">{{ $pol['name'] }}</p>
+                        <p class="sec2-sub">guards: <span style="color:var(--text);">{{ $pol['model']??'Unknown' }}</span></p>
+                    </div>
                 </div>
+                @if(!empty($pol['actions']))
+                <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                    @foreach($pol['actions'] as $a)
+                    <span class="sec2-chip" style="background:rgba(52,211,153,.1);color:var(--emerald);border-color:rgba(52,211,153,.25);">{{ $a }}</span>
+                    @endforeach
+                </div>
+                @endif
             </div>
             @endforeach
         </div>
         @endif
     </div>
-    <div id="policies-detail" style="display:none">
-        <div id="policies-detail-content"></div>
-    </div>
+    <div id="policies-detail" style="display:none"><div id="policies-detail-content"></div></div>
 </section>
 
 {{-- Dependencies --}}
 <section id="sec-dependencies" class="p-6" style="display:none">
-    <h1 class="sec-title" style="margin-bottom:6px;">Dependency Graph</h1>
-    <p class="sec-sub" style="margin-bottom:24px;">{{ count($data['dependencies']['nodes']??[]) }} nodes · {{ count($data['dependencies']['edges']??[]) }} edges — how your classes connect across layers</p>
+    <div class="sec-header" style="margin-bottom:24px;">
+        <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
+            <svg viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+        </div>
+        <div>
+            <h1 class="sec-header__title">Dependency Graph</h1>
+            <p class="sec-header__sub">{{ count($data['dependencies']['nodes']??[]) }} nodes · {{ count($data['dependencies']['edges']??[]) }} edges — how your classes connect across layers</p>
+        </div>
+    </div>
 
     @php
     $depNodes = $data['dependencies']['nodes'] ?? [];
@@ -2109,7 +2844,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         $fLines[] = "    class {$n['name']} {$n['layer']}";
     }
 
-    $fLines[] = '    classDef controller fill:#EAF2FF,stroke:#0052CC,color:#172B4D';
+    $fLines[] = '    classDef controller fill:#EEF2FF,stroke:#6366F1,color:#172B4D';
     $fLines[] = '    classDef service    fill:#E3FCEF,stroke:#00875A,color:#172B4D';
     $fLines[] = '    classDef repository fill:#FFFAE6,stroke:#FF8B00,color:#172B4D';
     $fLines[] = '    classDef model      fill:#F3F0FF,stroke:#6554C0,color:#172B4D';
@@ -2125,7 +2860,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     foreach ($depNodes as $n) { $lCounts[$n['layer']] = ($lCounts[$n['layer']] ?? 0) + 1; }
 
     $legendItems = [
-        'controller' => ['Controllers', '#0052CC', '#EAF2FF'],
+        'controller' => ['Controllers', '#6366F1', '#EEF2FF'],
         'service'    => ['Services',    '#00875A', '#E3FCEF'],
         'repository' => ['Repositories','#FF8B00', '#FFFAE6'],
         'model'      => ['Models',      '#6554C0', '#F3F0FF'],
@@ -2179,7 +2914,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         <path d="M0,0 L0,6 L7,3 z" fill="rgba(148,178,222,0.5)"/>
                     </marker>
                     <marker id="dep-arr-hi" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L7,3 z" fill="#0052CC"/>
+                        <path d="M0,0 L0,6 L7,3 z" fill="#6366F1"/>
                     </marker>
                     <filter id="dep-shadow" x="-20%" y="-20%" width="140%" height="140%">
                         <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(23,43,77,0.10)" flood-opacity="1"/>
@@ -2201,16 +2936,14 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
     @php $modules = $data['modules'] ?? []; @endphp
 
-    <div style="margin-bottom:24px;">
-        <h1 class="sec-title">Module Explorer</h1>
-        <p class="sec-sub">
-            {{ count($modules) }} module{{ count($modules) !== 1 ? 's' : '' }} detected
-            @if(count($modules) > 0)
-            · {{ array_sum(array_column($modules, 'controllers')) }} controllers
-            · {{ array_sum(array_column($modules, 'models')) }} models
-            · {{ array_sum(array_column($modules, 'routes')) }} routes
-            @endif
-        </p>
+    <div class="sec-header" style="margin-bottom:24px;">
+        <div class="sec-header__icon" style="background:rgba(6,182,212,.10);border:1px solid rgba(6,182,212,.20);color:#06b6d4;">
+            <svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        </div>
+        <div>
+            <h1 class="sec-header__title">Module Explorer</h1>
+            <p class="sec-header__sub">{{ count($modules) }} module{{ count($modules) !== 1 ? 's' : '' }} detected@if(count($modules) > 0) · {{ array_sum(array_column($modules, 'controllers')) }} controllers · {{ array_sum(array_column($modules, 'models')) }} models · {{ array_sum(array_column($modules, 'routes')) }} routes@endif</p>
+        </div>
     </div>
 
     @if(empty($modules))
@@ -2255,7 +2988,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         @php
         $modPalette = [
             ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.15)','border'=>'rgba(167,139,250,.3)'],
-            ['color'=>'#0052CC','bg'=>'rgba(0,82,204,.15)','border'=>'rgba(0,82,204,.3)'],
+            ['color'=>'#6366F1','bg'=>'rgba(99,102,241,.15)','border'=>'rgba(99,102,241,.3)'],
             ['color'=>'#34D399','bg'=>'rgba(52,211,153,.15)','border'=>'rgba(52,211,153,.3)'],
             ['color'=>'#60A5FA','bg'=>'rgba(96,165,250,.15)','border'=>'rgba(96,165,250,.3)'],
             ['color'=>'#F87171','bg'=>'rgba(248,113,113,.15)','border'=>'rgba(248,113,113,.3)'],
@@ -2340,40 +3073,45 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     }
     ksort($byCategory);
 
-    $categoryColors = [
-        'Admin Panel'       => ['color'=>'#FBBF24','bg'=>'rgba(251,191,36,.12)','border'=>'rgba(251,191,36,.25)'],
-        'API Authentication'=> ['color'=>'#60A5FA','bg'=>'rgba(96,165,250,.12)','border'=>'rgba(96,165,250,.25)'],
-        'Architecture'      => ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.12)','border'=>'rgba(167,139,250,.25)'],
-        'Audit'             => ['color'=>'#F87171','bg'=>'rgba(248,113,113,.12)','border'=>'rgba(248,113,113,.25)'],
-        'Auth Scaffolding'  => ['color'=>'#E879F9','bg'=>'rgba(232,121,249,.12)','border'=>'rgba(232,121,249,.25)'],
-        'Authorization'     => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.12)','border'=>'rgba(52,211,153,.25)'],
-        'Backup'            => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.12)','border'=>'rgba(52,211,153,.25)'],
-        'Debug'             => ['color'=>'#6B778C','bg'=>'rgba(142,155,184,.1)','border'=>'rgba(142,155,184,.2)'],
-        'Import / Export'   => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.12)','border'=>'rgba(52,211,153,.25)'],
-        'Media'             => ['color'=>'#0052CC','bg'=>'rgba(0,82,204,.12)','border'=>'rgba(0,82,204,.25)'],
-        'Payments'          => ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.12)','border'=>'rgba(167,139,250,.25)'],
-        'PDF'               => ['color'=>'#F87171','bg'=>'rgba(248,113,113,.12)','border'=>'rgba(248,113,113,.25)'],
-        'Queue Monitoring'  => ['color'=>'#2DD4BF','bg'=>'rgba(45,212,191,.12)','border'=>'rgba(45,212,191,.25)'],
-        'Search'            => ['color'=>'#60A5FA','bg'=>'rgba(96,165,250,.12)','border'=>'rgba(96,165,250,.25)'],
-        'UI Framework'      => ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.12)','border'=>'rgba(167,139,250,.25)'],
+    $devCount = count(array_filter($packages, fn($p) => $p['dev']));
+
+    $categoryMeta = [
+        'Admin Panel'       => ['color'=>'#FBBF24','bg'=>'rgba(251,191,36,.1)','border'=>'#FBBF24','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>'],
+        'API Authentication'=> ['color'=>'#60A5FA','bg'=>'rgba(96,165,250,.1)','border'=>'#60A5FA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>'],
+        'Architecture'      => ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.1)','border'=>'#A78BFA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>'],
+        'Audit'             => ['color'=>'#F87171','bg'=>'rgba(248,113,113,.1)','border'=>'#F87171','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>'],
+        'Auth Scaffolding'  => ['color'=>'#E879F9','bg'=>'rgba(232,121,249,.1)','border'=>'#E879F9','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>'],
+        'Authorization'     => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.1)','border'=>'#34D399','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>'],
+        'Backup'            => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.1)','border'=>'#34D399','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>'],
+        'Debug'             => ['color'=>'#94A3B8','bg'=>'rgba(148,163,184,.1)','border'=>'#94A3B8','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>'],
+        'Import / Export'   => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.1)','border'=>'#34D399','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>'],
+        'Media'             => ['color'=>'#818CF8','bg'=>'rgba(129,140,248,.1)','border'=>'#818CF8','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>'],
+        'Payments'          => ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.1)','border'=>'#A78BFA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>'],
+        'PDF'               => ['color'=>'#F87171','bg'=>'rgba(248,113,113,.1)','border'=>'#F87171','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>'],
+        'Queue Monitoring'  => ['color'=>'#2DD4BF','bg'=>'rgba(45,212,191,.1)','border'=>'#2DD4BF','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>'],
+        'Search'            => ['color'=>'#60A5FA','bg'=>'rgba(96,165,250,.1)','border'=>'#60A5FA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>'],
+        'UI Framework'      => ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.1)','border'=>'#A78BFA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>'],
     ];
-    $defaultCatColor = ['color'=>'#6B778C','bg'=>'rgba(142,155,184,.1)','border'=>'rgba(142,155,184,.2)'];
+    $defaultCatMeta = ['color'=>'#94A3B8','bg'=>'rgba(148,163,184,.1)','border'=>'#94A3B8','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>'];
 
     $dotHexColors = [
         'pink'=>'#F472B6','purple'=>'#C084FC','red'=>'#F87171','blue'=>'#60A5FA',
         'orange'=>'#FB923C','violet'=>'#A78BFA','amber'=>'#FBBF24',
         'sky'=>'#38BDF8','emerald'=>'#34D399','green'=>'#4ADE80',
-        'teal'=>'#2DD4BF','slate'=>'#6B778C','cyan'=>'#0052CC','indigo'=>'#818CF8',
+        'teal'=>'#2DD4BF','slate'=>'#94A3B8','cyan'=>'#818CF8','indigo'=>'#818CF8',
         'rose'=>'#FB7185',
     ];
     @endphp
 
-    <div style="margin-bottom:24px;">
-        <h1 class="sec-title">Packages</h1>
-        <p class="sec-sub">
-            {{ count($packages) }} known package{{ count($packages) !== 1 ? 's' : '' }} detected
-            · {{ count($byCategory) }} {{ count($byCategory) !== 1 ? 'categories' : 'category' }}
-        </p>
+    {{-- Page Header --}}
+    <div class="sec-header" style="margin-bottom:24px;">
+        <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
+            <svg viewBox="0 0 24 24"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+        </div>
+        <div>
+            <h1 class="sec-header__title">Packages</h1>
+            <p class="sec-header__sub">Composer dependencies detected in your application</p>
+        </div>
     </div>
 
     @if(empty($packages))
@@ -2386,33 +3124,102 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     </div>
     @else
 
-    @foreach($byCategory as $category => $pkgs)
-    @php $catColor = $categoryColors[$category] ?? $defaultCatColor; @endphp
-    <div style="margin-bottom:28px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-            <span style="font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);">{{ $category }}</span>
-            <span style="font-family:var(--font-mono);font-size:10px;padding:2px 8px;border-radius:10px;background:{{ $catColor['bg'] }};color:{{ $catColor['color'] }};border:1px solid {{ $catColor['border'] }};">{{ count($pkgs) }}</span>
+    {{-- Stats Banner --}}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:28px;">
+        <div class="pkg-stat-card">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,.10);border:1px solid rgba(99,102,241,.25);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg style="width:20px;height:20px;color:#6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            </div>
+            <div>
+                <p style="font-size:22px;font-weight:800;color:var(--text);line-height:1;">{{ count($packages) }}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin-top:2px;">Total Packages</p>
+            </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">
+        <div class="pkg-stat-card">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg style="width:20px;height:20px;color:#34D399;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+            </div>
+            <div>
+                <p style="font-size:22px;font-weight:800;color:var(--text);line-height:1;">{{ count($byCategory) }}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin-top:2px;">Categories</p>
+            </div>
+        </div>
+        <div class="pkg-stat-card">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg style="width:20px;height:20px;color:#FBBF24;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            </div>
+            <div>
+                <p style="font-size:22px;font-weight:800;color:var(--text);line-height:1;">{{ $devCount }}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin-top:2px;">Dev Only</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Categories --}}
+    @php $globalPkgIdx = 0; @endphp
+    @foreach($byCategory as $category => $pkgs)
+    @php $catMeta = $categoryMeta[$category] ?? $defaultCatMeta; @endphp
+    <div style="margin-bottom:32px;">
+
+        {{-- Category Header --}}
+        <div class="pkg-cat-header" style="background:{{ $catMeta['bg'] }};border-left-color:{{ $catMeta['border'] }};">
+            <div style="width:32px;height:32px;border-radius:8px;background:{{ $catMeta['bg'] }};border:1px solid {{ $catMeta['border'] }}40;display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg style="width:16px;height:16px;color:{{ $catMeta['color'] }};" fill="none" stroke="currentColor" viewBox="0 0 24 24">{!! $catMeta['icon'] !!}</svg>
+            </div>
+            <span style="font-weight:700;font-size:13px;color:{{ $catMeta['color'] }};flex:1;">{{ $category }}</span>
+            <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:{{ $catMeta['color'] }}22;color:{{ $catMeta['color'] }};border:1px solid {{ $catMeta['color'] }}44;">{{ count($pkgs) }} pkg{{ count($pkgs) !== 1 ? 's' : '' }}</span>
+        </div>
+
+        {{-- Cards Grid --}}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($pkgs as $pkg)
-            @php $dotHex = $dotHexColors[$pkg['color']] ?? '#6B778C'; @endphp
-            <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .18s;" onmouseenter="this.style.borderColor='{{ $dotHex }}55'" onmouseleave="this.style.borderColor='var(--border)'">
-                <div style="height:2px;background:{{ $dotHex }};opacity:.6;"></div>
-                <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;flex:1;">
-                    <div style="width:8px;height:8px;border-radius:50%;background:{{ $dotHex }};flex:none;margin-top:4px;"></div>
-                    <div style="min-width:0;flex:1;">
-                        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px;">
-                            <p style="font-weight:700;font-size:13px;color:var(--text);line-height:1.25;">{{ $pkg['name'] }}</p>
-                            @if($pkg['version'])
-                            <span style="font-family:var(--font-mono);font-size:10px;background:var(--bg-hover);color:var(--text-faint);padding:1px 6px;border-radius:4px;">v{{ $pkg['version'] }}</span>
-                            @endif
-                            @if($pkg['dev'])
-                            <span style="font-family:var(--font-mono);font-size:10px;color:var(--amber);background:rgba(251,191,36,.1);padding:1px 6px;border-radius:4px;border:1px solid rgba(251,191,36,.2);">dev</span>
-                            @endif
+            @php
+                $dotHex  = $dotHexColors[$pkg['color']] ?? '#94A3B8';
+                $initials = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice(explode(' ', $pkg['name']), 0, 2))));
+                $hasDoc  = !empty($pkg['docs']);
+            @endphp
+            <div class="pkg-card" style="--pkg-i:{{ $globalPkgIdx++ }};background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s,box-shadow .2s;" onmouseenter="this.style.borderColor='{{ $dotHex }}88';this.style.boxShadow='0 8px 28px {{ $dotHex }}22';" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='';">
+                {{-- Colored top bar --}}
+                <div style="height:6px;background:linear-gradient(90deg,{{ $dotHex }},{{ $dotHex }}99);"></div>
+
+                <div style="padding:16px;display:flex;flex-direction:column;gap:12px;flex:1;">
+                    {{-- Header row: avatar + name + badges --}}
+                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                        {{-- Avatar --}}
+                        <div style="width:42px;height:42px;border-radius:10px;background:{{ $dotHex }}18;border:1px solid {{ $dotHex }}33;display:flex;align-items:center;justify-content:center;flex:none;font-weight:800;font-size:13px;color:{{ $dotHex }};letter-spacing:.02em;">{{ $initials }}</div>
+                        {{-- Name & badges --}}
+                        <div style="min-width:0;flex:1;padding-top:2px;">
+                            <p style="font-weight:700;font-size:14px;color:var(--text);line-height:1.3;margin-bottom:5px;">{{ $pkg['name'] }}</p>
+                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                @if($pkg['version'])
+                                <span class="pkg-ver-badge" style="font-family:var(--font-mono);font-size:10px;background:{{ $dotHex }}15;color:{{ $dotHex }};padding:2px 8px;border-radius:5px;border:1px solid {{ $dotHex }}33;font-weight:600;">v{{ $pkg['version'] }}</span>
+                                @endif
+                                @if($pkg['dev'])
+                                <span style="font-family:var(--font-mono);font-size:10px;color:var(--amber);background:rgba(251,191,36,.12);padding:2px 8px;border-radius:5px;border:1px solid rgba(251,191,36,.25);font-weight:600;">dev-only</span>
+                                @endif
+                            </div>
                         </div>
-                        <p style="font-size:12px;color:var(--text-faint);line-height:1.5;margin-bottom:4px;">{{ $pkg['description'] }}</p>
-                        <p style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);opacity:.6;">{{ $pkg['key'] }}</p>
                     </div>
+
+                    {{-- Description --}}
+                    <p style="font-size:12px;color:var(--text-dim);line-height:1.6;flex:1;">{{ $pkg['description'] }}</p>
+
+                    {{-- Composer key --}}
+                    <div style="background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pkg['key'] }}</span>
+                        <button onclick="copyPkgKey(this,'{{ $pkg['key'] }}')" title="Copy composer require command" style="flex:none;display:flex;align-items:center;gap:4px;background:transparent;border:none;color:var(--text-faint);cursor:pointer;padding:2px 4px;border-radius:4px;font-size:10px;transition:color .15s;" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text-faint)'">
+                            <svg style="width:13px;height:13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        </button>
+                    </div>
+
+                    {{-- Docs link --}}
+                    @if($hasDoc)
+                    <a href="{{ $pkg['docs'] }}" target="_blank" rel="noopener" class="pkg-docs-btn" style="color:{{ $dotHex }};border-color:{{ $dotHex }}44;background:{{ $dotHex }}10;align-self:flex-start;" onmouseenter="this.style.background='{{ $dotHex }}20'" onmouseleave="this.style.background='{{ $dotHex }}10'">
+                        <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        View Docs
+                        <svg style="width:11px;height:11px;opacity:.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    @endif
                 </div>
             </div>
             @endforeach
@@ -2426,8 +3233,15 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 {{-- Export --}}
 <section id="sec-export" class="p-6" style="display:none">
-    <h1 class="sec-title" style="margin-bottom:6px;">Export Architecture</h1>
-    <p class="sec-sub" style="margin-bottom:30px;">Download your architecture report in multiple formats for sharing, documentation, or archiving.</p>
+    <div class="sec-header" style="margin-bottom:30px;">
+        <div class="sec-header__icon" style="background:rgba(0,135,90,.10);border:1px solid rgba(0,135,90,.20);color:var(--emerald);">
+            <svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        </div>
+        <div>
+            <h1 class="sec-header__title">Export Architecture</h1>
+            <p class="sec-header__sub">Download your architecture report in multiple formats for sharing, documentation, or archiving.</p>
+        </div>
+    </div>
 
     @php
     $exportPath = rtrim(request()->getSchemeAndHttpHost() . request()->getBasePath(), '/') . '/' . ltrim(config('laradar.dashboard.path', 'architecture'), '/');
@@ -2436,7 +3250,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:880px;">
 
         {{-- JSON --}}
-        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+        <div class="export-card" style="--ei:0;">
             <div style="display:flex;align-items:center;gap:12px;">
                 <div style="width:40px;height:40px;border-radius:10px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);display:flex;align-items:center;justify-content:center;flex:none;">
                     <svg style="width:20px;height:20px;color:var(--amber);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
@@ -2459,7 +3273,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
 
         {{-- Markdown --}}
-        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+        <div class="export-card" style="--ei:1;">
             <div style="display:flex;align-items:center;gap:12px;">
                 <div style="width:40px;height:40px;border-radius:10px;background:rgba(142,155,184,.1);border:1px solid rgba(142,155,184,.2);display:flex;align-items:center;justify-content:center;flex:none;">
                     <svg style="width:20px;height:20px;color:var(--text-dim);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -2477,7 +3291,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
 
         {{-- HTML --}}
-        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+        <div class="export-card" style="--ei:2;">
             <div style="display:flex;align-items:center;gap:12px;">
                 <div style="width:40px;height:40px;border-radius:10px;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.25);display:flex;align-items:center;justify-content:center;flex:none;">
                     <svg style="width:20px;height:20px;color:#FB923C;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
@@ -2495,7 +3309,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
 
         {{-- Graphic Report --}}
-        <div style="background:var(--bg-elevated);border:2px solid rgba(167,139,250,.35);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;">
+        <div class="export-card" style="--ei:3;border-width:2px;border-color:rgba(167,139,250,.35);position:relative;overflow:hidden;">
             <div style="position:absolute;top:0;right:0;background:var(--violet);color:#fff;font-size:10px;font-weight:800;font-family:var(--font-mono);padding:4px 10px;border-radius:0 0 0 10px;letter-spacing:.08em;">NEW</div>
             <div style="display:flex;align-items:center;gap:12px;">
                 <div style="width:40px;height:40px;border-radius:10px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.25);display:flex;align-items:center;justify-content:center;flex:none;">
@@ -2509,8 +3323,9 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 </div>
             </div>
             <p style="font-size:13px;color:var(--text-dim);line-height:1.6;flex:1;">Beautiful standalone HTML report with SVG charts, score gauge, route distribution, dependency graph, and full component tables. No server required.</p>
-            <button onclick="exportGraphicHTML()" id="graphic-report-btn" style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--violet);font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);margin-top:auto;transition:background .15s;" onmouseenter="this.style.background='rgba(167,139,250,.25)'" onmouseleave="this.style.background='rgba(167,139,250,.15)'">
-                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <button onclick="exportGraphicHTML()" id="graphic-report-btn" style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--violet);font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);margin-top:auto;transition:background .15s,opacity .15s;" onmouseenter="if(!this.disabled)this.style.background='rgba(167,139,250,.25)'" onmouseleave="if(!this.disabled)this.style.background='rgba(167,139,250,.15)'">
+                <svg id="graphic-report-icon" style="width:14px;height:14px;flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <svg id="graphic-report-spinner" style="width:14px;height:14px;flex:none;display:none;animation:spin .7s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-width="2.5" d="M12 2a10 10 0 0 1 10 10"/></svg>
                 <span id="graphic-report-label">Generate &amp; Download</span>
             </button>
         </div>
@@ -2543,7 +3358,15 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- AI Insights --}}
 <section id="sec-ai" class="p-6" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px;">
-        <h1 class="sec-title">AI Insights</h1>
+        <div class="sec-header" style="margin-bottom:0;">
+            <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
+                <svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            </div>
+            <div>
+                <h1 class="sec-header__title">AI Insights</h1>
+                <p class="sec-header__sub">AI-powered architecture review — score, SOLID analysis, code smells, and actionable suggestions.</p>
+            </div>
+        </div>
         @if(config('laradar.ai.enabled', false))
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--emerald);background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);padding:5px 12px;border-radius:20px;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>
@@ -2556,7 +3379,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </span>
         @endif
     </div>
-    <p class="sec-sub" style="margin-bottom:24px;">AI-powered architecture review — score, SOLID analysis, code smells, and actionable suggestions.</p>
+    <div style="margin-bottom:24px;"></div>
 
     @if(!config('laradar.ai.enabled', false))
     {{-- Setup card --}}
@@ -2584,26 +3407,28 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     @endif
 
     {{-- Analyze button --}}
-    <div id="ai-trigger" style="margin-bottom:24px;">
-        <button onclick="aiAnalyze()"
-            {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
-            style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(0,82,204,0.15);border:1px solid rgba(0,82,204,0.4);border-radius:10px;color:var(--cyan);font-weight:600;font-size:13px;cursor:pointer;transition:background .2s;font-family:var(--font-mono);">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+    <div id="ai-trigger" style="margin-bottom:28px;">
+        <button onclick="aiAnalyze()" class="ai-analyze-btn" {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}>
+            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
             Analyze with AI
         </button>
-        <p style="font-size:12px;color:var(--text-faint);margin-top:8px;font-family:var(--font-mono);">Sends your architecture data to {{ config('laradar.ai.model', 'gemini-2.5-flash') }} for analysis. Takes 10–30 seconds.</p>
+        <p style="font-size:12px;color:var(--text-faint);margin-top:10px;font-family:var(--font-mono);">
+            Sends your architecture to <span style="color:var(--cyan);">{{ config('laradar.ai.model', 'gemini-2.5-flash') }}</span> · Takes 10–30 seconds
+        </p>
     </div>
 
     {{-- Loading state --}}
-    <div id="ai-loading" style="display:none;margin-bottom:24px;">
-        <div style="display:flex;align-items:center;gap:12px;color:var(--cyan);">
-            <svg style="width:20px;height:20px;animation:radarSpin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    <div id="ai-loading" style="display:none;margin-bottom:28px;">
+        <div style="display:inline-flex;align-items:center;gap:14px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.18);border-radius:12px;padding:14px 20px;">
+            <svg style="width:22px;height:22px;color:var(--cyan);animation:aiSpin 1s linear infinite;flex:none;" fill="none" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="40 20" opacity=".3"></circle>
+                <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" opacity=".8"></path>
             </svg>
-            <span style="font-size:13px;font-weight:600;font-family:var(--font-mono);">Analyzing architecture with AI…</span>
+            <div>
+                <p style="font-size:13px;font-weight:700;color:var(--cyan);font-family:var(--font-mono);margin-bottom:2px;">Analyzing architecture…</p>
+                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">Usually takes 10–30 seconds</p>
+            </div>
         </div>
-        <p style="font-size:12px;color:var(--text-faint);margin-top:6px;margin-left:32px;font-family:var(--font-mono);">This usually takes 10–30 seconds.</p>
     </div>
 
     {{-- Error state --}}
@@ -2621,13 +3446,22 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 <p style="font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);margin-bottom:10px;">AI Summary</p>
                 <p id="ai-summary" style="font-size:13px;color:var(--text-dim);line-height:1.65;"></p>
             </div>
-            <div style="width:140px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;flex:none;">
+            <div style="width:160px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex:none;">
                 <p style="font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);">AI Score</p>
-                <p id="ai-score-num" style="font-size:40px;font-weight:800;color:var(--cyan);font-family:var(--font-sans);line-height:1;"></p>
-                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">/ 100</p>
-                <div style="width:100%;height:4px;background:var(--bg-hover);border-radius:4px;margin-top:4px;overflow:hidden;">
-                    <div id="ai-score-bar" style="height:4px;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--violet));transition:width .7s ease;width:0%;"></div>
+                <div style="position:relative;width:90px;height:90px;">
+                    <svg width="90" height="90" viewBox="0 0 90 90">
+                        <circle cx="45" cy="45" r="36" fill="none" stroke="var(--bg-sunken)" stroke-width="7"/>
+                        <circle id="ai-score-ring" class="ai-score-ring" cx="45" cy="45" r="36" fill="none"
+                            stroke="var(--cyan)" stroke-width="7" stroke-linecap="round"
+                            stroke-dasharray="226" stroke-dashoffset="226"
+                            style="transition:stroke-dashoffset .9s cubic-bezier(.4,0,.2,1),stroke .4s;"/>
+                    </svg>
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                        <span id="ai-score-num" style="font-size:26px;font-weight:800;color:var(--cyan);font-family:var(--font-sans);line-height:1;"></span>
+                        <span style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);">/100</span>
+                    </div>
                 </div>
+                <div id="ai-score-bar" style="display:none;"></div>
             </div>
         </div>
 
@@ -2663,7 +3497,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         {{-- Re-analyze --}}
         <div style="display:flex;align-items:center;gap:12px;padding-top:4px;">
-            <button onclick="aiAnalyze()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-dim);font-size:12px;border-radius:9px;cursor:pointer;transition:border-color .15s;" onmouseenter="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
+            <button onclick="aiAnalyze()" class="ai-analyze-btn" style="padding:9px 18px;font-size:12px;">
                 <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                 Re-analyze
             </button>
@@ -2676,8 +3510,16 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 {{-- ══ AI CHAT ══ --}}
 <section id="sec-chat" style="display:none;flex-direction:column;height:100%;padding:24px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px;">
-        <h1 class="sec-title">AI Chat</h1>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div class="sec-header" style="margin-bottom:0;">
+            <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
+                <svg viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            </div>
+            <div>
+                <h1 class="sec-header__title">AI Chat</h1>
+                <p class="sec-header__sub">Ask anything about your architecture — only relevant context is sent to AI.</p>
+            </div>
+        </div>
         @if(config('laradar.ai.enabled', false))
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--emerald);background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);padding:5px 12px;border-radius:20px;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>
@@ -2685,7 +3527,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </span>
         @endif
     </div>
-    <p class="sec-sub" style="margin-bottom:20px;">Ask anything. The package finds the relevant controllers, models, and routes in your architecture — then sends only that to AI.</p>
 
     @if(!config('laradar.ai.enabled', false))
     <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:20px;">
@@ -2693,48 +3534,77 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     </div>
     @endif
 
-    {{-- Suggestion pills --}}
+    {{-- Suggestion chips --}}
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;" id="chat-suggestions">
-        <button onclick="chatSuggest('Which controller has the most methods?')" class="ctrl-chip" style="cursor:pointer;border-radius:20px;color:var(--cyan);border-color:rgba(0,82,204,0.3);padding:5px 12px;">Which controller is largest?</button>
-        <button onclick="chatSuggest('Trace the main request flow from route through controller to model.')" class="ctrl-chip" style="cursor:pointer;border-radius:20px;color:var(--cyan);border-color:rgba(0,82,204,0.3);padding:5px 12px;">Trace request flow</button>
-        <button onclick="chatSuggest('Are there any SOLID principle violations?')" class="ctrl-chip" style="cursor:pointer;border-radius:20px;color:var(--cyan);border-color:rgba(0,82,204,0.3);padding:5px 12px;">SOLID violations?</button>
-        <button onclick="chatSuggest('Which models have the most relationships?')" class="ctrl-chip" style="cursor:pointer;border-radius:20px;color:var(--cyan);border-color:rgba(0,82,204,0.3);padding:5px 12px;">Models with most relationships</button>
-        <button onclick="chatSuggest('What services should I extract from my controllers?')" class="ctrl-chip" style="cursor:pointer;border-radius:20px;color:var(--cyan);border-color:rgba(0,82,204,0.3);padding:5px 12px;">Suggest service extractions</button>
-        <button onclick="chatSuggest('Explain the overall architecture and data flow.')" class="ctrl-chip" style="cursor:pointer;border-radius:20px;color:var(--cyan);border-color:rgba(0,82,204,0.3);padding:5px 12px;">Overall architecture</button>
+        <button onclick="chatSuggest('Which controller has the most methods?')" class="chat-suggestion-chip">
+            <svg style="width:12px;height:12px;color:var(--amber);flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+            Which controller is largest?
+        </button>
+        <button onclick="chatSuggest('Trace the main request flow from route through controller to model.')" class="chat-suggestion-chip">
+            <svg style="width:12px;height:12px;color:var(--emerald);flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+            Trace request flow
+        </button>
+        <button onclick="chatSuggest('Are there any SOLID principle violations?')" class="chat-suggestion-chip">
+            <svg style="width:12px;height:12px;color:var(--rose);flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            SOLID violations?
+        </button>
+        <button onclick="chatSuggest('Which models have the most relationships?')" class="chat-suggestion-chip">
+            <svg style="width:12px;height:12px;color:var(--violet);flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+            Model relationships
+        </button>
+        <button onclick="chatSuggest('What services should I extract from my controllers?')" class="chat-suggestion-chip">
+            <svg style="width:12px;height:12px;color:#2DD4BF;flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Suggest service extractions
+        </button>
+        <button onclick="chatSuggest('Explain the overall architecture and data flow.')" class="chat-suggestion-chip">
+            <svg style="width:12px;height:12px;color:var(--cyan);flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Overall architecture
+        </button>
     </div>
 
     {{-- Messages --}}
     <div id="chat-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;margin-bottom:16px;max-height:calc(100vh - 420px);min-height:200px;padding-right:4px;">
         <div id="chat-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--text-faint);">
-            <svg style="width:40px;height:40px;margin-bottom:12px;color:var(--border-strong);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-            <p style="font-size:13px;">Ask a question about your architecture</p>
+            <div style="width:56px;height:56px;border-radius:16px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+                <svg style="width:26px;height:26px;color:var(--cyan);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            </div>
+            <p style="font-size:13px;font-weight:600;color:var(--text-dim);">Ask anything about your architecture</p>
+            <p style="font-size:11px;color:var(--text-faint);margin-top:4px;">Use a suggestion above or type your own question</p>
         </div>
     </div>
 
     {{-- Input --}}
-    <div style="border:1px solid var(--border);border-radius:10px;background:var(--bg-elevated);overflow:hidden;">
+    <div style="border:1px solid var(--border);border-radius:12px;background:var(--bg-elevated);overflow:hidden;transition:border-color .2s,box-shadow .2s;" onfocusin="this.style.borderColor='rgba(99,102,241,.4)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.08)'" onfocusout="this.style.borderColor='var(--border)';this.style.boxShadow=''">
         <textarea id="chat-input" rows="2"
             placeholder="e.g. Trace the main request flow  •  Which controller is too large?  •  Where should I add a service?"
             {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
             oninput="chatPreviewContext(this.value)"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend();}"
-            style="width:100%;padding:12px 16px 4px;font-size:13px;color:var(--text);background:transparent;resize:none;outline:none;border:none;font-family:var(--font-sans);box-sizing:border-box;"></textarea>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 16px 12px;">
+            style="width:100%;padding:14px 16px 6px;font-size:13px;color:var(--text);background:transparent;resize:none;outline:none;border:none;font-family:var(--font-sans);box-sizing:border-box;line-height:1.6;"></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px 10px;">
             <span id="chat-context-hint" style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px;"></span>
-            <button onclick="chatSend()" id="chat-send-btn"
-                {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
-                style="display:flex;align-items:center;gap:6px;padding:6px 16px;background:rgba(0,82,204,0.15);border:1px solid rgba(0,82,204,0.4);border-radius:8px;color:var(--cyan);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-mono);flex:none;">
-                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                Send
-            </button>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);">Enter to send</span>
+                <button onclick="chatSend()" id="chat-send-btn" class="chat-send-btn" {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}>
+                    <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                </button>
+            </div>
         </div>
     </div>
 </section>
 
 {{-- ══ AI DOCS ══ --}}
 <section id="sec-aidocs" class="p-6" style="display:none">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px;">
-        <h1 class="sec-title">AI Documentation</h1>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <div class="sec-header" style="margin-bottom:0;">
+            <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
+                <svg viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </div>
+            <div>
+                <h1 class="sec-header__title">AI Documentation</h1>
+                <p class="sec-header__sub">AI writes full markdown docs for each layer of your architecture. One click per file — or generate all at once.</p>
+            </div>
+        </div>
         @if(config('laradar.ai.enabled', false))
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--emerald);background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);padding:5px 12px;border-radius:20px;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>
@@ -2742,7 +3612,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </span>
         @endif
     </div>
-    <p class="sec-sub" style="margin-bottom:24px;">AI writes full markdown docs for each layer of your architecture. One click per file — or generate all at once.</p>
 
     @if(!config('laradar.ai.enabled', false))
     <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:24px;">
@@ -2753,8 +3622,8 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
         <button onclick="docsGenerateAll()"
             {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
-            class="atlas-btn atlas-btn--cyan"
-            style="padding:9px 18px;font-size:13px;border-radius:10px;opacity:{{ config('laradar.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('laradar.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
+            class="ai-analyze-btn"
+            style="opacity:{{ config('laradar.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('laradar.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
             <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
             Generate All Docs
         </button>
@@ -2898,6 +3767,217 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 </section>
 
+{{-- ── Dead Code Section ───────────────────────────────────────────────────── --}}
+@php
+    $deadData    = $data['dead_code'] ?? ['items' => [], 'summary' => [], 'errors' => []];
+    $deadItems   = $deadData['items']   ?? [];
+    $deadSummary = $deadData['summary'] ?? [];
+    $dTotal  = $deadSummary['total']             ?? 0;
+    $dHigh   = $deadSummary['high']              ?? 0;
+    $dMedium = $deadSummary['medium']            ?? 0;
+    $dLow    = $deadSummary['low']               ?? 0;
+    $dDebug  = $deadSummary['debug_statements']  ?? 0;
+    $dComm   = $deadSummary['commented_code']    ?? 0;
+    $dModels = $deadSummary['unused_models']     ?? 0;
+    $dOrphan = $deadSummary['orphan_methods']    ?? 0;
+    $dJobs   = $deadSummary['undispatched_jobs'] ?? 0;
+    $dEvents = $deadSummary['unfired_events']    ?? 0;
+    $dSvc    = $deadSummary['unused_services']   ?? 0;
+    $dHighPct = $dTotal > 0 ? round($dHigh   / $dTotal * 100) : 0;
+    $dMedPct  = $dTotal > 0 ? round($dMedium / $dTotal * 100) : 0;
+    $dLowPct  = $dTotal > 0 ? max(0, 100 - $dHighPct - $dMedPct) : 0;
+@endphp
+<section id="sec-deadcode" class="p-6" style="display:none">
+
+    {{-- ── Header — matches every other section ── --}}
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div class="sec-header" style="margin-bottom:0;">
+            <div class="sec-header__icon" style="background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.20);color:#EF4444;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div>
+                <h1 class="sec-header__title">Dead Code</h1>
+                <p class="sec-header__sub">Debug calls, unused models, orphan methods, jobs, events & services — detected by static analysis</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Stats banner — same pattern as Jobs / Events / Services ── --}}
+    <div class="sec-stats-banner" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+        {{-- Total --}}
+        <div class="sec-stat-card">
+            <div class="sec-stat-icon" style="background:rgba(239,68,68,.10);color:#EF4444;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+                <div class="sec-stat-num" style="color:#EF4444;">{{ $dTotal }}</div>
+                <div class="sec-stat-lbl">Total Issues</div>
+                {{-- Severity bar --}}
+                <div class="dc-sev-bar">
+                    @if($dHighPct>0)<div class="dc-sev-bar__seg" style="width:{{ $dHighPct }}%;background:#EF4444;"></div>@endif
+                    @if($dMedPct>0)<div class="dc-sev-bar__seg" style="width:{{ $dMedPct }}%;background:#F59E0B;"></div>@endif
+                    @if($dLowPct>0)<div class="dc-sev-bar__seg" style="width:{{ $dLowPct }}%;background:var(--sky);"></div>@endif
+                    @if($dTotal===0)<div class="dc-sev-bar__seg" style="width:100%;background:var(--border);"></div>@endif
+                </div>
+            </div>
+        </div>
+        {{-- High --}}
+        <div class="sec-stat-card" style="cursor:pointer;" onclick="dcSevFilter('high',document.querySelector('#dc-filter-row [data-sev=high]'))">
+            <div class="sec-stat-icon" style="background:rgba(239,68,68,.10);color:#EF4444;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div>
+                <div class="sec-stat-num" style="color:#EF4444;">{{ $dHigh }}</div>
+                <div class="sec-stat-lbl">High Severity</div>
+            </div>
+        </div>
+        {{-- Medium --}}
+        <div class="sec-stat-card" style="cursor:pointer;" onclick="dcSevFilter('medium',document.querySelector('#dc-filter-row [data-sev=medium]'))">
+            <div class="sec-stat-icon" style="background:rgba(245,158,11,.10);color:#F59E0B;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div>
+                <div class="sec-stat-num" style="color:#F59E0B;">{{ $dMedium }}</div>
+                <div class="sec-stat-lbl">Medium Severity</div>
+            </div>
+        </div>
+        {{-- Low --}}
+        <div class="sec-stat-card" style="cursor:pointer;" onclick="dcSevFilter('low',document.querySelector('#dc-filter-row [data-sev=low]'))">
+            <div class="sec-stat-icon" style="background:rgba(37,99,235,.10);color:var(--sky);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+                <div class="sec-stat-num" style="color:var(--sky);">{{ $dLow }}</div>
+                <div class="sec-stat-lbl">Low Severity</div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Type Grid ── --}}
+    @php
+        $typeCards = [
+            ['emoji'=>'🐛','label'=>'Debug Calls',      'type'=>'debug_statement',  'count'=>$dDebug,  'color'=>'#EF4444'],
+            ['emoji'=>'💬','label'=>'Commented Code',   'type'=>'commented_code',   'count'=>$dComm,   'color'=>'#F59E0B'],
+            ['emoji'=>'📦','label'=>'Unused Models',    'type'=>'unused_model',     'count'=>$dModels, 'color'=>'#7C3AED'],
+            ['emoji'=>'⚡','label'=>'Orphan Methods',   'type'=>'orphan_method',    'count'=>$dOrphan, 'color'=>'#F97316'],
+            ['emoji'=>'📮','label'=>'Undispatched Jobs','type'=>'undispatched_job', 'count'=>$dJobs,   'color'=>'#0EA5E9'],
+            ['emoji'=>'🔔','label'=>'Unfired Events',   'type'=>'unfired_event',    'count'=>$dEvents, 'color'=>'#10B981'],
+            ['emoji'=>'🔧','label'=>'Unused Services',  'type'=>'unused_service',   'count'=>$dSvc,    'color'=>'#EC4899'],
+        ];
+    @endphp
+    <div class="dc-type-grid" id="dc-type-grid">
+        <div class="dc-type-card dc-type-active{{ $dTotal===0?' dc-type-zero':'' }}"
+             data-type="all" onclick="dcTypeFilter('all',this)"
+             style="animation:dcTypeIn .32s var(--ease) both;">
+            <span class="tc-emoji">📋</span>
+            <span class="tc-label">All Issues</span>
+            <span class="tc-count">{{ $dTotal }}</span>
+        </div>
+        @foreach($typeCards as $tc)
+        <div class="dc-type-card{{ $tc['count']===0?' dc-type-zero':'' }}"
+             data-type="{{ $tc['type'] }}" onclick="dcTypeFilter('{{ $tc['type'] }}',this)"
+             style="animation:dcTypeIn .32s var(--ease) both;animation-delay:{{ ($loop->index+1)*35 }}ms;">
+            <span class="tc-emoji">{{ $tc['emoji'] }}</span>
+            <span class="tc-label">{{ $tc['label'] }}</span>
+            <span class="tc-count" style="color:{{ $tc['color'] }};">{{ $tc['count'] }}</span>
+        </div>
+        @endforeach
+    </div>
+
+    {{-- ── Severity Filter Row ── --}}
+    <div class="dc-filter-row" id="dc-filter-row">
+        <button class="dc-sev-tab dc-sev-tab--active" data-sev="all" onclick="dcSevFilter('all',this)">
+            All <span style="font-family:var(--font-mono);font-size:11px;opacity:.65;">{{ $dTotal }}</span>
+        </button>
+        <button class="dc-sev-tab dc-sev-tab--high" data-sev="high" onclick="dcSevFilter('high',this)">
+            <span style="width:7px;height:7px;border-radius:50%;background:#EF4444;flex:none;{{ $dHigh>0?'animation:severityPulse 1.8s ease infinite;':'' }}"></span>
+            High <span style="font-family:var(--font-mono);font-size:11px;opacity:.65;">{{ $dHigh }}</span>
+        </button>
+        <button class="dc-sev-tab dc-sev-tab--medium" data-sev="medium" onclick="dcSevFilter('medium',this)">
+            <span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;flex:none;"></span>
+            Medium <span style="font-family:var(--font-mono);font-size:11px;opacity:.65;">{{ $dMedium }}</span>
+        </button>
+        <button class="dc-sev-tab dc-sev-tab--low" data-sev="low" onclick="dcSevFilter('low',this)">
+            <span style="width:7px;height:7px;border-radius:50%;background:var(--sky);flex:none;"></span>
+            Low <span style="font-family:var(--font-mono);font-size:11px;opacity:.65;">{{ $dLow }}</span>
+        </button>
+    </div>
+
+    {{-- ── Item List ── --}}
+    @if(empty($deadItems))
+    <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:14px;padding:48px;text-align:center;">
+        <svg style="width:48px;height:48px;color:#10B981;margin:0 auto 14px;display:block;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <p style="font-size:17px;font-weight:800;color:#10B981;margin:0 0 6px;">Codebase is clean</p>
+        <p style="font-size:13px;color:var(--text-faint);margin:0;">No dead code detected. Every class, method, job, and event appears to be in use.</p>
+    </div>
+    @else
+    <div id="dead-list">
+        @foreach($deadItems as $di)
+        @php
+            $sev       = $di['severity'] ?? 'low';
+            $type      = $di['type'] ?? '';
+            $sevColor  = match($sev) { 'high' => '#EF4444', 'medium' => '#F59E0B', default => '#2563EB' };
+            $typeLabel = match($type) {
+                'debug_statement'  => 'Debug Call',
+                'commented_code'   => 'Commented Code',
+                'unused_model'     => 'Unused Model',
+                'orphan_method'    => 'Orphan Method',
+                'undispatched_job' => 'Undispatched Job',
+                'unfired_event'    => 'Unfired Event',
+                'unused_service'   => 'Unused Service',
+                default            => ucfirst(str_replace('_',' ',$type)),
+            };
+            $itemName   = $di['name'] ?? '';
+            $location   = ($di['path'] ?? '') . (isset($di['line']) && $di['line'] ? ':' . $di['line'] : '');
+            $hasSnippet = !empty($di['snippet']);
+            $isOrphan   = $type === 'orphan_method';
+            $methodOnly = $isOrphan ? ($di['method'] ?? $itemName) : null;
+            $ctrlOnly   = $isOrphan ? (str_contains($itemName,'::') ? explode('::',$itemName)[0] : null) : null;
+        @endphp
+        <div class="dc-item"
+             data-type="{{ $type }}"
+             data-severity="{{ $sev }}"
+             style="--di:{{ $loop->index }}">
+            <div class="dc-item__accent" style="background:{{ $sevColor }};{{ $sev==='high' ? 'animation:severityPulse 1.8s ease infinite;' : '' }}"></div>
+            <div class="dc-item__body">
+                <div class="dc-item__head">
+                    <div class="dc-item__badges">
+                        <span style="font-size:10px;font-weight:700;background:{{ $sevColor }}18;color:{{ $sevColor }};border:1px solid {{ $sevColor }}30;border-radius:10px;padding:2px 9px;letter-spacing:.05em;text-transform:uppercase;">{{ $sev }}</span>
+                        <span style="font-size:10.5px;font-weight:600;background:var(--bg-sunken);color:var(--text-dim);border:1px solid var(--border);border-radius:10px;padding:2px 9px;">{{ $typeLabel }}</span>
+                    </div>
+                    @if($location)
+                    <button class="dc-copy-btn" onclick="dcCopyPath('{{ addslashes($location) }}',this)">
+                        <svg style="width:10px;height:10px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                        Copy path
+                    </button>
+                    @endif
+                </div>
+                @if($isOrphan && $methodOnly)
+                <div class="dc-item__name">
+                    @if($ctrlOnly)<span style="color:var(--text-dim);font-weight:500;">{{ $ctrlOnly }}</span><span style="color:var(--border-strong);">::</span>@endif<span style="color:#F97316;">{{ $methodOnly }}</span><span style="color:var(--text-faint);">()</span>
+                </div>
+                @elseif($itemName)
+                <div class="dc-item__name">{{ $itemName }}</div>
+                @endif
+                @if($location)
+                <div class="dc-item__loc">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>{{ $location }}</span>
+                </div>
+                @endif
+                @if(!empty($di['detail']))
+                <div class="dc-item__detail">{{ $di['detail'] }}</div>
+                @endif
+                @if($hasSnippet)
+                <pre class="dc-item__snippet" style="border-left-color:{{ $sevColor }};">{{ $di['snippet'] }}</pre>
+                @endif
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @endif
+</section>
+
 </main>
 
 {{-- ── Doc Preview Modal ──────────────────────────────────────────────────── --}}
@@ -2926,7 +4006,8 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','jobs','events','services','repositories','observers','policies','dependencies','export','ai','chat','aidocs'];
+const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','jobs','events','services','repositories','observers','policies','dependencies','export','ai','chat','aidocs','deadcode'];
+
 let depRendered     = false;
 let mapTreeRendered = false;
 let erRendered      = false;
@@ -2935,20 +4016,27 @@ let graphRendered   = false;
 // ── ER Diagram — Mermaid erDiagram ──────────────────────────────────────────
 const _erFull    = @json($mmErCode);
 const _erFocused = @json($mmFocused);
+const _erModels  = @json($data['models']);
+let _erZoom = 1, _erPan = { x: 0, y: 0 }, _erLayout = 'TB';
+let _erFsPan = { x: 0, y: 0 }, _erFsZoom = 1;
+const _erPairCount = {{ count($mmErPairs) }}; // unique model pairs in the ER diagram
 
 function erFocus(modelName) {
     const el = document.getElementById('er-mermaid');
     if (!el) return;
     const code = modelName === '__all__' ? _erFull : (_erFocused[modelName] || '');
     if (!code) return;
+    const directive = `%%{init:{'er':{'layoutDirection':'${_erLayout}','diagramPadding':20,'minEntityWidth':100,'entityPadding':15}}}%%\n`;
     el.removeAttribute('data-processed');
-    el.textContent = code;
-    if (window.mermaid) mermaid.run({ nodes: [el] });
+    el.textContent = directive + code;
+    if (window.mermaid) { mermaid.run({ nodes: [el] }); _erSchedulePostProcess(); }
+    _erUpdateInfoPanel(modelName);
 }
 
 function initER() {
     if (erRendered) return;
     erRendered = true;
+    _erInitPan();
     const el = document.getElementById('er-mermaid');
     if (!el) return;
     @if(count($data['models']) > 20 && $mmFirstFocusModel)
@@ -2956,44 +4044,536 @@ function initER() {
     const sel = document.getElementById('er-focus-select');
     if (sel) sel.value = '{{ $mmFirstFocusModel }}';
     @else
-    if (window.mermaid) mermaid.run({ nodes: [el] });
+    // Inject layout directive into initial render
+    const directive = `%%{init:{'er':{'layoutDirection':'TB','diagramPadding':20,'minEntityWidth':100,'entityPadding':15}}}%%\n`;
+    el.removeAttribute('data-processed');
+    el.textContent = directive + (el.textContent || '');
+    if (window.mermaid) { mermaid.run({ nodes: [el] }); _erSchedulePostProcess(); }
+    _erUpdateInfoPanel('__all__');
     @endif
 }
 
-function navigate(s) {
-    SECTIONS.forEach(id => {
-        const sec = document.getElementById('sec-' + id);
-        if (sec) {
-            if (id === s) {
-                sec.style.display = id === 'chat' ? 'flex' : 'block';
-                sec.classList.remove('sec-fade');
-                void sec.offsetWidth;
-                sec.classList.add('sec-fade');
-            } else {
-                sec.style.display = 'none';
-            }
-        }
-        const nav = document.getElementById('nav-' + id);
-        if (nav) {
-            nav.classList.toggle('nav-active', id === s);
-        }
+function _erGetSVG() {
+    return document.querySelector('#er-mermaid svg');
+}
+
+// ── ER model info panel ────────────────────────────────────────────────────────
+function _erUpdateInfoPanel(modelName) {
+    const el = document.getElementById('er-info-content');
+    if (!el) return;
+
+    if (modelName === '__all__') {
+        const totalRels = _erPairCount;
+        const rows = _erModels.map(m => {
+            const rc = (m.relationships || []).length;
+            return `<button onclick="document.getElementById('er-focus-select').value='${m.name}';erFocus('${m.name}')"
+                style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:transparent;border:none;padding:5px 8px;border-radius:6px;font-size:11px;color:var(--text);cursor:pointer;font-family:var(--font-sans);transition:background .1s;"
+                onmouseenter="this.style.background='#EEF2FF'" onmouseleave="this.style.background='transparent'">
+                <span style="font-family:var(--font-mono);">${m.name}</span>
+                ${rc ? `<span style="font-size:9px;color:#6366F1;background:rgba(99,102,241,.08);padding:1px 5px;border-radius:4px;">${rc}</span>` : ''}
+            </button>`;
+        }).join('');
+
+        el.innerHTML = `<div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;gap:8px;">
+                <div style="flex:1;background:rgba(99,102,241,.06);border-radius:10px;padding:10px;text-align:center;">
+                    <div style="font-size:20px;font-weight:800;color:#6366F1;line-height:1;">${_erModels.length}</div>
+                    <div style="font-size:10px;color:#6366F1;margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Models</div>
+                </div>
+                <div style="flex:1;background:#F0FDF4;border-radius:10px;padding:10px;text-align:center;">
+                    <div style="font-size:20px;font-weight:800;color:#10B981;line-height:1;">${totalRels}</div>
+                    <div style="font-size:10px;color:#10B981;margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Relations</div>
+                </div>
+            </div>
+            <div>
+                <p style="font-size:10px;font-weight:700;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px;">Jump to Model</p>
+                <div style="display:flex;flex-direction:column;gap:1px;">${rows}</div>
+            </div>
+        </div>`;
+        return;
+    }
+
+    const model = _erModels.find(m => m.name === modelName);
+    if (!model) { el.innerHTML = '<p style="font-size:12px;color:var(--text-faint);text-align:center;margin-top:32px;">No data found.</p>'; return; }
+
+    const rels     = model.relationships || [];
+    const fillable = model.fillable     || [];
+    const casts    = model.casts        || {};
+    const traits   = model.traits       || [];
+
+    const relColors = {
+        hasMany:        ['#3B82F6','#EFF6FF'], hasOne:        ['#10B981','#F0FDF4'],
+        belongsTo:      ['#6366F1','rgba(99,102,241,.08)'], belongsToMany: ['#8B5CF6','#F5F3FF'],
+        hasManyThrough: ['#EC4899','#FDF2F8'], hasOneThrough: ['#F59E0B','#FFFBEB'],
+        morphTo:        ['#EF4444','#FEF2F2'], morphMany:     ['#EF4444','#FEF2F2'],
+        morphOne:       ['#EF4444','#FEF2F2'], morphToMany:   ['#EF4444','#FEF2F2'],
+    };
+
+    const fieldsHtml = fillable.length ? `
+        <div>
+            <p style="font-size:10px;font-weight:700;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px;">Fields (${fillable.length})</p>
+            <div style="display:flex;flex-direction:column;gap:2px;">
+                ${fillable.map(f => {
+                    const t = casts[f];
+                    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:#F8FAFC;border-radius:6px;border:1px solid #F1F5F9;">
+                        <span style="font-size:11px;color:var(--text);font-family:var(--font-mono);">${f}</span>
+                        ${t ? `<span style="font-size:9px;font-weight:600;color:#6366F1;background:rgba(99,102,241,.08);padding:1px 5px;border-radius:4px;">${t}</span>` : ''}
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>` : '';
+
+    const relsHtml = rels.length ? `
+        <div>
+            <p style="font-size:10px;font-weight:700;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px;">Relationships (${rels.length})</p>
+            <div style="display:flex;flex-direction:column;gap:3px;">
+                ${rels.map(r => {
+                    const [c, bg] = relColors[r.type] || ['#6366F1','rgba(99,102,241,.08)'];
+                    return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:#F8FAFC;border-radius:6px;border:1px solid #F1F5F9;">
+                        <span style="font-size:9px;font-weight:700;color:${c};background:${bg};padding:2px 5px;border-radius:4px;flex:none;white-space:nowrap;">${r.type}</span>
+                        <span style="font-size:11px;color:var(--text);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.related}</span>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>` : '';
+
+    const traitsHtml = traits.length ? `
+        <div>
+            <p style="font-size:10px;font-weight:700;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px;">Traits</p>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                ${traits.map(t => `<span style="font-size:10px;color:#64748B;background:#F1F5F9;padding:2px 7px;border-radius:5px;border:1px solid #E2E8F0;">${t}</span>`).join('')}
+            </div>
+        </div>` : '';
+
+    el.innerHTML = `<div style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+            <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px;">${model.name}</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <code style="font-size:10px;color:#6366F1;background:rgba(99,102,241,.08);padding:2px 7px;border-radius:5px;">${model.table}</code>
+                ${model.observer ? `<span style="font-size:10px;color:#10B981;background:#F0FDF4;padding:2px 7px;border-radius:5px;">Observer</span>` : ''}
+            </div>
+        </div>
+        ${fieldsHtml}${relsHtml}${traitsHtml}
+    </div>`;
+}
+
+// ── ER zoom / pan ──────────────────────────────────────────────────────────────
+
+function _erApplyTransform() {
+    const w = document.getElementById('er-transform-wrap');
+    if (w) w.style.transform = `translate(${_erPan.x}px,${_erPan.y}px) scale(${_erZoom})`;
+}
+
+function _erUpdateZoomLabel() {
+    const lbl = document.getElementById('er-zoom-lbl');
+    if (lbl) lbl.textContent = Math.round(_erZoom * 100) + '%';
+}
+
+function erZoom(factor) {
+    const wrap = document.getElementById('er-canvas-wrap');
+    const newZ = Math.max(0.2, Math.min(6, _erZoom * factor));
+    if (wrap) {
+        const cx = wrap.clientWidth  / 2;
+        const cy = wrap.clientHeight / 2;
+        _erPan.x = cx - (cx - _erPan.x) * (newZ / _erZoom);
+        _erPan.y = cy - (cy - _erPan.y) * (newZ / _erZoom);
+    }
+    _erZoom = newZ;
+    _erApplyTransform(); _erUpdateZoomLabel();
+}
+
+function erZoomFit() {
+    _erZoom = 1; _erPan = { x: 0, y: 0 };
+    _erApplyTransform(); _erUpdateZoomLabel();
+}
+
+function _erInitPan() {
+    const wrap = document.getElementById('er-canvas-wrap');
+    if (!wrap || wrap._erPanInit) return;
+    wrap._erPanInit = true;
+    let panning = false, ox = 0, oy = 0;
+
+    wrap.addEventListener('mousedown', e => {
+        if (e.button !== 0) return;
+        panning = true; wrap.style.cursor = 'grabbing';
+        ox = e.clientX - _erPan.x; oy = e.clientY - _erPan.y;
     });
-    // Update topbar breadcrumb
+    window.addEventListener('mousemove', e => {
+        if (!panning) return;
+        _erPan.x = e.clientX - ox; _erPan.y = e.clientY - oy;
+        _erApplyTransform();
+    });
+    window.addEventListener('mouseup', () => {
+        if (!panning) return; panning = false;
+        if (wrap) wrap.style.cursor = 'grab';
+    });
+    wrap.addEventListener('wheel', e => {
+        e.preventDefault();
+        const rect = wrap.getBoundingClientRect();
+        const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+        const f   = e.deltaY > 0 ? 0.9 : 1.11;
+        const newZ = Math.max(0.2, Math.min(6, _erZoom * f));
+        _erPan.x = mx - (mx - _erPan.x) * (newZ / _erZoom);
+        _erPan.y = my - (my - _erPan.y) * (newZ / _erZoom);
+        _erZoom  = newZ;
+        _erApplyTransform(); _erUpdateZoomLabel();
+    }, { passive: false });
+}
+
+// ── ER layout toggle ───────────────────────────────────────────────────────────
+
+function erToggleLayout() {
+    _erLayout = _erLayout === 'TB' ? 'LR' : 'TB';
+    const btn = document.getElementById('er-layout-btn');
+    if (btn) btn.childNodes[btn.childNodes.length - 1].textContent = ' ' + _erLayout;
+    const sel = document.getElementById('er-focus-select');
+    erFocus(sel ? sel.value : '__all__');
+    _erZoom = 1; _erPan = { x: 0, y: 0 };
+    _erApplyTransform(); _erUpdateZoomLabel();
+}
+
+// ── ER fullscreen ──────────────────────────────────────────────────────────────
+
+function erFullScreen() {
+    const svgEl = _erGetSVG();
+    if (!svgEl) { alert('ER diagram not ready yet — wait a moment and try again.'); return; }
+    const modal   = document.getElementById('er-fs-modal');
+    const fsTrans = document.getElementById('er-fs-transform');
+    if (!modal || !fsTrans) return;
+
+    // Clone SVG at natural size
+    const clone = svgEl.cloneNode(true);
+    clone.removeAttribute('style');
+    clone.style.display = 'block';
+    const vb = svgEl.getAttribute('viewBox');
+    if (vb) {
+        const p = vb.trim().split(/[\s,]+/);
+        if (p.length >= 4) { clone.setAttribute('width', p[2]); clone.setAttribute('height', p[3]); }
+    }
+    fsTrans.innerHTML = '';
+    fsTrans.appendChild(clone);
+
+    _erFsZoom = 1; _erFsPan = { x: 0, y: 0 };
+    fsTrans.style.transform = '';
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Wire pan+zoom inside fullscreen
+    const fsContent = document.getElementById('er-fs-content');
+    if (fsContent && !fsContent._fsPanInit) {
+        fsContent._fsPanInit = true;
+        let panning = false, ox = 0, oy = 0;
+        fsContent.addEventListener('mousedown', e => {
+            if (e.button !== 0) return;
+            panning = true; fsContent.style.cursor = 'grabbing';
+            ox = e.clientX - _erFsPan.x; oy = e.clientY - _erFsPan.y;
+        });
+        window.addEventListener('mousemove', e => {
+            if (!panning) return;
+            _erFsPan.x = e.clientX - ox; _erFsPan.y = e.clientY - oy;
+            fsTrans.style.transform = `translate(${_erFsPan.x}px,${_erFsPan.y}px) scale(${_erFsZoom})`;
+        });
+        window.addEventListener('mouseup', () => {
+            if (!panning) return; panning = false;
+            fsContent.style.cursor = 'grab';
+        });
+        fsContent.addEventListener('wheel', e => {
+            e.preventDefault();
+            const rect = fsContent.getBoundingClientRect();
+            const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+            const f  = e.deltaY > 0 ? 0.9 : 1.11;
+            const newZ = Math.max(0.15, Math.min(8, _erFsZoom * f));
+            _erFsPan.x = mx - (mx - _erFsPan.x) * (newZ / _erFsZoom);
+            _erFsPan.y = my - (my - _erFsPan.y) * (newZ / _erFsZoom);
+            _erFsZoom  = newZ;
+            fsTrans.style.transform = `translate(${_erFsPan.x}px,${_erFsPan.y}px) scale(${_erFsZoom})`;
+        }, { passive: false });
+    }
+}
+
+function erCloseFullScreen() {
+    const modal = document.getElementById('er-fs-modal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+// Close fullscreen on Escape
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') erCloseFullScreen();
+});
+
+// ── ER CSS post-processing (Option B — style injection only, no DOM mutation) ──
+let _erPostTimer = null;
+function _erSchedulePostProcess() {
+    clearTimeout(_erPostTimer);
+    _erPostTimer = setTimeout(_erPostProcess, 350);
+}
+
+function _erPostProcess() {
+    const svg = _erGetSVG();
+    if (!svg) return;
+
+    // Ensure defs block exists for the style element
+    let defs = svg.querySelector('defs');
+    if (!defs) {
+        defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        svg.prepend(defs);
+    }
+
+    // Remove any previous injection so re-renders start clean
+    const prev = svg.querySelector('#er-pp-style');
+    if (prev) prev.remove();
+
+    const styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    styleEl.id = 'er-pp-style';
+    styleEl.textContent = `
+        /* Entity header — Laravel Red fill, rounded top corners, drop shadow */
+        .er.entityBox {
+            fill: #6366F1 !important;
+            stroke: #4338CA !important;
+            stroke-width: 1.5px !important;
+            rx: 10px !important;
+            ry: 10px !important;
+            filter: drop-shadow(0 4px 12px rgba(99,102,241,0.22)) !important;
+        }
+        /* Entity name — white bold on red */
+        .er.entityLabel {
+            fill: #FFFFFF !important;
+            font-weight: 700 !important;
+            font-size: 12px !important;
+            font-family: 'Inter', ui-sans-serif, sans-serif !important;
+            letter-spacing: 0.3px !important;
+        }
+        /* Even attribute rows — very light indigo tint */
+        .er.attributeBoxEven {
+            fill: #FFFFFF !important;
+            stroke: #C7D2FE !important;
+            stroke-width: 1px !important;
+        }
+        /* Odd attribute rows — slightly deeper tint */
+        .er.attributeBoxOdd {
+            fill: #EEF2FF !important;
+            stroke: #C7D2FE !important;
+            stroke-width: 1px !important;
+        }
+        /* Attribute name — dark indigo ink */
+        .er.attributeName {
+            fill: #1E1B4B !important;
+            font-size: 11px !important;
+            font-family: 'Inter', ui-sans-serif, sans-serif !important;
+            font-weight: 500 !important;
+        }
+        /* Attribute type — medium indigo, smaller, semibold */
+        .er.attributeType {
+            fill: #818CF8 !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            font-family: 'Inter', ui-sans-serif, sans-serif !important;
+        }
+        /* Relationship lines — soft indigo, slightly thicker */
+        .er.relationshipLine {
+            stroke: #818CF8 !important;
+            stroke-width: 1.5px !important;
+        }
+        /* Cardinality labels */
+        .er.relationshipLabel {
+            fill: #4338CA !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            font-family: 'Inter', ui-sans-serif, sans-serif !important;
+        }
+    `;
+    defs.appendChild(styleEl);
+}
+
+function erDownloadSVG() {
+    _erPostProcess(); // ensure styles are applied before cloning
+    const svgEl = _erGetSVG();
+    if (!svgEl) { alert('ER diagram not ready yet — wait a moment and try again.'); return; }
+
+    const clone = svgEl.cloneNode(true);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+
+    // Ensure explicit px dimensions so the file opens at a readable size
+    const vb = clone.getAttribute('viewBox');
+    if (vb) {
+        const p = vb.trim().split(/[\s,]+/);
+        if (p.length >= 4) { clone.setAttribute('width', p[2]); clone.setAttribute('height', p[3]); }
+    }
+
+    // White background rect so it looks clean in any viewer
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('width', '100%'); bg.setAttribute('height', '100%'); bg.setAttribute('fill', '#FFFFFF');
+    clone.insertBefore(bg, clone.firstChild);
+
+    const svgStr = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone);
+    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'er-diagram.svg'; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 200);
+}
+
+function erDownloadPNG() {
+    _erPostProcess(); // ensure styles are applied before rasterising
+    const svgEl = _erGetSVG();
+    if (!svgEl) { alert('ER diagram not ready yet — wait a moment and try again.'); return; }
+
+    const btn = document.getElementById('er-dl-png');
+    const _restore = () => {
+        if (btn) {
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex:none;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PNG';
+            btn.disabled = false;
+        }
+    };
+    if (btn) { btn.textContent = 'Generating…'; btn.disabled = true; }
+
+    const clone = svgEl.cloneNode(true);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+
+    // Derive natural SVG size from viewBox for best resolution
+    let W = svgEl.getBoundingClientRect().width  || 1200;
+    let H = svgEl.getBoundingClientRect().height || 800;
+    const vb = svgEl.getAttribute('viewBox');
+    if (vb) {
+        const p = vb.trim().split(/[\s,]+/);
+        if (p.length >= 4) { W = parseFloat(p[2]) || W; H = parseFloat(p[3]) || H; }
+    }
+    clone.setAttribute('width', W); clone.setAttribute('height', H);
+
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('width', '100%'); bg.setAttribute('height', '100%'); bg.setAttribute('fill', '#FFFFFF');
+    clone.insertBefore(bg, clone.firstChild);
+
+    const scale  = 2; // 2× = good balance of resolution vs file size
+    const canvas = document.createElement('canvas');
+    canvas.width  = Math.round(W * scale);
+    canvas.height = Math.round(H * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(scale, scale);
+
+    const svgStr = new XMLSerializer().serializeToString(clone);
+    const blob   = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url    = URL.createObjectURL(blob);
+    const img    = new Image();
+    img.onload = () => {
+        ctx.drawImage(img, 0, 0, W, H);
+        URL.revokeObjectURL(url);
+        const a = document.createElement('a');
+        a.download = 'er-diagram.png'; a.href = canvas.toDataURL('image/png'); a.click();
+        _restore();
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); _restore(); alert('PNG export failed — try SVG instead.'); };
+    img.src = url;
+}
+
+let _navTimer = null;
+
+function _moveNavIndicator(s) {
+    const ind  = document.getElementById('nav-indicator');
+    const item = document.getElementById('nav-' + s);
+    if (!ind || !item) return;
+    const r = item.getBoundingClientRect();
+    ind.style.top    = r.top + 'px';
+    ind.style.height = r.height + 'px';
+}
+
+function navigate(s) {
+    if (_navTimer) { clearTimeout(_navTimer); _navTimer = null; }
+
+    // Auto-close sidebar on mobile after nav click
+    const sb = document.querySelector('.sidebar');
+    if (sb && sb.classList.contains('is-open')) toggleSidebar();
+
+    // Update nav highlight + breadcrumb immediately
+    SECTIONS.forEach(id => {
+        const nav = document.getElementById('nav-' + id);
+        if (nav) nav.classList.toggle('nav-active', id === s);
+    });
+    _moveNavIndicator(s);
     const sectionNames = {
         overview:'Overview', models:'Models', modelmap:'Relation Graph', controllers:'Controllers',
         routes:'Routes', apidocs:'API Docs', jobs:'Jobs', events:'Events', services:'Services',
         repositories:'Repositories', observers:'Observers', policies:'Policies',
         dependencies:'Dependencies', export:'Export', ai:'AI Insights', chat:'AI Chat',
-        aidocs:'AI Docs', modules:'Modules', packages:'Packages'
+        aidocs:'AI Docs', modules:'Modules', packages:'Packages', deadcode:'Dead Code'
     };
     const breadcrumb = document.getElementById('topbar-section');
     if (breadcrumb) breadcrumb.textContent = sectionNames[s] || s;
-    if (s === 'dependencies' && !depRendered) {
-        depRendered = true;
-        requestAnimationFrame(() => requestAnimationFrame(initDepGraph));
-    }
-    if (s === 'modelmap' && !graphRendered) {
-        setTimeout(initRelGraph, 50);
+
+    // Find the currently visible section to fade out
+    let outSec = null;
+    SECTIONS.forEach(id => {
+        if (id === s) return;
+        const sec = document.getElementById('sec-' + id);
+        if (sec && sec.style.display !== 'none' && sec.style.display !== '') outSec = sec;
+    });
+
+    const _show = () => {
+        SECTIONS.forEach(id => {
+            const sec = document.getElementById('sec-' + id);
+            if (!sec) return;
+            if (id === s) {
+                sec.style.display = id === 'chat' ? 'flex' : 'block';
+                sec.classList.remove('sec-out', 'sec-fade');
+                void sec.offsetWidth;
+                sec.classList.add('sec-fade');
+            } else {
+                sec.style.display = 'none';
+                sec.classList.remove('sec-out');
+            }
+        });
+        if (s === 'dependencies' && !depRendered) {
+            depRendered = true;
+            requestAnimationFrame(() => requestAnimationFrame(initDepGraph));
+        }
+        if (s === 'modelmap' && !graphRendered) {
+            setTimeout(initRelGraph, 50);
+        }
+        if (s === 'deadcode') {
+            _dcActiveType = 'all';
+            _dcActiveSev  = 'all';
+            document.querySelectorAll('#dc-type-grid .dc-type-card').forEach(c => c.classList.remove('dc-type-active'));
+            const allTypeCard = document.querySelector('#dc-type-grid .dc-type-card[data-type="all"]');
+            if (allTypeCard) allTypeCard.classList.add('dc-type-active');
+            document.querySelectorAll('#dc-filter-row .dc-sev-tab').forEach(t => t.classList.remove('dc-sev-tab--active'));
+            const allSevTab = document.querySelector('#dc-filter-row .dc-sev-tab[data-sev="all"]');
+            if (allSevTab) allSevTab.classList.add('dc-sev-tab--active');
+            document.querySelectorAll('#dead-list .dc-item').forEach(item => {
+                item.style.display = '';
+                item.classList.remove('is-hiding');
+            });
+        }
+        if (s === 'controllers') {
+            setTimeout(() => {
+                document.querySelectorAll('.ctrl-complexity-fill').forEach(bar => {
+                    bar.style.width = (bar.dataset.target || 0) + '%';
+                });
+            }, 200);
+        }
+
+        // Re-trigger health check stagger every time overview is shown.
+        // The IntersectionObserver only fires once, so rows never re-animate
+        // on subsequent navigates — reset each row's animation to replay it.
+        if (s === 'overview') {
+            setTimeout(() => {
+                document.querySelectorAll('#sec-overview .hc-row').forEach(el => {
+                    el.style.animation = 'none';
+                    void el.offsetWidth;    // force reflow so browser registers the reset
+                    el.style.animation = '';
+                });
+            }, 80);
+        }
+    };
+
+    if (outSec) {
+        outSec.classList.add('sec-out');
+        _navTimer = setTimeout(() => { _navTimer = null; _show(); }, 150);
+    } else {
+        _show();
     }
 }
 
@@ -3042,6 +4622,11 @@ function showList(type) {
 
 function topbarGoBack() {
     if (_activeDetailType) showList(_activeDetailType);
+}
+
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('is-open');
+    document.getElementById('sidebar-overlay').classList.toggle('is-open');
 }
 
 function filterGrid(type) {
@@ -3196,9 +4781,9 @@ const EDGE_LABEL = { injects: 'injects', uses: 'uses', triggers: 'triggers', per
 
 const RF_COLOR = {
     // Atlassian light theme: white bg, coloured border/stroke, navy text
-    request:    { bg:'#EAF2FF', border:'#0052CC', type:'#0052CC', name:'#172B4D', sub:'#0065FF',  dot:'#0052CC' },
+    request:    { bg:'#EEF2FF', border:'#6366F1', type:'#6366F1', name:'#172B4D', sub:'#6366F1',  dot:'#6366F1' },
     middleware: { bg:'#FFFAE6', border:'#FF8B00', type:'#FF8B00', name:'#172B4D', sub:'#FF8B00',  dot:'#FF8B00' },
-    controller: { bg:'#EAF2FF', border:'#0052CC', type:'#0052CC', name:'#172B4D', sub:'#0052CC',  dot:'#0052CC' },
+    controller: { bg:'#EEF2FF', border:'#6366F1', type:'#6366F1', name:'#172B4D', sub:'#6366F1',  dot:'#6366F1' },
     service:    { bg:'#E3FCEF', border:'#00875A', type:'#00875A', name:'#172B4D', sub:'#00875A',  dot:'#00875A' },
     repository: { bg:'#FFFAE6', border:'#FF8B00', type:'#FF8B00', name:'#172B4D', sub:'#FF8B00',  dot:'#FF8B00' },
     model:      { bg:'#F3F0FF', border:'#6554C0', type:'#6554C0', name:'#172B4D', sub:'#6554C0',  dot:'#6554C0' },
@@ -3231,9 +4816,9 @@ function startRfFlowAnimation() {
         if (len < 10) return;
         for (let d = 0; d < 2; d++) {
             const glow = document.createElementNS(ns, 'circle');
-            glow.setAttribute('r', '9'); glow.setAttribute('fill', '#4C9AFF'); glow.setAttribute('opacity', '0.18');
+            glow.setAttribute('r', '9'); glow.setAttribute('fill', '#818CF8'); glow.setAttribute('opacity', '0.18');
             const circle = document.createElementNS(ns, 'circle');
-            circle.setAttribute('r', '4'); circle.setAttribute('fill', '#4C9AFF'); circle.setAttribute('opacity', '0.9');
+            circle.setAttribute('r', '4'); circle.setAttribute('fill', '#818CF8'); circle.setAttribute('opacity', '0.9');
             dotsG.appendChild(glow);
             dotsG.appendChild(circle);
             dots.push({ dot: circle, glow, path, len, progress: (d * 0.5 + i * 0.17) % 1 });
@@ -3353,7 +4938,7 @@ function showRouteDetail(idx) {
             <polygon points="0 0,9 3.5,0 7" fill="rgba(148,178,222,0.5)"/>
         </marker>
         <marker id="rf-arr-hi" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
-            <polygon points="0 0,9 3.5,0 7" fill="#0052CC"/>
+            <polygon points="0 0,9 3.5,0 7" fill="#6366F1"/>
         </marker>
         <filter id="rf-glow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="3" result="blur"/>
@@ -3454,7 +5039,7 @@ function showRouteDetail(idx) {
 
             <!-- Tabs -->
             <div style="display:flex;border-bottom:1px solid #DFE1E6;padding:0 4px;flex-shrink:0;background:#FFFFFF">
-                <button id="rftab-info"  onclick="rfTab('info')"  style="flex:1;padding:8px 0;font-size:10px;color:#0052CC;background:none;border:none;border-bottom:2px solid #0052CC;cursor:pointer;font-family:inherit;font-weight:700;letter-spacing:0.04em">INFO</button>
+                <button id="rftab-info"  onclick="rfTab('info')"  style="flex:1;padding:8px 0;font-size:10px;color:#6366F1;background:none;border:none;border-bottom:2px solid #6366F1;cursor:pointer;font-family:inherit;font-weight:700;letter-spacing:0.04em">INFO</button>
                 <button id="rftab-flow"  onclick="rfTab('flow')"  style="flex:1;padding:8px 0;font-size:10px;color:#6B778C;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;font-weight:600;letter-spacing:0.04em">FLOW</button>
                 <button id="rftab-edges" onclick="rfTab('edges')" style="flex:1;padding:8px 0;font-size:10px;color:#6B778C;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;font-weight:600;letter-spacing:0.04em">EDGES</button>
             </div>
@@ -3539,7 +5124,7 @@ function rfEdgeList() {
         if (!from || !to) return '';
         return `<div style="margin-bottom:8px;padding:8px;border-radius:8px;border:1px solid #DFE1E6;background:#FFFFFF">
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-                <span style="font-size:9px;color:#0052CC;font-family:ui-monospace,monospace;font-weight:700">${_esc(from.name)}</span>
+                <span style="font-size:9px;color:#6366F1;font-family:ui-monospace,monospace;font-weight:700">${_esc(from.name)}</span>
                 <span style="font-size:8px;color:#6B778C">→</span>
                 <span style="font-size:9px;color:#6554C0;font-family:ui-monospace,monospace;font-weight:700">${_esc(to.name)}</span>
             </div>
@@ -3570,8 +5155,8 @@ function rfTab(tab) {
         const btn = document.getElementById('rftab-' + t);
         if (!btn) return;
         const active = t === tab;
-        btn.style.color        = active ? '#0052CC' : '#6B778C';
-        btn.style.borderBottom = active ? '2px solid #0052CC' : '2px solid transparent';
+        btn.style.color        = active ? '#6366F1' : '#6B778C';
+        btn.style.borderBottom = active ? '2px solid #6366F1' : '2px solid transparent';
     });
     rfRefreshPanel();
 }
@@ -3613,7 +5198,7 @@ function avatar(letter, color) {
 }
 
 const MDS_PALETTE = [
-    {color:'var(--cyan)',    rgb:'79,209,232',   hex:'#0052CC'},
+    {color:'var(--cyan)',    rgb:'99,102,241',   hex:'#6366F1'},
     {color:'var(--violet)',  rgb:'167,139,250',  hex:'#A78BFA'},
     {color:'var(--emerald)', rgb:'52,211,153',   hex:'#34D399'},
     {color:'var(--amber)',   rgb:'251,191,36',   hex:'#FBBF24'},
@@ -3622,7 +5207,7 @@ const MDS_PALETTE = [
 ];
 const MDS_REL_CFG = {
     hasMany:       {hex:'#34D399',color:'var(--emerald)',bg:'rgba(52,211,153,.12)', border:'rgba(52,211,153,.3)'},
-    hasOne:        {hex:'#0052CC',color:'var(--cyan)',   bg:'rgba(0,82,204,.12)', border:'rgba(0,82,204,.3)'},
+    hasOne:        {hex:'#6366F1',color:'var(--cyan)',   bg:'rgba(99,102,241,.12)',  border:'rgba(99,102,241,.3)'},
     belongsTo:     {hex:'#60A5FA',color:'var(--sky)',    bg:'rgba(96,165,250,.12)', border:'rgba(96,165,250,.3)'},
     belongsToMany: {hex:'#A78BFA',color:'var(--violet)', bg:'rgba(167,139,250,.12)',border:'rgba(167,139,250,.3)'},
     morphMany:     {hex:'#F87171',color:'var(--rose)',   bg:'rgba(248,113,113,.12)',border:'rgba(248,113,113,.3)'},
@@ -3717,7 +5302,7 @@ function renderModel(m) {
         Fields ${fieldMap.size ? `<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(${pal.rgb},.15);color:${pal.color};margin-left:5px;font-family:var(--font-mono);">${fieldMap.size}</span>` : ''}
       </button>
       ${relCnt ? `<button class="mds-tab-btn" id="mds-tab-relations" onclick="mdsTab('relations')">Relationships <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(167,139,250,.15);color:var(--violet);margin-left:5px;font-family:var(--font-mono);">${relCnt}</span></button>` : ''}
-      ${usedBy.length ? `<button class="mds-tab-btn" id="mds-tab-usedby" onclick="mdsTab('usedby')">Used By <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(0,82,204,.15);color:var(--cyan);margin-left:5px;font-family:var(--font-mono);">${usedBy.length}</span></button>` : ''}
+      ${usedBy.length ? `<button class="mds-tab-btn" id="mds-tab-usedby" onclick="mdsTab('usedby')">Used By <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(99,102,241,.12);color:var(--cyan);margin-left:5px;font-family:var(--font-mono);">${usedBy.length}</span></button>` : ''}
     </div>`;
 
     // ── Fields Tab ──
@@ -3865,8 +5450,8 @@ function renderController(c) {
                 <p style="font-size:22px;font-weight:700;color:#A78BFA;margin:0 0 2px;">${(c.dependencies||[]).length}</p>
                 <p style="font-size:11px;color:var(--text-faint);margin:0;">Dependencies</p>
             </div>
-            <div style="background:rgba(0,82,204,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(0,82,204,.18);">
-                <p style="font-size:22px;font-weight:700;color:#0052CC;margin:0 0 2px;">${linkedRoutes.length}</p>
+            <div style="background:rgba(99,102,241,.07);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(99,102,241,.15);">
+                <p style="font-size:22px;font-weight:700;color:#6366F1;margin:0 0 2px;">${linkedRoutes.length}</p>
                 <p style="font-size:11px;color:var(--text-faint);margin:0;">Routes</p>
             </div>
             <div style="background:rgba(52,211,153,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(52,211,153,.18);">
@@ -3876,75 +5461,160 @@ function renderController(c) {
         </div>
     </div>`;
 
-    // ── Request Flow Diagram ───────────────────────────────────────
-    const flowId = 'ctrl-flow-' + c.name.replace(/\W/g,'');
-    let flowLines = ['flowchart LR'];
+    // ── Request Flow Diagram (card-style) ────────────────────────────────────
 
-    // Route node(s) — sanitize URIs for Mermaid labels
-    if (linkedRoutes.length > 0) {
-        const routeLabels = linkedRoutes.slice(0,3).map(r => {
-            const ms = (r.methods||[]).filter(m=>m!=='HEAD');
-            return mEsc((ms[0]||'?') + ' ' + (r.uri||''));
-        });
-        flowLines.push(`    Route["🌐 Route\\n${routeLabels.join('\\n')}"]`);
-    } else {
-        flowLines.push(`    Route["🌐 Route"]`);
+    // Collect data
+    const _cfAllMw = [...new Set([...(c.middleware||[]), ...linkedRoutes.flatMap(r => r.middleware||[])])].filter(Boolean);
+    const _cfDeps  = (c.dependencies||[]).slice(0, 4);
+    const _cfMdls  = usedModels.slice(0, 4);
+    const _cfRts   = linkedRoutes.slice(0, 5);
+
+    // Method pill (white text on solid bg, shown inside route card header)
+    const _cfBadge = ms => (ms||[]).filter(m=>m!=='HEAD').slice(0,1).map(m => {
+        const bg = {GET:'rgba(16,185,129,.9)',POST:'rgba(59,130,246,.9)',PUT:'rgba(245,158,11,.9)',PATCH:'rgba(249,115,22,.9)',DELETE:'rgba(239,68,68,.9)'}[m]||'rgba(100,116,139,.9)';
+        return `<span style="font-size:8.5px;font-weight:700;font-family:var(--font-mono);padding:2px 7px;border-radius:5px;background:${bg};color:#fff;letter-spacing:.05em;">${m}</span>`;
+    }).join('');
+
+    // White SVG icons (for colored card headers)
+    const _cfIcoRoute = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 16l4.553-2.276A1 1 0 0021 19.382V8.618a1 1 0 00-.553-.894L15 5m0 16V5m0 0L9 7"/></svg>`;
+    const _cfIcoLock  = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+    const _cfIcoCtrl  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`;
+    const _cfIcoDep   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>`;
+    const _cfIcoDB    = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5"/><path d="M3 12c0 1.657 4.03 3 9 3s9-1.343 9-3"/></svg>`;
+    const _cfIcoMdl   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>`;
+
+    // Proper card: gradient colored header + white content body
+    const _cfCard = (headerGrad, headerIcon, headerLabel, body, delay) =>
+        `<div class="cf-node" style="border-radius:14px;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,.09),0 0 0 1px rgba(0,0,0,.04);margin-bottom:8px;animation-delay:${delay}ms;">
+            <div style="background:${headerGrad};padding:8px 12px;display:flex;align-items:center;gap:7px;">
+                ${headerIcon}
+                <span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.08em;text-transform:uppercase;flex:1;">${headerLabel}</span>
+            </div>
+            <div style="background:#fff;padding:10px 12px;">${body}</div>
+        </div>`;
+
+    // Animated arrow connector between columns
+    const _cfArrow = (c1, c2) =>
+        `<div style="display:flex;align-items:center;align-self:center;padding:0 5px;margin-top:18px;">
+            <div style="width:28px;height:2px;background:linear-gradient(90deg,${c1},${c2});border-radius:1px;opacity:.55;"></div>
+            <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid ${c2};opacity:.65;"></div>
+        </div>`;
+
+    // Column wrapper with label
+    const _cfColWrap = (label, color, inner, width) =>
+        `<div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${color};margin-bottom:10px;font-family:var(--font-mono);white-space:nowrap;opacity:.75;">${label}</div>
+            <div style="width:${width||185}px;">${inner}</div>
+        </div>`;
+
+    // ── Build each column ──────────────────────────────────────────
+
+    // Col 0 — Routes
+    const _cfRtInner = (_cfRts.length > 0 ? _cfRts : [null]).map((r, i) =>
+        _cfCard('linear-gradient(135deg,#6366F1,#818CF8)', _cfIcoRoute,
+            r ? `${_cfBadge(r.methods)}&nbsp;&nbsp;Route` : 'No Routes',
+            r ? `<div style="font-size:10px;font-family:var(--font-mono);color:#4338CA;font-weight:500;word-break:break-all;line-height:1.5;">${esc(r.uri||'/')}</div>`
+              : `<div style="font-size:11px;color:#9CA3AF;font-style:italic;">No routes linked</div>`,
+            i * 45)
+    ).join('');
+
+    const _cfCols = [
+        { label: 'Route' + (_cfRts.length !== 1 ? 's' : ''), color:'#6366F1', inner:_cfRtInner, width:182 },
+    ];
+
+    // Col 1 — Middleware (optional)
+    if (_cfAllMw.length > 0) {
+        const mwInner = _cfAllMw.slice(0,5).map((mw, i) =>
+            _cfCard('linear-gradient(135deg,#D97706,#F59E0B)', _cfIcoLock, 'Guard',
+                `<span style="font-size:10px;font-family:var(--font-mono);color:#78350F;font-weight:600;word-break:break-all;line-height:1.45;">${esc(mw)}</span>`,
+                120 + i * 40)
+        ).join('');
+        _cfCols.push({ label:'Middleware', color:'#D97706', inner:mwInner, width:165 });
     }
 
-    // Middleware — sanitize labels for Mermaid
-    const mwList = c.middleware || [];
-    const routeMw = linkedRoutes.length > 0
-        ? [...new Set(linkedRoutes.flatMap(r => r.middleware || []))]
-        : [];
-    const allMw = [...new Set([...mwList, ...routeMw])].filter(Boolean);
-    if (allMw.length > 0) {
-        flowLines.push(`    Middleware["🔒 Middleware\\n${allMw.slice(0,3).map(mEsc).join('\\n')}"]`);
-        flowLines.push(`    Route --> Middleware`);
-        flowLines.push(`    Middleware --> Controller["🎮 ${mEsc(c.name)}"]`);
-    } else {
-        flowLines.push(`    Route --> Controller["🎮 ${mEsc(c.name)}"]`);
+    // Col 2 — Controller (hero card — gradient header + white body, larger shadow)
+    const _cfCtrlDelay = _cfAllMw.length > 0 ? 240 : 160;
+    const _cfCx        = c.complexity || 0;
+    const _cfCxClr     = _cfCx > 10 ? '#EF4444' : _cfCx > 5 ? '#F59E0B' : '#10B981';
+    const _cfCtrlCard  = `<div class="cf-node" style="border-radius:14px;overflow:hidden;box-shadow:0 8px 32px rgba(99,102,241,.18),0 0 0 1.5px rgba(99,102,241,.22);animation-delay:${_cfCtrlDelay}ms;">
+        <div style="background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%);padding:14px 16px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;flex:none;">${_cfIcoCtrl}</div>
+                <div style="font-size:12px;font-weight:700;color:#fff;line-height:1.3;word-break:break-word;flex:1;">${esc(c.name)}</div>
+            </div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                <span style="font-size:9px;background:rgba(255,255,255,.18);color:#fff;padding:2px 9px;border-radius:20px;font-weight:600;">${c.method_count||0} methods</span>
+                ${c.is_resource ? '<span style="font-size:9px;background:rgba(52,211,153,.3);color:#A7F3D0;padding:2px 9px;border-radius:20px;font-weight:600;">Resource</span>' : ''}
+            </div>
+        </div>
+        <div style="background:#FAFBFF;padding:14px 16px;">
+            ${_cfCx > 0
+                ? `<div>
+                    <div style="display:flex;justify-content:space-between;font-size:9px;color:#9CA3AF;margin-bottom:4px;">
+                        <span>Complexity score</span>
+                        <span style="color:${_cfCxClr};font-weight:700;">${_cfCx}</span>
+                    </div>
+                    <div style="height:4px;background:#E5E7EB;border-radius:3px;overflow:hidden;">
+                        <div style="height:100%;width:${Math.min(100,_cfCx*6)}%;background:linear-gradient(90deg,${_cfCxClr},${_cfCxClr}bb);border-radius:3px;"></div>
+                    </div>
+                   </div>`
+                : '<div style="font-size:11px;color:#10B981;font-weight:500;">Low complexity</div>'}
+        </div>
+    </div>`;
+    _cfCols.push({ label:'Controller', color:'#6366F1', inner:_cfCtrlCard, width:220 });
+
+    // Col 3 — Dependencies + Models (optional)
+    const _cfDepDelay = _cfCtrlDelay + 120;
+    const _cfRightNodes = [
+        ..._cfDeps.map((dep, i) => _cfCard('linear-gradient(135deg,#7C3AED,#A78BFA)', _cfIcoDep, 'Service',
+            `<span style="font-size:10px;font-family:var(--font-mono);color:#5B21B6;font-weight:600;word-break:break-all;">${esc(dep.type||dep)}</span>`,
+            _cfDepDelay + i * 40)),
+        ..._cfMdls.map((mdl, i) => _cfCard('linear-gradient(135deg,#059669,#34D399)', _cfIcoMdl, 'Model',
+            `<span style="font-size:10px;font-family:var(--font-mono);color:#065F46;font-weight:600;word-break:break-all;">${esc(mdl)}</span>`,
+            _cfDepDelay + (_cfDeps.length + i) * 40)),
+    ];
+    if (_cfRightNodes.length > 0) {
+        _cfCols.push({ label:'Dependencies', color:'#7C3AED', inner:_cfRightNodes.join(''), width:178 });
     }
 
-    // Dependencies (services/repos) — sanitize type names
-    const deps = c.dependencies || [];
-    deps.forEach((dep, i) => {
-        const nodeId = 'Dep' + i;
-        flowLines.push(`    ${nodeId}["⚙️ ${mEsc(dep.type)}"]`);
-        flowLines.push(`    Controller --> ${nodeId}`);
+    // Col 4 — Database (card with header + centered icon body)
+    const _cfDbDelay = _cfDepDelay + (_cfRightNodes.length > 0 ? 160 : 0);
+    const _cfDbInner = `<div class="cf-node" style="border-radius:14px;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,.07),0 0 0 1px rgba(100,116,139,.12);animation-delay:${_cfDbDelay}ms;">
+        <div style="background:linear-gradient(135deg,#334155,#64748B);padding:9px 13px;display:flex;align-items:center;gap:7px;">
+            ${_cfIcoDB}
+            <span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.08em;text-transform:uppercase;">Database</span>
+        </div>
+        <div style="background:#fff;padding:18px 14px;text-align:center;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" style="margin:0 auto 6px;display:block;">
+                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                <path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5"/>
+                <path d="M3 12c0 1.657 4.03 3 9 3s9-1.343 9-3"/>
+            </svg>
+            <div style="font-size:10px;font-weight:600;color:#64748B;">Eloquent ORM</div>
+            <div style="font-size:9px;color:#94A3B8;margin-top:2px;">${usedModels.length} model${usedModels.length!==1?'s':''}</div>
+        </div>
+    </div>`;
+    _cfCols.push({ label:'Database', color:'#64748B', inner:_cfDbInner, width:142 });
+
+    // ── Assemble ───────────────────────────────────────────────────
+    let _cfHtml = '';
+    _cfCols.forEach((col, ci) => {
+        _cfHtml += _cfColWrap(col.label, col.color, col.inner, col.width);
+        if (ci < _cfCols.length - 1) {
+            _cfHtml += _cfArrow(col.color, _cfCols[ci+1].color);
+        }
     });
 
-    // Models — sanitize model names
-    usedModels.forEach((m, i) => {
-        const nodeId = 'Mdl' + i;
-        flowLines.push(`    ${nodeId}["📦 ${mEsc(m)}"]`);
-        const parentId = deps.length > 0 ? 'Dep0' : 'Controller';
-        flowLines.push(`    ${parentId} --> ${nodeId}`);
-        flowLines.push(`    ${nodeId} --> DB[(Database)]`);
-    });
-    if (usedModels.length === 0 && deps.length === 0) {
-        flowLines.push(`    Controller --> DB[(Database)]`);
-    }
-
-    // Styles — ATLAS dark theme
-    flowLines.push(`    classDef ctrl fill:#EAF2FF,stroke:#0052CC,color:#172B4D`);
-    flowLines.push(`    classDef mw  fill:#FFFAE6,stroke:#FF8B00,color:#172B4D`);
-    flowLines.push(`    classDef dep fill:#F3F0FF,stroke:#6554C0,color:#172B4D`);
-    flowLines.push(`    classDef mdl fill:#E3FCEF,stroke:#00875A,color:#172B4D`);
-    flowLines.push(`    classDef db  fill:#F4F5F7,stroke:#6B778C,color:#172B4D`);
-    flowLines.push(`    classDef rt  fill:#EAF2FF,stroke:#0052CC,color:#172B4D`);
-    flowLines.push(`    class Controller ctrl`);
-    flowLines.push(`    class Route rt`);
-    if (allMw.length > 0) flowLines.push(`    class Middleware mw`);
-    deps.forEach((_, i) => flowLines.push(`    class Dep${i} dep`));
-    usedModels.forEach((_, i) => flowLines.push(`    class Mdl${i} mdl`));
-    if (usedModels.length > 0 || deps.length === 0) flowLines.push(`    class DB db`);
-
-    h += `<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-6">
-        <h3 class="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
-            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+    h += `<div style="background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border);padding:20px;margin-bottom:24px;">
+        <h3 style="font-size:13px;font-weight:700;color:var(--text);margin:0 0 16px;display:flex;align-items:center;gap:8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             Request Flow
         </h3>
-        <div class="mermaid" id="${esc(flowId)}">${flowLines.join('\n')}</div>
+        <div style="background:#FAFAFA;background-image:radial-gradient(rgba(99,102,241,.06) 1px,transparent 1px);background-size:20px 20px;border-radius:12px;border:1px solid var(--border);padding:22px 24px;overflow-x:auto;">
+            <div style="display:flex;align-items:center;gap:0;min-width:max-content;">
+                ${_cfHtml}
+            </div>
+        </div>
     </div>`;
 
     // ── Methods Table ──────────────────────────────────────────────
@@ -4102,68 +5772,275 @@ function renderController(c) {
         </div>`;
     }
 
-    // Render only the newly created flowchart (not all .mermaid elements)
-    setTimeout(() => {
-        if (window.mermaid) {
-            const flowEl = document.getElementById(flowId);
-            if (flowEl && !flowEl.dataset.processed) {
-                try { mermaid.run({ nodes: [flowEl] }); } catch(e){}
-            }
-        }
-    }, 50);
-
     return h;
 }
 
 function renderJob(j) {
-    let h = `<div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">${avatar(j.name[0],'#FBBF24')}
-        <div><h2 style="font-size:20px;font-weight:700;color:var(--text);margin:0 0 2px;">${j.name}</h2><p style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin:0;">${j.namespace}</p></div></div>`;
-    let meta = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;font-size:13px;">
-        <div><p style="font-size:11px;color:var(--text-faint);margin:0 0 4px;">Queue</p><p style="font-weight:500;color:var(--text);margin:0;">${j.queue || 'default'}</p></div>`;
-    if (j.tries)   meta += `<div><p style="font-size:11px;color:var(--text-faint);margin:0 0 4px;">Tries</p><p style="font-weight:500;color:var(--text);margin:0;">${j.tries}</p></div>`;
-    if (j.timeout) meta += `<div><p style="font-size:11px;color:var(--text-faint);margin:0 0 4px;">Timeout</p><p style="font-weight:500;color:var(--text);margin:0;">${j.timeout}s</p></div>`;
-    if (j.delay)   meta += `<div><p style="font-size:11px;color:var(--text-faint);margin:0 0 4px;">Delay</p><p style="font-weight:500;color:var(--text);margin:0;">${j.delay}s</p></div>`;
-    meta += '</div>';
-    const flags = [j.should_queue && pill('ShouldQueue','#FBBF24'), j.unique && pill('ShouldBeUnique','#0052CC'), j.encrypted && pill('ShouldBeEncrypted','#A78BFA')].filter(Boolean);
-    if (flags.length) meta += `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">${flags.join('')}</div>`;
-    h += detailCard('Queue Config', meta);
-    if (j.dependencies?.length) h += detailCard('Dependencies', `<div style="display:flex;flex-wrap:wrap;gap:6px;">${j.dependencies.map(d => pill(d.split('\\\\').pop())).join('')}</div>`);
+    const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const clr = '#FBBF24', rgb = '251,191,36';
+    let h = `
+    <div style="background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border);padding:24px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+            <div style="width:56px;height:56px;border-radius:14px;background:rgba(${rgb},.13);border:1px solid rgba(${rgb},.3);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+                    <h2 style="font-size:22px;font-weight:700;color:var(--text);margin:0;">${esc(j.name)}</h2>
+                    ${j.should_queue ? `<span style="font-size:11px;background:rgba(${rgb},.12);color:${clr};border:1px solid rgba(${rgb},.3);padding:2px 10px;border-radius:20px;font-weight:600;">Queued</span>` : ''}
+                </div>
+                <p style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin:0 0 2px;">${esc(j.namespace)}</p>
+                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin:0;">${esc(j.path || '')}</p>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+            <div style="background:rgba(${rgb},.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(${rgb},.18);">
+                <p style="font-size:13px;font-weight:700;color:${clr};margin:0 0 2px;font-family:var(--font-mono);">${esc(j.queue || 'default')}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Queue</p>
+            </div>
+            <div style="background:rgba(96,165,250,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(96,165,250,.18);">
+                <p style="font-size:22px;font-weight:700;color:#60A5FA;margin:0 0 2px;">${j.tries || '—'}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Max Tries</p>
+            </div>
+            <div style="background:rgba(167,139,250,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(167,139,250,.18);">
+                <p style="font-size:22px;font-weight:700;color:#A78BFA;margin:0 0 2px;">${j.timeout ? esc(j.timeout)+'s' : '—'}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Timeout</p>
+            </div>
+            <div style="background:rgba(52,211,153,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(52,211,153,.18);">
+                <p style="font-size:22px;font-weight:700;color:#34D399;margin:0 0 2px;">${j.delay ? esc(j.delay)+'s' : '—'}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Delay</p>
+            </div>
+        </div>
+    </div>`;
+    const flags = [
+        j.should_queue  && `<span style="font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;background:rgba(${rgb},.1);color:${clr};">ShouldQueue</span>`,
+        j.unique        && `<span style="font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;background:rgba(99,102,241,.08);color:#6366F1;">ShouldBeUnique</span>`,
+        j.encrypted     && `<span style="font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;background:rgba(167,139,250,.1);color:#A78BFA;">ShouldBeEncrypted</span>`,
+    ].filter(Boolean);
+    if (flags.length) h += detailCard('Queue Interfaces', `<div style="display:flex;flex-wrap:wrap;gap:8px;">${flags.join('')}</div>`);
+    if (j.dependencies?.length) {
+        const depItems = j.dependencies.map(d =>
+            `<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(167,139,250,.07);border-radius:9px;border:1px solid rgba(167,139,250,.18);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.5" style="flex:none;"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+                <div><span style="font-size:11px;font-family:var(--font-mono);color:#6D28D9;font-weight:600;">${esc(d.type||d)}</span>${d.name?`<span style="font-size:10px;color:#9CA3AF;margin-left:5px;">$${esc(d.name)}</span>`:''}</div>
+            </div>`
+        ).join('');
+        h += detailCard('Dependencies', `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;">${depItems}</div>`);
+    }
     return h;
 }
 
 function renderEvent(e) {
-    let h = `<div class="flex items-center gap-3 mb-6">${avatar(e.name[0],'bg-pink-100','text-pink-600')}
-        <div><h2 class="text-xl font-bold">${e.name}</h2><p class="text-sm text-slate-400 font-mono">${e.namespace}</p></div></div>`;
-    const flags = [e.should_broadcast && pill('ShouldBroadcast','bg-pink-50 text-pink-700'), e.broadcastNow && pill('ShouldBroadcastNow','bg-rose-50 text-rose-700')].filter(Boolean);
-    if (flags.length) h += detailCard('Broadcast', `<div class="flex gap-2">${flags.join('')}</div>`);
-    if (e.properties?.length) h += detailCard('Payload Properties', `<div class="flex flex-wrap gap-2">${e.properties.map(p => pill(p)).join('')}</div>`);
+    const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const clr = '#EC4899', rgb = '236,72,153';
+    let h = `
+    <div style="background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border);padding:24px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+            <div style="width:56px;height:56px;border-radius:14px;background:rgba(${rgb},.13);border:1px solid rgba(${rgb},.3);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+                    <h2 style="font-size:22px;font-weight:700;color:var(--text);margin:0;">${esc(e.name)}</h2>
+                    <span style="font-size:11px;background:rgba(${rgb},.1);color:${clr};border:1px solid rgba(${rgb},.25);padding:2px 10px;border-radius:20px;font-weight:600;">Event</span>
+                </div>
+                <p style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin:0 0 2px;">${esc(e.namespace)}</p>
+                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin:0;">${esc(e.path || '')}</p>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div style="background:rgba(${rgb},.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(${rgb},.18);">
+                <p style="font-size:22px;font-weight:700;color:${clr};margin:0 0 2px;">${(e.properties||[]).length}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Properties</p>
+            </div>
+            <div style="background:rgba(99,102,241,.07);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(99,102,241,.15);">
+                <p style="font-size:22px;font-weight:700;color:#6366F1;margin:0 0 2px;">${e.should_broadcast ? 'Yes' : 'No'}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Broadcasts</p>
+            </div>
+            <div style="background:rgba(248,113,113,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(248,113,113,.18);">
+                <p style="font-size:14px;font-weight:700;color:#F87171;margin:0 0 2px;">${e.broadcastNow ? 'Immediate' : 'Queued'}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Broadcast Mode</p>
+            </div>
+        </div>
+    </div>`;
+    if (e.properties?.length) {
+        const props = e.properties.map(p =>
+            `<span style="font-size:11px;font-family:var(--font-mono);padding:5px 12px;border-radius:7px;background:rgba(${rgb},.08);color:${clr};border:1px solid rgba(${rgb},.2);">${esc(p)}</span>`
+        ).join('');
+        h += detailCard('Payload Properties', `<div style="display:flex;flex-wrap:wrap;gap:8px;">${props}</div>`);
+    }
+    if (e.should_broadcast || e.broadcastNow) {
+        const bFlags = [
+            e.should_broadcast && `<span style="font-size:11px;font-weight:600;padding:5px 14px;border-radius:7px;background:rgba(99,102,241,.08);color:#6366F1;border:1px solid rgba(99,102,241,.2);">ShouldBroadcast</span>`,
+            e.broadcastNow     && `<span style="font-size:11px;font-weight:600;padding:5px 14px;border-radius:7px;background:rgba(248,113,113,.1);color:#F87171;border:1px solid rgba(248,113,113,.2);">ShouldBroadcastNow</span>`,
+        ].filter(Boolean);
+        h += detailCard('Broadcast Interfaces', `<div style="display:flex;flex-wrap:wrap;gap:8px;">${bFlags.join('')}</div>`);
+    }
     return h;
 }
 
 function renderService(s, type) {
-    const [bg, fg] = type === 'Repository' ? ['bg-cyan-100','text-cyan-600'] : ['bg-purple-100','text-purple-600'];
-    let h = `<div class="flex items-center gap-3 mb-6">${avatar(s.name[0], bg, fg)}
-        <div><h2 class="text-xl font-bold">${s.name}</h2><p class="text-sm text-slate-400 font-mono">${s.namespace}</p></div></div>`;
-    if (s.dependencies?.length) h += detailCard('Dependencies', `<div class="flex flex-wrap gap-2">${s.dependencies.map(d => pill(d.split('\\').pop())).join('')}</div>`);
-    if (s.methods?.length) h += detailCard(`Public Methods (${s.methods.length})`, `<div class="flex flex-wrap gap-2">${s.methods.map(m => pill(m, 'bg-slate-100 text-slate-700')).join('')}</div>`);
+    const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const isRepo = type === 'Repository';
+    const clr    = isRepo ? '#0EA5E9' : '#8B5CF6';
+    const rgb    = isRepo ? '14,165,233' : '139,92,246';
+    const typeIcon = isRepo
+        ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>`
+        : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>`;
+    let h = `
+    <div style="background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border);padding:24px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+            <div style="width:56px;height:56px;border-radius:14px;background:rgba(${rgb},.13);border:1px solid rgba(${rgb},.3);display:flex;align-items:center;justify-content:center;flex:none;">${typeIcon}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+                    <h2 style="font-size:22px;font-weight:700;color:var(--text);margin:0;">${esc(s.name)}</h2>
+                    <span style="font-size:11px;background:rgba(${rgb},.1);color:${clr};border:1px solid rgba(${rgb},.25);padding:2px 10px;border-radius:20px;font-weight:600;">${type}</span>
+                </div>
+                <p style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin:0 0 2px;">${esc(s.namespace)}</p>
+                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin:0;">${esc(s.path || '')}</p>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+            <div style="background:rgba(${rgb},.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(${rgb},.18);">
+                <p style="font-size:22px;font-weight:700;color:${clr};margin:0 0 2px;">${s.method_count||0}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Public Methods</p>
+            </div>
+            <div style="background:rgba(167,139,250,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(167,139,250,.18);">
+                <p style="font-size:22px;font-weight:700;color:#A78BFA;margin:0 0 2px;">${(s.dependencies||[]).length}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Dependencies</p>
+            </div>
+        </div>
+    </div>`;
+    if (s.dependencies?.length) {
+        const depItems = s.dependencies.map(d =>
+            `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(167,139,250,.07);border-radius:9px;border:1px solid rgba(167,139,250,.18);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.5" style="flex:none;"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+                <span style="font-size:11px;font-family:var(--font-mono);color:#6D28D9;font-weight:600;">${esc(d)}</span>
+            </div>`
+        ).join('');
+        h += detailCard('Dependencies', `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;">${depItems}</div>`);
+    }
+    if (s.methods?.length) {
+        const methodItems = s.methods.map(m =>
+            `<span style="font-size:11px;font-family:var(--font-mono);padding:5px 12px;border-radius:7px;background:rgba(${rgb},.08);color:${clr};border:1px solid rgba(${rgb},.18);">${esc(m)}</span>`
+        ).join('');
+        h += detailCard(`Public Methods (${s.methods.length})`, `<div style="display:flex;flex-wrap:wrap;gap:8px;">${methodItems}</div>`);
+    }
     return h;
 }
 
 function renderObserver(o) {
-    const colors = {created:'bg-green-50 text-green-700',updated:'bg-blue-50 text-blue-700',deleted:'bg-red-50 text-red-700',saved:'bg-teal-50 text-teal-700',creating:'bg-emerald-50 text-emerald-700',updating:'bg-sky-50 text-sky-700',deleting:'bg-rose-50 text-rose-700',saving:'bg-cyan-50 text-cyan-700'};
-    let h = `<div class="flex items-center gap-3 mb-6">${avatar(o.name[0],'bg-orange-100','text-orange-600')}
-        <div><h2 class="text-xl font-bold">${o.name}</h2><p class="text-sm text-slate-400 font-mono">${o.namespace}</p></div></div>`;
-    h += detailCard('Observes', `<p class="font-medium text-slate-700">${o.model || 'Unknown'}</p>`);
-    if (o.events?.length) h += detailCard('Lifecycle Events', `<div class="flex flex-wrap gap-2">${o.events.map(e => pill(e, colors[e] || 'bg-slate-100 text-slate-600')).join('')}</div>`);
+    const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const clr = '#F97316', rgb = '249,115,22';
+    const evtClr = {
+        created:  {bg:'rgba(16,185,129,.1)',  color:'#059669'},
+        creating: {bg:'rgba(16,185,129,.1)',  color:'#059669'},
+        updated:  {bg:'rgba(59,130,246,.1)',  color:'#2563EB'},
+        updating: {bg:'rgba(59,130,246,.1)',  color:'#2563EB'},
+        deleted:  {bg:'rgba(239,68,68,.1)',   color:'#DC2626'},
+        deleting: {bg:'rgba(239,68,68,.1)',   color:'#DC2626'},
+        saved:    {bg:'rgba(20,184,166,.1)',  color:'#0D9488'},
+        saving:   {bg:'rgba(20,184,166,.1)',  color:'#0D9488'},
+        restored: {bg:'rgba(99,102,241,.08)',  color:'#6366F1'},
+    };
+    let h = `
+    <div style="background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border);padding:24px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+            <div style="width:56px;height:56px;border-radius:14px;background:rgba(${rgb},.13);border:1px solid rgba(${rgb},.3);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+                    <h2 style="font-size:22px;font-weight:700;color:var(--text);margin:0;">${esc(o.name)}</h2>
+                    <span style="font-size:11px;background:rgba(${rgb},.1);color:${clr};border:1px solid rgba(${rgb},.25);padding:2px 10px;border-radius:20px;font-weight:600;">Observer</span>
+                </div>
+                <p style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin:0 0 2px;">${esc(o.namespace)}</p>
+                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin:0;">${esc(o.path || '')}</p>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+            <div style="background:rgba(${rgb},.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(${rgb},.18);">
+                <p style="font-size:15px;font-weight:700;color:${clr};margin:0 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(o.model || 'Unknown')}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Observes Model</p>
+            </div>
+            <div style="background:rgba(99,102,241,.07);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(99,102,241,.15);">
+                <p style="font-size:22px;font-weight:700;color:#6366F1;margin:0 0 2px;">${(o.events||[]).length}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Lifecycle Hooks</p>
+            </div>
+        </div>
+    </div>`;
+    h += detailCard('Observes Model', `
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(${rgb},.06);border-radius:10px;border:1px solid rgba(${rgb},.15);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2" style="flex:none;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <div>
+                <p style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 2px;">${esc(o.model || 'Unknown')}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Eloquent Model</p>
+            </div>
+        </div>`);
+    if (o.events?.length) {
+        const badges = o.events.map(ev => {
+            const c = evtClr[ev] || {bg:'rgba(100,116,139,.1)', color:'#64748B'};
+            return `<span style="font-size:11px;font-weight:600;padding:5px 13px;border-radius:7px;background:${c.bg};color:${c.color};">${esc(ev)}</span>`;
+        }).join('');
+        h += detailCard('Lifecycle Events', `<div style="display:flex;flex-wrap:wrap;gap:8px;">${badges}</div>`);
+    }
     return h;
 }
 
 function renderPolicy(p) {
-    const colors = {viewAny:'bg-blue-50 text-blue-700',view:'bg-sky-50 text-sky-700',create:'bg-green-50 text-green-700',update:'bg-yellow-50 text-yellow-700',delete:'bg-red-50 text-red-700',restore:'bg-teal-50 text-teal-700',forceDelete:'bg-rose-50 text-rose-700',before:'bg-purple-50 text-purple-700'};
-    let h = `<div class="flex items-center gap-3 mb-6">${avatar(p.name[0],'bg-slate-200','text-slate-600')}
-        <div><h2 class="text-xl font-bold">${p.name}</h2><p class="text-sm text-slate-400 font-mono">${p.namespace}</p></div></div>`;
-    h += detailCard('Guards Model', `<p class="font-medium text-slate-700">${p.model || 'Unknown'}</p>`);
-    if (p.actions?.length) h += detailCard('Policy Actions', `<div class="flex flex-wrap gap-2">${p.actions.map(a => pill(a, colors[a] || 'bg-slate-100 text-slate-600')).join('')}</div>`);
+    const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const clr = '#6366F1', rgb = '99,102,241';
+    const actClr = {
+        viewAny:     {bg:'rgba(59,130,246,.1)',  color:'#2563EB'},
+        view:        {bg:'rgba(96,165,250,.1)',   color:'#3B82F6'},
+        create:      {bg:'rgba(16,185,129,.1)',   color:'#059669'},
+        update:      {bg:'rgba(245,158,11,.1)',   color:'#D97706'},
+        delete:      {bg:'rgba(239,68,68,.1)',    color:'#DC2626'},
+        restore:     {bg:'rgba(20,184,166,.1)',   color:'#0D9488'},
+        forceDelete: {bg:'rgba(244,63,94,.1)',    color:'#E11D48'},
+        before:      {bg:'rgba(139,92,246,.1)',   color:'#7C3AED'},
+    };
+    let h = `
+    <div style="background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border);padding:24px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+            <div style="width:56px;height:56px;border-radius:14px;background:rgba(${rgb},.13);border:1px solid rgba(${rgb},.3);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+                    <h2 style="font-size:22px;font-weight:700;color:var(--text);margin:0;">${esc(p.name)}</h2>
+                    <span style="font-size:11px;background:rgba(${rgb},.1);color:${clr};border:1px solid rgba(${rgb},.25);padding:2px 10px;border-radius:20px;font-weight:600;">Policy</span>
+                </div>
+                <p style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin:0 0 2px;">${esc(p.namespace)}</p>
+                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin:0;">${esc(p.path || '')}</p>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+            <div style="background:rgba(${rgb},.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(${rgb},.18);">
+                <p style="font-size:15px;font-weight:700;color:${clr};margin:0 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.model || 'Unknown')}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Guards Model</p>
+            </div>
+            <div style="background:rgba(52,211,153,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(52,211,153,.18);">
+                <p style="font-size:22px;font-weight:700;color:#34D399;margin:0 0 2px;">${(p.actions||[]).length}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Policy Actions</p>
+            </div>
+        </div>
+    </div>`;
+    h += detailCard('Guards Model', `
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(${rgb},.06);border-radius:10px;border:1px solid rgba(${rgb},.15);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2" style="flex:none;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <div>
+                <p style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 2px;">${esc(p.model || 'Unknown')}</p>
+                <p style="font-size:11px;color:var(--text-faint);margin:0;">Protected Eloquent Model</p>
+            </div>
+        </div>`);
+    if (p.actions?.length) {
+        const badges = p.actions.map(a => {
+            const c = actClr[a] || {bg:'rgba(100,116,139,.1)', color:'#64748B'};
+            return `<span style="font-size:11px;font-weight:600;padding:5px 13px;border-radius:7px;background:${c.bg};color:${c.color};">${esc(a)}</span>`;
+        }).join('');
+        h += detailCard('Policy Actions', `<div style="display:flex;flex-wrap:wrap;gap:8px;">${badges}</div>`);
+    }
     return h;
 }
 
@@ -4171,7 +6048,7 @@ function renderPolicy(p) {
 
 const REL_COLORS = {
     hasMany:        { color:'#34D399', bg:'rgba(52,211,153,.13)',  border:'rgba(52,211,153,.3)'  },
-    hasOne:         { color:'#0052CC', bg:'rgba(0,82,204,.13)',  border:'rgba(0,82,204,.3)'  },
+    hasOne:         { color:'#6366F1', bg:'rgba(99,102,241,.12)',   border:'rgba(99,102,241,.3)'   },
     belongsTo:      { color:'#60A5FA', bg:'rgba(96,165,250,.13)',  border:'rgba(96,165,250,.3)'  },
     belongsToMany:  { color:'#A78BFA', bg:'rgba(167,139,250,.13)', border:'rgba(167,139,250,.3)' },
     morphMany:      { color:'#FB923C', bg:'rgba(251,146,60,.13)',  border:'rgba(251,146,60,.3)'  },
@@ -4238,7 +6115,7 @@ function renderModelTree() {
         return da !== 0 ? da : a.name.localeCompare(b.name);
     });
 
-    const PALETTE = ['#0052CC','#A78BFA','#34D399','#FBBF24','#F87171','#60A5FA'];
+    const PALETTE = ['#6366F1','#A78BFA','#34D399','#FBBF24','#F87171','#60A5FA'];
 
     let html = `<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:hidden;">`;
 
@@ -4307,9 +6184,9 @@ function setMapTab(tab) {
         document.getElementById('map-' + t).style.display = t === tab ? 'block' : 'none';
         const btn = document.getElementById('map-tab-' + t);
         if (btn) {
-            btn.style.background    = t === tab ? 'var(--bg-elevated)' : 'none';
-            btn.style.color         = t === tab ? 'var(--text)'        : 'var(--text-dim)';
-            btn.style.borderColor   = t === tab ? 'var(--border)'      : 'transparent';
+            btn.style.background = t === tab ? '#6366F1' : 'transparent';
+            btn.style.color      = t === tab ? '#FFFFFF'  : '#6B7280';
+            btn.style.border     = 'none';
         }
     });
 
@@ -4354,44 +6231,28 @@ function initRelGraph() {
     _rgW = svg.clientWidth  || 900;
     _rgH = svg.clientHeight || 600;
     const W = _rgW, H = _rgH;
-    // Virtual canvas: large enough to spread nodes, small enough to stay navigable
-    const N  = models.length;
-    const _vSpan = Math.ceil(Math.sqrt(N * 1.6));
-    const VW = Math.max(W, _vSpan * 165);
-    const VH = Math.max(H, _vSpan * 120);
+
     const edgesG = document.getElementById('rg-edges-g');
     const nodesG = document.getElementById('rg-nodes-g');
 
     if (!models.length) {
         const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         t.setAttribute('x', W/2); t.setAttribute('y', H/2);
-        t.setAttribute('text-anchor', 'middle'); t.setAttribute('fill', '#6B778C');
-        t.setAttribute('font-size', '14'); t.setAttribute('font-family', 'system-ui');
+        t.setAttribute('text-anchor', 'middle'); t.setAttribute('fill', '#9CA3AF');
+        t.setAttribute('font-size', '14'); t.setAttribute('font-family', 'system-ui,sans-serif');
         t.textContent = 'No models found';
         nodesG.appendChild(t);
         return;
     }
 
-    // Build node data from APP.models — deduplicate by full_class to avoid
-    // duplicate nodes when two files share the same class basename (e.g. User)
+    // Deduplicate by name — avoids duplicate node IDs when two namespaces share a class basename
     const nById = {};
-    const seenClass = new Set();
+    const seenName = new Set();
     const nodes = [];
-    models.forEach((m, i) => {
-        const key = m.full_class || m.name;
-        if (seenClass.has(key)) return;
-        seenClass.add(key);
-        const idx   = nodes.length;
-        const angle = (idx / Math.max(models.length, 1)) * 2 * Math.PI - Math.PI / 2;
-        const r     = Math.min(VW, VH) * 0.40;
-        const node  = {
-            id:    m.name,
-            table: m.table || m.name.toLowerCase() + 's',
-            rels:  (m.relationships || []).length,
-            x: VW/2 + r * Math.cos(angle),
-            y: VH/2 + r * Math.sin(angle),
-            vx: 0, vy: 0,
-        };
+    models.forEach(m => {
+        if (!m.name || seenName.has(m.name)) return;
+        seenName.add(m.name);
+        const node = { id: m.name, table: m.table || m.name.toLowerCase() + 's', rels: (m.relationships || []).length, x: 0, y: 0, vx: 0, vy: 0 };
         nById[m.name] = node;
         nodes.push(node);
     });
@@ -4402,21 +6263,44 @@ function initRelGraph() {
         (m.relationships || []).forEach(rel => {
             const toName = rel.related ? rel.related.split('\\').pop() : null;
             if (!toName || !nById[toName] || toName === m.name) return;
-            const key = m.name + '|' + toName + '|' + rel.type;
-            if (!edgeSet.has(key)) edgeSet.set(key, { from: m.name, to: toName, type: rel.type });
+            const k = m.name + '→' + toName + ':' + rel.type;
+            if (!edgeSet.has(k)) edgeSet.set(k, { from: m.name, to: toName, type: rel.type });
         });
     });
     const edges = [...edgeSet.values()];
 
-    // Force constants: IDEAL capped at 220 so nodes don't spread unreadably far
-    const REPEL = Math.max(9000, N * 150), IDEAL = Math.max(180, Math.min(220, Math.sqrt(N) * 18));
-    const SPRING = 0.05, GRAV = 0.0015, DAMP = 0.80;
-    for (let it = 0; it < 400; it++) {
-        for (let a = 0; a < nodes.length; a++) {
-            for (let b = a + 1; b < nodes.length; b++) {
-                const na = nodes[a], nb = nodes[b];
+    // Separate connected nodes (have edges) from isolated ones (no edges)
+    const connIds  = new Set();
+    edges.forEach(e => { connIds.add(e.from); connIds.add(e.to); });
+    const simNodes = nodes.filter(n =>  connIds.has(n.id));
+    const isoNodes = nodes.filter(n => !connIds.has(n.id));
+    const NC = simNodes.length;
+
+    // Virtual canvas — generous but bounded so nodes stay navigable
+    const VW = Math.max(W * 2.2, 1600), VH = Math.max(H * 2.2, 1200);
+    const CX = VW / 2, CY = VH / 2;
+
+    // Start connected nodes in a non-overlapping grid (circle start causes hairball collapse)
+    // Spacing > node diagonal (sqrt(150²+60²) ≈ 161px) so nodes never overlap at t=0
+    const SP    = 192;
+    const gcols = Math.max(2, Math.ceil(Math.sqrt(NC * 1.4)));
+    const grows  = Math.ceil(NC / gcols);
+    simNodes.forEach((n, i) => {
+        const col = i % gcols, row = Math.floor(i / gcols);
+        n.x = CX - (gcols * SP) / 2 + col * SP + SP / 2 + Math.sin(i * 2.4) * 18;
+        n.y = CY - (grows * SP) / 2 + row * SP + SP / 2 + Math.cos(i * 2.4) * 18;
+    });
+
+    // Force simulation — strong repel to maintain non-overlap, spring for edges
+    const REPEL  = Math.max(18000, NC * 400);
+    const IDEAL  = Math.max(180, Math.min(240, SP + NC * 2));
+    const SPRING = 0.05, GRAV = 0.004, DAMP = 0.82;
+    for (let it = 0; it < 320; it++) {
+        for (let a = 0; a < NC; a++) {
+            for (let b = a + 1; b < NC; b++) {
+                const na = simNodes[a], nb = simNodes[b];
                 const dx = na.x - nb.x, dy = na.y - nb.y;
-                const d2 = Math.max(dx*dx + dy*dy, 100), d = Math.sqrt(d2), f = REPEL / d2;
+                const d2 = Math.max(dx*dx + dy*dy, 1600), d = Math.sqrt(d2), f = REPEL / d2;
                 na.vx += dx/d*f; na.vy += dy/d*f;
                 nb.vx -= dx/d*f; nb.vy -= dy/d*f;
             }
@@ -4425,17 +6309,44 @@ function initRelGraph() {
             const na = nById[e.from], nb = nById[e.to];
             if (!na || !nb) return;
             const dx = nb.x - na.x, dy = nb.y - na.y;
-            const d  = Math.sqrt(dx*dx + dy*dy) || 1, f = (d - IDEAL) * SPRING;
+            const d = Math.sqrt(dx*dx + dy*dy) || 1, f = (d - IDEAL) * SPRING;
             na.vx += dx/d*f; na.vy += dy/d*f;
             nb.vx -= dx/d*f; nb.vy -= dy/d*f;
         });
-        nodes.forEach(n => {
-            n.vx += (VW/2 - n.x) * GRAV; n.vy += (VH/2 - n.y) * GRAV;
+        simNodes.forEach(n => {
+            n.vx += (CX - n.x) * GRAV; n.vy += (CY - n.y) * GRAV;
             n.vx *= DAMP; n.vy *= DAMP;
             n.x = Math.max(RG_NW/2 + 20, Math.min(VW - RG_NW/2 - 20, n.x + n.vx));
             n.y = Math.max(RG_NH/2 + 20, Math.min(VH - RG_NH/2 - 20, n.y + n.vy));
         });
     }
+
+    // Place isolated nodes in a tidy labelled section below the connected cluster
+    if (isoNodes.length > 0) {
+        const cxArr  = simNodes.length ? simNodes.map(n => n.x) : [CX];
+        const cyArr  = simNodes.length ? simNodes.map(n => n.y) : [CY];
+        const clMinX = Math.min(...cxArr) - RG_NW / 2;
+        const clMaxX = Math.max(...cxArr) + RG_NW / 2;
+        const clMaxY = Math.max(...cyArr) + RG_NH / 2;
+        const gridW  = Math.max(clMaxX - clMinX, (RG_NW + 16) * 5);
+        const isoCols = Math.max(5, Math.floor(gridW / (RG_NW + 14)));
+        // Draw a section label
+        const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lbl.setAttribute('x',           clMinX);
+        lbl.setAttribute('y',           clMaxY + 40);
+        lbl.setAttribute('font-size',   '11');
+        lbl.setAttribute('font-weight', '600');
+        lbl.setAttribute('font-family', 'ui-monospace,monospace');
+        lbl.setAttribute('fill',        '#9CA3AF');
+        lbl.setAttribute('letter-spacing', '0.08em');
+        lbl.textContent = 'STANDALONE MODELS (' + isoNodes.length + ')';
+        nodesG.appendChild(lbl);
+        isoNodes.forEach((n, i) => {
+            n.x = clMinX + RG_NW / 2 + (i % isoCols) * (RG_NW + 14);
+            n.y = clMaxY + 60 + RG_NH / 2 + Math.floor(i / isoCols) * (RG_NH + 10);
+        });
+    }
+
     _rgNodes = nodes;
 
     // Draw edges via createElementNS
@@ -4459,20 +6370,27 @@ function initRelGraph() {
     });
 
     // Draw nodes via createElementNS
+    const _rgScaleInners = [];
     nodes.forEach(n => {
+        const isIso = !connIds.has(n.id);
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.setAttribute('class',     'rg-node-g g-node');
         g.setAttribute('data-id',   n.id);
         g.style.cursor = 'pointer';
         g.setAttribute('transform', 'translate(' + (n.x - RG_NW/2) + ',' + (n.y - RG_NH/2) + ')');
 
+        const inner = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        inner.style.transformOrigin = (RG_NW/2) + 'px ' + (RG_NH/2) + 'px';
+        inner.style.opacity   = '0';
+        inner.style.transform = 'scale(0)';
+
         const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         bg.setAttribute('class',        'rg-node-bg g-node-bg');
         bg.setAttribute('width',        RG_NW);
         bg.setAttribute('height',       RG_NH);
         bg.setAttribute('rx',           '10');
-        bg.setAttribute('fill',         '#FFFFFF');
-        bg.setAttribute('stroke',       '#DFE1E6');
+        bg.setAttribute('fill',         isIso ? '#F8FAFC' : '#FFFFFF');
+        bg.setAttribute('stroke',       isIso ? '#CBD5E1' : '#E5E7EB');
         bg.setAttribute('stroke-width', '1.5');
         bg.setAttribute('filter',       'url(#rg-f-node)');
 
@@ -4481,7 +6399,7 @@ function initRelGraph() {
         bar.setAttribute('width',  RG_NW);
         bar.setAttribute('height', '5');
         bar.setAttribute('rx',     '5');
-        bar.setAttribute('fill',   '#0052CC');
+        bar.setAttribute('fill',   isIso ? '#94A3B8' : '#6366F1');
 
         const nm = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         nm.setAttribute('x',           RG_NW/2);
@@ -4489,8 +6407,8 @@ function initRelGraph() {
         nm.setAttribute('text-anchor', 'middle');
         nm.setAttribute('font-family', 'ui-monospace,monospace');
         nm.setAttribute('font-size',   '13');
-        nm.setAttribute('font-weight', '800');
-        nm.setAttribute('fill',        '#172B4D');
+        nm.setAttribute('font-weight', '700');
+        nm.setAttribute('fill',        isIso ? '#334155' : '#111827');
         nm.textContent = n.id.length > 17 ? n.id.slice(0, 16) + '…' : n.id;
 
         const tb = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -4499,10 +6417,10 @@ function initRelGraph() {
         tb.setAttribute('text-anchor', 'middle');
         tb.setAttribute('font-family', 'ui-monospace,monospace');
         tb.setAttribute('font-size',   '10');
-        tb.setAttribute('fill',        '#6B778C');
+        tb.setAttribute('fill',        '#6B7280');
         tb.textContent = n.table.length > 20 ? n.table.slice(0, 19) + '…' : n.table;
 
-        g.appendChild(bg); g.appendChild(bar); g.appendChild(nm); g.appendChild(tb);
+        inner.appendChild(bg); inner.appendChild(bar); inner.appendChild(nm); inner.appendChild(tb);
 
         if (n.rels > 0) {
             const rb = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -4511,12 +6429,23 @@ function initRelGraph() {
             rb.setAttribute('text-anchor', 'end');
             rb.setAttribute('font-size',   '9');
             rb.setAttribute('font-weight', '700');
-            rb.setAttribute('fill',        '#a5b4fc');
+            rb.setAttribute('fill',        '#818CF8');
             rb.textContent = n.rels + 'r';
-            g.appendChild(rb);
+            inner.appendChild(rb);
         }
+        g.appendChild(inner);
         g.addEventListener('click', ev => { ev.stopPropagation(); rgSelect(n.id); });
         nodesG.appendChild(g);
+        _rgScaleInners.push(inner);
+    });
+
+    // Node scale-in: stagger each node popping from scale(0) → scale(1)
+    _rgScaleInners.forEach((inn, i) => {
+        setTimeout(() => {
+            inn.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            inn.style.opacity    = '1';
+            inn.style.transform  = 'scale(1)';
+        }, i * 20);
     });
 
     // Build adjacency map
@@ -4566,8 +6495,18 @@ function initRelGraph() {
     svg.addEventListener('click', e => { if (e.target === svg) rgDiagClear(); });
 
     _rgInitMinimap(nodes, VW, VH);
+
+    // Initial view: fit to connected cluster for readable zoom; press ⊡ to see all nodes
+    const _initNodes = simNodes.length ? simNodes : nodes;
+    const _ixs = _initNodes.map(n => n.x), _iys = _initNodes.map(n => n.y);
+    const _iMinX = Math.min(..._ixs) - RG_NW/2 - 40;
+    const _iMaxX = Math.max(..._ixs) + RG_NW/2 + 40;
+    const _iMinY = Math.min(..._iys) - RG_NH/2 - 40;
+    const _iMaxY = Math.max(..._iys) + RG_NH/2 + 40;
+    _rgVp.z = Math.max(0.45, Math.min(1.5, Math.min(W / (_iMaxX - _iMinX), H / (_iMaxY - _iMinY)) * 0.92));
+    _rgVp.x = _iMinX - (W / _rgVp.z - (_iMaxX - _iMinX)) / 2;
+    _rgVp.y = _iMinY - (H / _rgVp.z - (_iMaxY - _iMinY)) / 2;
     applyVp();
-    graphCenterView();
 }
 
 function _rgSetEdgePath(path, na, nb) {
@@ -4590,7 +6529,7 @@ function _rgInitMinimap(nodes, vW, vH) {
     const offX  = (mmW - W * scale) / 2, offY = (mmH - H * scale) / 2;
 
     const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    bg.setAttribute('width', mmW); bg.setAttribute('height', mmH); bg.setAttribute('fill', '#F4F5F7');
+    bg.setAttribute('width', mmW); bg.setAttribute('height', mmH); bg.setAttribute('fill', '#F9FAFB');
     mm.appendChild(bg);
 
     nodes.forEach(n => {
@@ -4600,15 +6539,15 @@ function _rgInitMinimap(nodes, vW, vH) {
         dot.setAttribute('width',   Math.max(4, RG_NW * scale));
         dot.setAttribute('height',  Math.max(3, RG_NH * scale));
         dot.setAttribute('rx',      '2');
-        dot.setAttribute('fill',    '#0052CC');
+        dot.setAttribute('fill',    '#6366F1');
         dot.setAttribute('opacity', '0.45');
         mm.appendChild(dot);
     });
 
     const vr = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     vr.setAttribute('id',           'rg-mm-vp');
-    vr.setAttribute('fill',         'rgba(0,82,204,0.08)');
-    vr.setAttribute('stroke',       '#0052CC');
+    vr.setAttribute('fill',         'rgba(99,102,241,0.06)');
+    vr.setAttribute('stroke',       '#6366F1');
     vr.setAttribute('stroke-width', '1.5');
     vr.setAttribute('rx',           '2');
     mm.appendChild(vr);
@@ -4638,10 +6577,10 @@ function rgSelect(id) {
         const bg  = g.querySelector('.g-node-bg'), bar = g.querySelector('.g-node-bar');
         if (!bg || !bar) return;
         if (nid === id) {
-            bg.setAttribute('stroke',       '#0052CC');
+            bg.setAttribute('stroke',       '#6366F1');
             bg.setAttribute('stroke-width', '2.5');
             bg.setAttribute('filter',       'url(#rg-f-node-sel)');
-            bar.setAttribute('fill', '#0052CC');
+            bar.setAttribute('fill', '#6366F1');
             g.setAttribute('opacity', '1');
         } else if (conn.has(nid)) {
             bg.setAttribute('stroke',       '#34D399');
@@ -4650,10 +6589,10 @@ function rgSelect(id) {
             bar.setAttribute('fill', '#34D399');
             g.setAttribute('opacity', '1');
         } else {
-            bg.setAttribute('stroke',       'rgba(148,178,222,0.15)');
+            bg.setAttribute('stroke',       'rgba(229,231,235,0.5)');
             bg.setAttribute('stroke-width', '1.5');
             bg.setAttribute('filter',       'url(#rg-f-node)');
-            bar.setAttribute('fill', '#0052CC');
+            bar.setAttribute('fill', '#6366F1');
             g.setAttribute('opacity', '0.2');
         }
     });
@@ -4689,14 +6628,14 @@ function rgSelect(id) {
         const other = e.related ? e.related.split('\\').pop() : '?';
         const th    = rgEdgeTheme(e.type);
         const card  = document.createElement('div');
-        card.style.cssText = 'display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:10px;border:1px solid #DFE1E6;border-left:3px solid ' + th.stroke + ';background:#FFFFFF;cursor:pointer;box-shadow:0 1px 4px rgba(23,43,77,0.06);transition:box-shadow 0.2s;';
+        card.style.cssText = 'display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:10px;border:1px solid #E5E7EB;border-left:3px solid ' + th.stroke + ';background:#FFFFFF;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.06);transition:box-shadow 0.2s;';
         card.innerHTML =
             '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
-                '<span style="font-size:11px;font-weight:700;color:#172B4D;font-family:ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + other + '</span>' +
+                '<span style="font-size:11px;font-weight:700;color:#111827;font-family:ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + other + '</span>' +
                 '<span style="font-size:10px;font-family:ui-monospace,monospace;padding:2px 6px;border-radius:4px;background:' + th.stroke + '22;color:' + th.stroke + '">→</span>' +
             '</div>' +
             '<span style="font-size:10px;font-weight:600;color:' + th.stroke + ';font-family:ui-monospace,monospace;">' + e.type + '</span>' +
-            '<span style="font-size:10px;color:#6B778C;font-family:ui-monospace,monospace;">' + (e.method || '') + '()</span>';
+            '<span style="font-size:10px;color:#6B7280;font-family:ui-monospace,monospace;">' + (e.method || '') + '()</span>';
         cardsEl.appendChild(card);
     });
 
@@ -4714,8 +6653,8 @@ function rgDiagClear() {
     document.querySelectorAll('.g-node').forEach(g => {
         g.setAttribute('opacity', '1');
         const bg  = g.querySelector('.g-node-bg'), bar = g.querySelector('.g-node-bar');
-        if (bg)  { bg.setAttribute('stroke', 'rgba(148,178,222,0.2)'); bg.setAttribute('stroke-width', '1.5'); bg.setAttribute('filter', 'url(#rg-f-node)'); }
-        if (bar) bar.setAttribute('fill', '#0052CC');
+        if (bg)  { bg.setAttribute('stroke', '#E5E7EB'); bg.setAttribute('stroke-width', '1.5'); bg.setAttribute('filter', 'url(#rg-f-node)'); }
+        if (bar) bar.setAttribute('fill', '#6366F1');
     });
     document.querySelectorAll('.g-edge').forEach(p => {
         const th = rgEdgeTheme(p.getAttribute('data-type'));
@@ -4804,11 +6743,11 @@ function graphSearch(query) {
         g.setAttribute('opacity', match ? '1' : '0.12');
         const bg = g.querySelector('.g-node-bg'), bar = g.querySelector('.g-node-bar');
         if (bg) {
-            bg.setAttribute('stroke',       match ? '#0052CC' : 'rgba(148,178,222,0.15)');
+            bg.setAttribute('stroke',       match ? '#6366F1' : 'rgba(229,231,235,0.5)');
             bg.setAttribute('stroke-width', match ? '2.5'     : '1.5');
             bg.setAttribute('filter',       match ? 'url(#rg-f-node-sel)' : 'url(#rg-f-node)');
         }
-        if (bar) bar.setAttribute('fill', match ? '#0052CC' : 'rgba(148,178,222,0.3)');
+        if (bar) bar.setAttribute('fill', match ? '#6366F1' : 'rgba(99,102,241,0.15)');
     });
     document.querySelectorAll('.g-edge').forEach(p => {
         const from  = p.getAttribute('data-from'), to = p.getAttribute('data-to');
@@ -4951,7 +6890,7 @@ function apiRenderFlow(uid) {
 
     el.innerHTML = `
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-top:4px">
-            <div style="width:3px;height:14px;border-radius:2px;background:#0052CC;flex-shrink:0"></div>
+            <div style="width:3px;height:14px;border-radius:2px;background:#6366F1;flex-shrink:0"></div>
             <p style="font-size:10px;font-weight:700;color:#6B778C;text-transform:uppercase;letter-spacing:0.1em;margin:0;font-family:ui-monospace,monospace">Request Flow</p>
             <span style="font-size:9px;color:#6B778C;font-family:ui-monospace,monospace">${nodeList.length} nodes · ${lEdges.length} edges</span>
         </div>
@@ -4977,9 +6916,9 @@ function apiScrollTo(groupName) {
         });
         const tab = document.querySelector(`.api-nav-item[data-group-tab="${groupName}"]`);
         if (tab) {
-            tab.style.background  = 'rgba(0,82,204,0.12)';
+            tab.style.background  = 'rgba(99,102,241,0.08)';
             tab.style.color       = 'var(--cyan)';
-            tab.style.borderColor = 'rgba(0,82,204,0.35)';
+            tab.style.borderColor = 'rgba(99,102,241,0.25)';
         }
     }
 }
@@ -5022,15 +6961,26 @@ mermaid.initialize({
     startOnLoad: false,
     theme: 'base',
     themeVariables: {
-        background: '#FFFFFF',
-        primaryColor: '#EAF2FF',
-        primaryBorderColor: '#0052CC',
-        primaryTextColor: '#172B4D',
-        lineColor: '#6B778C',
-        secondaryColor: '#F4F5F7',
-        tertiaryColor: '#F3F0FF',
-        edgeLabelBackground: '#FFFFFF',
-        fontFamily: "'Inter', sans-serif",
+        background:                      '#FFFFFF',
+        primaryColor:                    '#EEF2FF',      // entity box fill — soft red tint
+        primaryBorderColor:              '#6366F1',      // entity border
+        primaryTextColor:                '#1D1D1F',      // entity text — charcoal
+        lineColor:                       '#818CF8',      // relationship lines
+        secondaryColor:                  '#F0FDF4',
+        tertiaryColor:                   '#FFF7ED',
+        edgeLabelBackground:             '#FFFFFF',
+        attributeBackgroundColorEven:    '#FAFAFA',
+        attributeBackgroundColorOdd:     '#FFFFFF',
+        fontFamily:                      "'Inter', ui-sans-serif, sans-serif",
+        fontSize:                        '13px',
+    },
+    er: {
+        diagramPadding:  20,
+        layoutDirection: 'TB',
+        minEntityWidth:  100,
+        minEntityHeight: 75,
+        entityPadding:   15,
+        useMaxWidth:     true,
     },
     flowchart: { rankSpacing:80, nodeSpacing:40, curve:'basis', padding:20 }
 });
@@ -5311,13 +7261,13 @@ function _buildOvArchDiagram() {
         const x = pos.x - BOX_W/2, y = pos.y - BOX_H/2;
 
         // "more" nodes get a dashed, dimmer style
-        const rectFill   = pos.isMore ? 'rgba(0,82,204,0.05)' : '#FFFFFF';
-        const rectStroke = pos.isMore ? `rgba(0,82,204,0.30)` : color;
+        const rectFill   = pos.isMore ? 'rgba(99,102,241,0.04)' : '#FFFFFF';
+        const rectStroke = pos.isMore ? `rgba(99,102,241,0.25)` : color;
         const rectDash   = pos.isMore ? '4,3' : 'none';
         const rect = _svgEl('rect', { x, y, width:BOX_W, height:BOX_H, rx:'10', fill:rectFill, stroke:rectStroke, 'stroke-width':'1.5', 'stroke-dasharray':rectDash, filter:'url(#ov-shadow)' });
 
         const dotR = pos.isMore ? '2.5' : '4';
-        const dotEl = _svgEl('circle', { cx:x+16, cy:y+BOX_H/2, r:dotR, fill: pos.isMore ? 'rgba(0,82,204,0.4)' : color });
+        const dotEl = _svgEl('circle', { cx:x+16, cy:y+BOX_H/2, r:dotR, fill: pos.isMore ? 'rgba(99,102,241,0.35)' : color });
 
         // Label: max 22 chars (wider box allows more)
         const lbl = _svgEl('text', { x:x+30, y:y+20, 'font-family':'Inter,sans-serif', 'font-size':'11', 'font-weight': pos.isMore ? '500' : '600', fill: pos.isMore ? '#6B778C' : '#172B4D' });
@@ -5431,7 +7381,7 @@ const _DEP_LG  = 80;    // gap between layers
 
 const _DEP_CFG = {
     // ATLAS dark theme: dark bg, bright stroke, label is the border/text color
-    controller: { label:'Controllers', color:'#0052CC', bg:'#EAF2FF', order:0 },
+    controller: { label:'Controllers', color:'#6366F1', bg:'#EEF2FF', order:0 },
     job:        { label:'Jobs',        color:'#FF5630', bg:'#FFF4E5', order:1 },
     event:      { label:'Events',      color:'#BF40BF', bg:'#FFF0FB', order:1 },
     listener:   { label:'Listeners',   color:'#DA62AC', bg:'#FEE4FA', order:2 },
@@ -5578,7 +7528,7 @@ function initDepGraph() {
 
         // Truncate display name: strip suffix, add ellipsis
         const suffixes = /Controller$|Service$|Repository$|Observer$|Policy$|Listener$/;
-        const short = n.name.replace(suffixes, '');
+        const short = n.name.replace(suffixes, '') || n.name;
         const display = short.length > 13 ? short.substring(0, 12) + '…' : short;
 
         const text = document.createElementNS(NS, 'text');
@@ -5700,7 +7650,7 @@ function depHighlight(name) {
 
     document.querySelectorAll('#dep-edges-g path').forEach(p => {
         const on = p.dataset.from === name || p.dataset.to === name;
-        p.setAttribute('stroke',       on ? '#0052CC' : 'rgba(148,178,222,0.15)');
+        p.setAttribute('stroke',       on ? '#6366F1' : 'rgba(148,178,222,0.15)');
         p.setAttribute('stroke-width', on ? '2'       : '1.5');
         p.setAttribute('opacity',      on ? '1'       : '0.5');
         p.setAttribute('marker-end',   on ? 'url(#dep-arr-hi)' : 'url(#dep-arr)');
@@ -5853,21 +7803,29 @@ function chatAppendBubble(role, text, loadingId = null, contextLabels = []) {
     const id   = loadingId || ('msg-' + Date.now());
 
     const ctxHtml = contextLabels.length && isAI
-        ? `<p class="text-xs text-slate-400 mt-2 pt-2 border-t border-slate-100">Context used: ${contextLabels.map(_esc).join(' · ')}</p>`
+        ? `<p style="font-size:11px;color:#94a3b8;margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;">Context used: ${contextLabels.map(_esc).join(' · ')}</p>`
         : '';
 
+    const dot = (delay) => `<span style="width:6px;height:6px;border-radius:50%;background:#94a3b8;display:inline-block;animation:chatBounce 1.2s ease-in-out ${delay} infinite;"></span>`;
     const bodyHtml = text === null
-        ? `<span class="inline-flex gap-1 items-center text-slate-400 text-sm"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay:0s"></span><span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay:.15s"></span><span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay:.3s"></span></span>`
-        : `<div class="prose-sm text-sm text-slate-700 leading-relaxed">${chatMarkdown(text)}</div>`;
+        ? `<span style="display:inline-flex;gap:4px;align-items:center;">${dot('0s')}${dot('.15s')}${dot('.3s')}</span>`
+        : `<div style="font-size:13px;color:#334155;line-height:1.65;">${chatMarkdown(text)}</div>`;
+
+    const rowStyle    = `display:flex;align-items:flex-end;gap:10px;${isAI ? 'justify-content:flex-start' : 'justify-content:flex-end'}`;
+    const aiAvatar    = isAI  ? `<div style="width:28px;height:28px;border-radius:50%;background:#4f46e5;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0;margin-bottom:2px;">AI</div>` : '';
+    const userAvatar  = !isAI ? `<div style="width:28px;height:28px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#475569;font-size:10px;font-weight:700;flex-shrink:0;margin-bottom:2px;">You</div>` : '';
+    const bubbleStyle = isAI
+        ? 'background:#fff;border:1px solid #e2e8f0;border-radius:16px;border-top-left-radius:4px;padding:12px 16px;max-width:80%;'
+        : 'background:#4f46e5;color:#fff;border-radius:16px;border-top-right-radius:4px;padding:12px 16px;max-width:80%;';
 
     wrap.insertAdjacentHTML('beforeend', `
-        <div class="flex ${isAI ? 'justify-start' : 'justify-end'} gap-2.5" id="${id}">
-            ${isAI ? `<div class="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">AI</div>` : ''}
-            <div class="max-w-[80%] rounded-2xl px-4 py-3 ${isAI ? 'bg-white border border-slate-200 rounded-tl-sm' : 'bg-indigo-600 text-white rounded-tr-sm'}">
+        <div style="${rowStyle};animation:chatBubbleIn .22s cubic-bezier(.22,1,.36,1) both;" id="${id}">
+            ${aiAvatar}
+            <div style="${bubbleStyle}" data-bubble="1">
                 ${bodyHtml}
                 ${ctxHtml}
             </div>
-            ${!isAI ? `<div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xs font-bold shrink-0 mt-0.5">You</div>` : ''}
+            ${userAvatar}
         </div>
     `);
 
@@ -5878,17 +7836,46 @@ function chatAppendBubble(role, text, loadingId = null, contextLabels = []) {
 function chatReplaceBubble(id, text, contextLabels = [], isError = false) {
     const el = document.getElementById(id);
     if (!el) return;
-    const inner = el.querySelector('div.max-w-\\[80\\%\\]');
+    const inner = el.querySelector('[data-bubble]');
     if (!inner) return;
 
     const ctxHtml = contextLabels.length
-        ? `<p class="text-xs text-slate-400 mt-2 pt-2 border-t border-slate-100">Context used: ${contextLabels.map(_esc).join(' · ')}</p>`
+        ? `<p style="font-size:11px;color:#94a3b8;margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;">Context used: ${contextLabels.map(_esc).join(' · ')}</p>`
         : '';
 
-    inner.innerHTML = `<div class="prose-sm text-sm ${isError ? 'text-red-600' : 'text-slate-700'} leading-relaxed">${chatMarkdown(text)}</div>${ctxHtml}`;
+    if (isError) {
+        inner.innerHTML = `<div style="font-size:13px;color:#dc2626;line-height:1.65;">${chatMarkdown(text)}</div>${ctxHtml}`;
+        document.getElementById('chat-messages').scrollTop = 99999;
+        return;
+    }
 
-    const wrap = document.getElementById('chat-messages');
-    wrap.scrollTop = wrap.scrollHeight;
+    // Typewriter reveal: type plain text first, then swap to full rendered HTML
+    const rendered = chatMarkdown(text);
+    const plain    = rendered.replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+
+    const box = document.createElement('div');
+    box.style.cssText = 'font-size:13px;color:#334155;line-height:1.65;';
+    box.className = 'type-cursor';
+    inner.innerHTML = '';
+    inner.appendChild(box);
+
+    const wrap  = document.getElementById('chat-messages');
+    const speed = plain.length > 400 ? 6 : plain.length > 150 ? 12 : 18;
+    const chunk = plain.length > 400 ? 5 : plain.length > 150 ? 3 : 1;
+    let i = 0;
+
+    const tick = () => {
+        if (i >= plain.length) {
+            inner.innerHTML = `<div style="font-size:13px;color:#334155;line-height:1.65;">${rendered}</div>${ctxHtml}`;
+            wrap.scrollTop = wrap.scrollHeight;
+            return;
+        }
+        i = Math.min(i + chunk, plain.length);
+        box.textContent = plain.slice(0, i);
+        wrap.scrollTop = wrap.scrollHeight;
+        setTimeout(tick, speed);
+    };
+    tick();
 }
 
 function chatMarkdown(text) {
@@ -5905,7 +7892,7 @@ function chatMarkdown(text) {
         if (/\S[ \t]*↓[ \t]*\S/.test(code)) {
             code = code.split('↓').map(s => s.trim()).filter(Boolean).join('\n    ↓\n');
         }
-        return `<pre class="bg-slate-800 text-green-300 rounded-lg p-3 mt-2 mb-2 text-xs" style="white-space:pre-wrap;word-break:break-word;overflow-x:auto;"><code>${code}</code></pre>`;
+        return `<pre style="background:#1e293b;color:#86efac;border-radius:8px;padding:12px;margin:8px 0;font-size:11px;white-space:pre-wrap;word-break:break-word;overflow-x:auto;font-family:monospace;"><code style="background:none;border:none;padding:0;color:inherit;">${code}</code></pre>`;
     });
 
     // Normalize inline tables — AI sometimes returns all rows on one line separated by "| |"
@@ -5955,13 +7942,13 @@ function chatMarkdown(text) {
 
     // Inline formatting
     return text
-        .replace(/`([^`]+)`/g, '<code class="bg-slate-100 text-indigo-700 px-1 rounded text-xs">$1</code>')
+        .replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;color:#4f46e5;padding:1px 5px;border-radius:3px;font-size:11px;font-family:monospace;border:none;">$1</code>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/^### (.+)$/gm, '<p class="font-semibold text-slate-800 mt-3 mb-1">$1</p>')
-        .replace(/^## (.+)$/gm,  '<p class="font-bold text-slate-800 mt-3 mb-1 text-base">$1</p>')
-        .replace(/^# (.+)$/gm,   '<p class="font-bold text-slate-900 mt-3 mb-2 text-lg">$1</p>')
-        .replace(/^- (.+)$/gm,   '<li class="ml-4 list-disc">$1</li>')
+        .replace(/^### (.+)$/gm, '<p style="font-weight:600;color:#1e293b;margin:10px 0 3px;font-size:13px;">$1</p>')
+        .replace(/^## (.+)$/gm,  '<p style="font-weight:700;color:#1e293b;margin:12px 0 4px;font-size:14px;">$1</p>')
+        .replace(/^# (.+)$/gm,   '<p style="font-weight:700;color:#0f172a;margin:14px 0 6px;font-size:16px;">$1</p>')
+        .replace(/^- (.+)$/gm,   '<li style="margin-left:16px;list-style-type:disc;margin-bottom:2px;">$1</li>')
         .replace(/\n\n/g, '<br>')
         .replace(/\n/g, ' ');
 }
@@ -6517,6 +8504,15 @@ function exportJson() {
     );
 }
 
+function copyPkgKey(btn, key) {
+    const cmd = 'composer require ' + key;
+    navigator.clipboard.writeText(cmd).then(() => {
+        const origHTML = btn.innerHTML;
+        btn.innerHTML = '<svg style="width:13px;height:13px;color:#34D399;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+        setTimeout(() => { btn.innerHTML = origHTML; }, 1800);
+    }).catch(() => {});
+}
+
 function copyJson() {
     const btn  = document.getElementById('copy-json-btn');
     const text = JSON.stringify(APP, null, 2);
@@ -6630,27 +8626,70 @@ function exportMarkdown() {
 
 // ── Graphic Report ────────────────────────────────────────────────────────────
 
-function exportGraphicHTML() {
-    const btn   = document.getElementById('graphic-report-btn');
-    const label = document.getElementById('graphic-report-label');
-    btn.disabled = true;
-    label.textContent = 'Building…';
+// Module-level guard — true while a build+download is in progress.
+// Any number of clicks during that window are silently dropped.
+let _exportingHTML = false;
 
-    try {
-        const html = _buildGraphicReport(APP);
-        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-        const a    = Object.assign(document.createElement('a'), {
-            href:     URL.createObjectURL(blob),
-            download: 'architecture-report.html',
-        });
-        a.click();
-        URL.revokeObjectURL(a.href);
-    } catch(e) {
-        alert('Report generation failed: ' + e.message);
-    } finally {
-        btn.disabled     = false;
-        label.textContent = 'Generate & Download';
-    }
+function exportGraphicHTML() {
+    if (_exportingHTML) return;   // hard guard — drop every extra click
+    _exportingHTML = true;
+
+    const btn     = document.getElementById('graphic-report-btn');
+    const label   = document.getElementById('graphic-report-label');
+    const icon    = document.getElementById('graphic-report-icon');
+    const spinner = document.getElementById('graphic-report-spinner');
+
+    // Show busy state immediately
+    btn.disabled        = true;
+    btn.style.opacity   = '0.72';
+    btn.style.cursor    = 'not-allowed';
+    label.textContent   = 'Building…';
+    icon.style.display  = 'none';
+    spinner.style.display = '';
+
+    // Defer the heavy work by one paint so the browser renders the loading state
+    // before the main thread is blocked by report generation
+    setTimeout(() => {
+        try {
+            const html = _buildGraphicReport(APP);
+            const url  = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+            const a    = document.createElement('a');
+            a.href     = url;
+            a.download = 'architecture-report.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 3000);
+
+            // Brief success confirmation before restoring button
+            label.textContent     = 'Downloaded!';
+            spinner.style.display = 'none';
+            icon.innerHTML        = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+            icon.style.display    = '';
+            setTimeout(() => _exportGraphicHTMLReset(btn, label, icon, spinner), 2000);
+
+        } catch(e) {
+            spinner.style.display = 'none';
+            icon.innerHTML        = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+            icon.style.display    = '';
+            label.textContent     = 'Failed — try again';
+            btn.style.opacity     = '1';
+            btn.style.cursor      = 'pointer';
+            // Re-enable after showing error so user can retry
+            setTimeout(() => _exportGraphicHTMLReset(btn, label, icon, spinner), 2500);
+        }
+    }, 50);
+}
+
+function _exportGraphicHTMLReset(btn, label, icon, spinner) {
+    _exportingHTML        = false;
+    btn.disabled          = false;
+    btn.style.opacity     = '';
+    btn.style.cursor      = '';
+    spinner.style.display = 'none';
+    icon.style.display    = '';
+    icon.innerHTML        = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>';
+    label.textContent     = 'Generate & Download';
 }
 
 function _buildGraphicReport(d) {
@@ -6903,7 +8942,7 @@ function _buildDepSvg(nodes, edges) {
 
     const layerOrder = ['controller','job','event','listener','service','repository','model'];
     const layerColors = {
-        controller: { fill:'#EAF2FF', stroke:'#0052CC', text:'#172B4D' },
+        controller: { fill:'#EEF2FF', stroke:'#6366F1', text:'#172B4D' },
         service:    { fill:'#E3FCEF', stroke:'#00875A', text:'#172B4D' },
         repository: { fill:'#FFFAE6', stroke:'#FF8B00', text:'#172B4D' },
         model:      { fill:'#F3F0FF', stroke:'#6554C0', text:'#172B4D' },
@@ -6969,7 +9008,7 @@ function _buildDepSvg(nodes, edges) {
         const x1 = f.cx, y1 = f.y + NH, x2 = t.cx, y2 = t.y;
         if (y2 <= y1 + 4) return '';
         const cp = (y2 - y1) * 0.45;
-        return `<path d="M${x1},${y1} C${x1},${y1+cp} ${x2},${y2-cp} ${x2},${y2}" fill="none" stroke="rgba(0,82,204,0.18)" stroke-width="1.4" marker-end="url(#dep-arr)"/>`;
+        return `<path d="M${x1},${y1} C${x1},${y1+cp} ${x2},${y2-cp} ${x2},${y2}" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="1.4" marker-end="url(#dep-arr)"/>`;
     }).join('');
 
     // Nodes
@@ -7045,18 +9084,19 @@ function aiRenderResults(data) {
     const score = data.score || 0;
     document.getElementById('ai-score-num').textContent = score;
     setTimeout(() => {
-        document.getElementById('ai-score-bar').style.width = score + '%';
+        const ring = document.getElementById('ai-score-ring');
+        if (ring) ring.style.strokeDashoffset = 226 - (score / 100 * 226);
     }, 50);
 
     // SOLID
     const solidEl = document.getElementById('ai-solid');
     solidEl.innerHTML = '';
     const solidNames = { S: 'Single Resp.', O: 'Open/Closed', L: 'Liskov Sub.', I: 'Interface Seg.', D: 'Dep. Inversion' };
-    Object.entries(data.solid_review || {}).forEach(([key, val]) => {
+    Object.entries(data.solid_review || {}).forEach(([key, val], idx) => {
         const color = val.status === 'pass' ? 'green' : val.status === 'warn' ? 'amber' : 'red';
         const icon  = val.status === 'pass' ? '✔' : val.status === 'warn' ? '⚠' : '✘';
         solidEl.insertAdjacentHTML('beforeend', `
-            <div class="flex flex-col items-center text-center p-3 rounded-xl bg-${color}-50 border border-${color}-200">
+            <div class="flex flex-col items-center text-center p-3 rounded-xl bg-${color}-50 border border-${color}-200" style="animation:fadeUp .35s var(--ease) both;animation-delay:${idx * 70}ms;">
                 <span class="text-xl font-bold text-${color}-600">${key}</span>
                 <span class="text-xs font-medium text-${color}-700 mt-0.5">${solidNames[key] || ''}</span>
                 <span class="text-lg mt-2">${icon}</span>
@@ -7071,11 +9111,11 @@ function aiRenderResults(data) {
     if (!(data.problems || []).length) {
         problemsEl.innerHTML = '<p class="text-sm text-slate-400 italic">No problems detected.</p>';
     }
-    (data.problems || []).forEach(p => {
+    (data.problems || []).forEach((p, idx) => {
         const sev   = p.severity || 'info';
         const color = sev === 'error' ? 'red' : sev === 'warning' ? 'amber' : 'blue';
         problemsEl.insertAdjacentHTML('beforeend', `
-            <div class="flex gap-3 p-3 rounded-lg bg-${color}-50 border border-${color}-100">
+            <div class="flex gap-3 p-3 rounded-lg bg-${color}-50 border border-${color}-100" style="animation:fadeUp .3s var(--ease) both;animation-delay:${idx * 55}ms;">
                 <div class="shrink-0 mt-0.5">
                     <span class="inline-block px-1.5 py-0.5 text-xs font-bold rounded uppercase bg-${color}-100 text-${color}-700">${sev}</span>
                 </div>
@@ -7094,11 +9134,11 @@ function aiRenderResults(data) {
     if (!(data.suggestions || []).length) {
         suggEl.innerHTML = '<p class="text-sm text-slate-400 italic">No suggestions.</p>';
     }
-    (data.suggestions || []).forEach(s => {
+    (data.suggestions || []).forEach((s, idx) => {
         const pri   = s.priority || 'medium';
         const color = pri === 'high' ? 'red' : pri === 'medium' ? 'amber' : 'slate';
         suggEl.insertAdjacentHTML('beforeend', `
-            <div class="flex gap-3 p-3 rounded-lg border border-slate-100 bg-slate-50">
+            <div class="flex gap-3 p-3 rounded-lg border border-slate-100 bg-slate-50" style="animation:fadeUp .3s var(--ease) both;animation-delay:${idx * 55}ms;">
                 <span class="shrink-0 mt-0.5 inline-block px-1.5 py-0.5 h-fit text-xs font-bold rounded uppercase bg-${color}-100 text-${color}-700">${pri}</span>
                 <div class="min-w-0">
                     <p class="text-sm font-semibold text-slate-800">${_esc(s.title || '')}</p>
@@ -7168,13 +9208,30 @@ function docsPreview(type) {
     document.getElementById('doc-modal-body').innerHTML    = _mdToHtml(doc.content);
     document.getElementById('doc-modal-dl-md').onclick    = () => docsDownload(type);
     document.getElementById('doc-modal-dl-html').onclick  = () => docsDownloadHtml(type);
-    document.getElementById('doc-modal').style.display    = 'flex';
+
+    const modal = document.getElementById('doc-modal');
+    const box   = modal.querySelector('.doc-modal-box');
+    modal.style.display  = 'flex';
+    modal.style.opacity  = '0';
+    box.style.animation  = 'none';
+    void box.offsetWidth; // reflow
+    modal.style.animation = 'modalBdIn .25s var(--ease) forwards';
+    box.style.animation   = 'modalScaleIn .3s cubic-bezier(.34,1.56,.64,1) forwards';
+    modal.style.opacity   = '';
     document.body.style.overflow = 'hidden';
 }
 
 function closeDocModal() {
-    document.getElementById('doc-modal').style.display = 'none';
-    document.body.style.overflow = '';
+    const modal = document.getElementById('doc-modal');
+    const box   = modal.querySelector('.doc-modal-box');
+    box.style.animation   = 'modalScaleOut .2s var(--ease) forwards';
+    modal.style.animation = 'modalBdIn .2s var(--ease) reverse forwards';
+    setTimeout(() => {
+        modal.style.display   = 'none';
+        modal.style.animation = '';
+        box.style.animation   = '';
+        document.body.style.overflow = '';
+    }, 200);
 }
 
 function docsDownloadHtml(type) {
@@ -7240,31 +9297,23 @@ function _downloadBlob(content, filename, mime, isBlob = false) {
 
 // ── Scrollytelling Architecture Story ────────────────────────────────────────
 (function () {
+    const clamp    = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+    const map01    = (p, s, e)   => clamp((p - s) / (e - s), 0, 1);
+    const easeOut  = t => 1 - Math.pow(1 - t, 3);
 
-    // ── Helpers ────────────────────────────────────────────────────────────────
-    const clamp  = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
-    const map01  = (p, s, e)   => clamp((p - s) / (e - s), 0, 1);
-    const easeOut = t => 1 - Math.pow(1 - t, 3);
-    const easeInOut = t => t < .5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
-
-    // ── Scene themes ───────────────────────────────────────────────────────────
     const ST_THEME = [
-        { bg:'#FAFBFF', orb:'rgba(79,70,229,0.13)',  orb2:'rgba(79,70,229,0.07)',  num:'rgba(79,70,229,0.055)',  tab:'#4F46E5' },
-        { bg:'#FAF5FF', orb:'rgba(124,58,237,0.13)', orb2:'rgba(124,58,237,0.07)', num:'rgba(124,58,237,0.055)', tab:'#7C3AED' },
-        { bg:'#F0F9FF', orb:'rgba(14,165,233,0.13)', orb2:'rgba(14,165,233,0.07)', num:'rgba(14,165,233,0.055)', tab:'#0EA5E9' },
-        { bg:'#FFFBEB', orb:'rgba(245,158,11,0.13)', orb2:'rgba(245,158,11,0.07)', num:'rgba(245,158,11,0.055)', tab:'#D97706' },
+        { bg:'linear-gradient(145deg,#ECEEFF 0%,#F7F8FF 50%,#EDFFF8 100%)', orb:'rgba(79,70,229,0.22)',  orb2:'rgba(79,70,229,0.14)',  num:'rgba(79,70,229,0.10)',  tab:'#4F46E5' },
+        { bg:'linear-gradient(145deg,#F2EEFF 0%,#F7F8FF 55%,#EEF0FF 100%)', orb:'rgba(124,58,237,0.22)', orb2:'rgba(124,58,237,0.13)', num:'rgba(124,58,237,0.10)', tab:'#7C3AED' },
+        { bg:'linear-gradient(145deg,#E8F4FF 0%,#F7F8FF 55%,#EEF6FF 100%)', orb:'rgba(14,165,233,0.22)',  orb2:'rgba(14,165,233,0.13)',  num:'rgba(14,165,233,0.10)',  tab:'#0EA5E9' },
+        { bg:'linear-gradient(145deg,#F5F5FF 0%,#F8F8FF 55%,#FFF5F0 100%)', orb:'rgba(249,115,22,0.18)',  orb2:'rgba(249,115,22,0.11)',  num:'rgba(249,115,22,0.09)',  tab:'#D97706' },
     ];
-
-    // ── Scene scroll windows (with cross-fade overlap) ─────────────────────────
     const SCENES = [
         { enter:-0.10, peak:0.00, hold:0.18, fade:0.25, exit:0.33 },
         { enter:0.23,  peak:0.29, hold:0.43, fade:0.50, exit:0.58 },
         { enter:0.48,  peak:0.54, hold:0.68, fade:0.75, exit:0.83 },
         { enter:0.73,  peak:0.79, hold:1.00, fade:1.20, exit:1.30 },
     ];
-
-    let _elData = [];
-    let _scenes = [];
+    let _elData = [], _scenes = [];
 
     function buildElData() {
         _scenes = [...document.querySelectorAll('.arch-scene')];
@@ -7272,17 +9321,34 @@ function _downloadBlob(content, filename, mime, isBlob = false) {
         _scenes.forEach((scene, si) => {
             const S = SCENES[si];
             [...scene.querySelectorAll('.ast')].forEach((el, ei) => {
-                const dir = el.classList.contains('ast-l') ? 'l' :
-                            el.classList.contains('ast-r') ? 'r' : 'u';
+                const dir = el.classList.contains('ast-l') ? 'l' : el.classList.contains('ast-r') ? 'r' : 'u';
                 const staggerBase = si === 0 ? S.peak - 0.18 : S.peak;
                 const elEnter = staggerBase + ei * 0.014;
                 const elFull  = elEnter + 0.055;
-                const elFade  = S.fade;
-                const elExit  = S.exit;
-                _elData.push({ el, dir, si, elEnter, elFull, elFade, elExit });
+                _elData.push({ el, dir, si, elEnter, elFull, elFade:S.fade, elExit:S.exit });
                 el.style.transition = 'none';
                 el.style.willChange = 'opacity, transform';
             });
+        });
+    }
+
+    let _heroCountDone = false;
+    function heroCountUp() {
+        if (_heroCountDone) return;
+        _heroCountDone = true;
+        document.querySelectorAll('#arch-scene-0 .hero-stat-num[data-target]').forEach(el => {
+            const target = parseInt(el.dataset.target) || 0;
+            if (target === 0) return;
+            let pos = 0, vel = 0, last = null;
+            const k = 180, d = 14;
+            function step(ts) {
+                if (!last) last = ts;
+                const dt = Math.min((ts - last) / 1000, 0.05); last = ts;
+                vel += (-k * (pos - target) - d * vel) * dt; pos += vel * dt;
+                el.textContent = Math.round(pos);
+                if (Math.abs(pos - target) < 0.5 && Math.abs(vel) < 0.5) { el.textContent = target; } else { requestAnimationFrame(step); }
+            }
+            requestAnimationFrame(step);
         });
     }
 
@@ -7290,6 +9356,7 @@ function _downloadBlob(content, filename, mime, isBlob = false) {
     function applyTheme(si) {
         if (si === _lastTheme) return;
         _lastTheme = si;
+        if (si === 0) heroCountUp();
         const T = ST_THEME[si];
         const sticky = document.getElementById('arch-story-sticky');
         const orb    = document.getElementById('arch-orb');
@@ -7310,28 +9377,22 @@ function _downloadBlob(content, filename, mime, isBlob = false) {
     function frame(p) {
         const bar = document.getElementById('arch-progress-bar');
         if (bar) bar.style.width = (p * 100).toFixed(2) + '%';
-
         let maxVis = 0, dominant = 0;
         _scenes.forEach((el, i) => {
-            const S   = SCENES[i];
-            const vis = easeOut(map01(p, S.enter, S.peak))
-                      * (1 - easeOut(map01(p, S.fade, S.exit)));
-            el.style.opacity       = vis;
+            const S = SCENES[i];
+            const vis = easeOut(map01(p, S.enter, S.peak)) * (1 - easeOut(map01(p, S.fade, S.exit)));
+            el.style.opacity = vis;
             el.style.pointerEvents = vis > 0.05 ? '' : 'none';
             if (vis > maxVis) { maxVis = vis; dominant = i; }
         });
-
         applyTheme(dominant);
-
         _elData.forEach(({ el, dir, elEnter, elFull, elFade, elExit }) => {
             const inP  = easeOut(map01(p, elEnter, elFull));
             const outP = 1 - easeOut(map01(p, elFade, elExit));
             const vis  = inP * outP;
             const slide = (1 - inP) * 56;
             el.style.opacity   = vis;
-            el.style.transform = dir === 'l' ? `translateX(${-slide}px)` :
-                                 dir === 'r' ? `translateX(${slide}px)`  :
-                                              `translateY(${(1-inP)*36}px)`;
+            el.style.transform = dir === 'l' ? `translateX(${-slide}px)` : dir === 'r' ? `translateX(${slide}px)` : `translateY(${(1 - inP) * 36}px)`;
         });
     }
 
@@ -7339,17 +9400,14 @@ function _downloadBlob(content, filename, mime, isBlob = false) {
         const content = document.querySelector('.content');
         const wrap    = document.getElementById('arch-story-wrap');
         if (!content || !wrap) return;
-        const scrollable = Math.max(1, wrap.offsetHeight - content.clientHeight);
-        content.scrollTo({ top: wrap.offsetTop + (SCENES[scene].peak * scrollable), behavior: 'smooth' });
+        content.scrollTo({ top: wrap.offsetTop + (SCENES[scene].peak * Math.max(1, wrap.offsetHeight - content.clientHeight)), behavior: 'smooth' });
     }
-
     function archSkip() {
         const content = document.querySelector('.content');
         const wrap    = document.getElementById('arch-story-wrap');
         if (!content || !wrap) return;
         content.scrollTo({ top: wrap.offsetTop + wrap.offsetHeight, behavior: 'smooth' });
     }
-
     window.archJumpTo = archJumpTo;
     window.archSkip   = archSkip;
 
@@ -7357,27 +9415,246 @@ function _downloadBlob(content, filename, mime, isBlob = false) {
         const content = document.querySelector('.content');
         const wrap    = document.getElementById('arch-story-wrap');
         if (!content || !wrap) return;
-
         buildElData();
-
-        let _ticking = false, _p = 0;
-
+        let _ticking = false;
         function onScroll() {
-            const wrapTop    = wrap.offsetTop;
             const scrollable = Math.max(1, wrap.offsetHeight - content.clientHeight);
-            _p = clamp((content.scrollTop - wrapTop) / scrollable, 0, 1);
-            if (!_ticking) {
-                _ticking = true;
-                requestAnimationFrame(() => { frame(_p); _ticking = false; });
-            }
+            const _p = Math.max(0, Math.min(1, (content.scrollTop - wrap.offsetTop) / scrollable));
+            if (!_ticking) { _ticking = true; requestAnimationFrame(() => { frame(_p); _ticking = false; }); }
         }
-
         content.addEventListener('scroll', onScroll, { passive: true });
         frame(0);
     }
-
     document.addEventListener('DOMContentLoaded', initArchStory);
 })();
+
+// ── Hero: Parallax · Letter Stagger · Particles · Magnetic Pull ──────────────
+(function() {
+    (function() {
+        const sticky = document.getElementById('arch-story-sticky');
+        if (!sticky) return;
+        const orb   = document.getElementById('arch-orb');
+        const orb2  = document.getElementById('arch-orb2');
+        const bgNum = document.getElementById('arch-bg-num');
+        let mx = 0, my = 0, tx = 0, ty = 0;
+        sticky.addEventListener('mousemove', e => {
+            const r = sticky.getBoundingClientRect();
+            mx = (e.clientX - r.left) / r.width  - 0.5;
+            my = (e.clientY - r.top)  / r.height - 0.5;
+        }, { passive: true });
+        (function loop() {
+            tx += (mx - tx) * 0.06; ty += (my - ty) * 0.06;
+            if (orb)   orb.style.transform   = `translate(${(tx*28).toFixed(2)}px,${(ty*20).toFixed(2)}px)`;
+            if (orb2)  orb2.style.transform  = `translate(${(tx*-18).toFixed(2)}px,${(ty*-14).toFixed(2)}px)`;
+            if (bgNum) bgNum.style.transform = `translate(${(tx*10).toFixed(2)}px,${(ty*8).toFixed(2)}px)`;
+            requestAnimationFrame(loop);
+        })();
+    })();
+
+    function splitHeroTitle() {
+        document.querySelectorAll('.hero-title').forEach(el => {
+            if (el.dataset.split) return;
+            el.dataset.split = '1';
+            if (getComputedStyle(el).webkitTextFillColor === 'rgba(0, 0, 0, 0)') {
+                el.style.animation = 'heroLetterDrop 0.65s cubic-bezier(.34,1.56,.64,1) both';
+                return;
+            }
+            const text = el.textContent;
+            el.textContent = '';
+            text.split('').forEach((ch, i) => {
+                if (ch === ' ') { el.appendChild(document.createTextNode(' ')); return; }
+                const s = document.createElement('span');
+                s.className = 'hero-title-letter';
+                s.textContent = ch;
+                s.style.animationDelay = (i * 36) + 'ms';
+                el.appendChild(s);
+            });
+        });
+    }
+
+    function initParticles() {
+        const canvas = document.getElementById('hero-particles');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const N = 48, LINK = 120;
+        let W = 0, H = 0, dots = [];
+        function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+        function spawn() { dots = []; for (let i = 0; i < N; i++) dots.push({ x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.38, vy:(Math.random()-.5)*.38 }); }
+        resize(); spawn();
+        window.addEventListener('resize', () => { resize(); spawn(); });
+        function loop() {
+            if (!dots.length || W < 2 || H < 2) { requestAnimationFrame(loop); return; }
+            ctx.clearRect(0, 0, W, H);
+            for (let i = 0; i < N; i++) {
+                const d = dots[i];
+                d.x += d.vx; d.y += d.vy;
+                if (d.x < 0) d.x = W; else if (d.x > W) d.x = 0;
+                if (d.y < 0) d.y = H; else if (d.y > H) d.y = 0;
+                ctx.beginPath(); ctx.arc(d.x, d.y, 2, 0, Math.PI*2);
+                ctx.fillStyle = 'rgba(99,102,241,0.52)'; ctx.fill();
+            }
+            for (let i = 0; i < N; i++) {
+                for (let j = i+1; j < N; j++) {
+                    const dist = Math.hypot(dots[i].x-dots[j].x, dots[i].y-dots[j].y);
+                    if (dist < LINK) {
+                        ctx.beginPath(); ctx.moveTo(dots[i].x,dots[i].y); ctx.lineTo(dots[j].x,dots[j].y);
+                        ctx.strokeStyle = `rgba(99,102,241,${(0.16*(1-dist/LINK)).toFixed(3)})`; ctx.lineWidth = 1; ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+    }
+
+    function initMagnetic() {
+        document.querySelectorAll('#arch-scene-0 .hero-stat-card').forEach(card => {
+            let raf = null;
+            card.addEventListener('mousemove', e => {
+                if (raf) cancelAnimationFrame(raf);
+                raf = requestAnimationFrame(() => {
+                    const r  = card.getBoundingClientRect();
+                    const dx = (e.clientX - (r.left + r.width/2))  / (r.width/2);
+                    const dy = (e.clientY - (r.top  + r.height/2)) / (r.height/2);
+                    card.style.transition = 'box-shadow .2s';
+                    card.style.transform  = `perspective(800px) rotateX(${(-dy*5).toFixed(2)}deg) rotateY(${(dx*5).toFixed(2)}deg) translate(${(dx*5).toFixed(2)}px,${(dy*5).toFixed(2)}px) translateZ(6px)`;
+                    raf = null;
+                });
+            }, { passive: true });
+            card.addEventListener('mouseleave', () => {
+                if (raf) { cancelAnimationFrame(raf); raf = null; }
+                card.style.transition = 'transform 0.5s cubic-bezier(.34,1.56,.64,1), box-shadow .25s';
+                card.style.transform  = '';
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { splitHeroTitle(); initParticles(); initMagnetic(); });
+})();
+
+// ── Card 3D tilt on hover ────────────────────────────────────────────────────
+(function() {
+    const MAX = 6; // max degrees
+
+    function _tilt(card, e) {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - 0.5;
+        const y = (e.clientY - r.top)  / r.height - 0.5;
+        card.style.transition = 'box-shadow .25s, border-color .25s';
+        card.style.transform  = `perspective(800px) rotateX(${(-y * MAX * 2).toFixed(2)}deg) rotateY(${(x * MAX * 2).toFixed(2)}deg) translateY(-4px)`;
+    }
+
+    function _initTilt() {
+        document.querySelectorAll('.mds-card, .ctrl-card, .pkg-card').forEach(card => {
+            let raf = null;
+            card.addEventListener('mousemove', e => {
+                if (raf) return;
+                raf = requestAnimationFrame(() => { raf = null; _tilt(card, e); });
+            });
+            card.addEventListener('mouseleave', () => {
+                if (raf) { cancelAnimationFrame(raf); raf = null; }
+                card.style.transition = 'transform 0.45s ease-out, box-shadow .25s, border-color .25s';
+                card.style.transform  = '';
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _initTilt);
+    } else {
+        _initTilt();
+    }
+})();
+
+// Init sidebar indicator on load + keep in sync on resize
+window.addEventListener('load',   () => _moveNavIndicator('overview'));
+window.addEventListener('resize', () => {
+    const active = document.querySelector('.nav-item.nav-active');
+    if (active) _moveNavIndicator(active.id.replace('nav-', ''));
+});
+
+// Score bar fill: animate mds-rel-bar segments when model card enters view
+(function() {
+    function _fillRelBar(card) {
+        card.querySelectorAll('.mds-rel-seg[data-flex]').forEach(seg => {
+            seg.style.flex = seg.dataset.flex;
+        });
+    }
+    if (!window.IntersectionObserver) {
+        document.querySelectorAll('.mds-card').forEach(_fillRelBar);
+    } else {
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                io.unobserve(e.target);
+                _fillRelBar(e.target);
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.mds-card').forEach(c => io.observe(c));
+    }
+})();
+
+// ── Dead Code: count-up (no-op; numbers are server-rendered, kept for compatibility) ──
+function _deadCountUp() { /* numbers rendered server-side */ }
+
+// ── Dead Code: dual-axis filter state ────────────────────────────────────────
+let _dcActiveType = 'all';
+let _dcActiveSev  = 'all';
+
+function dcTypeFilter(type, btn) {
+    _dcActiveType = type;
+    document.querySelectorAll('#dc-type-grid .dc-type-card').forEach(c => c.classList.remove('dc-type-active'));
+    if (btn) btn.classList.add('dc-type-active');
+    _dcApplyFilter();
+}
+
+function dcSevFilter(sev, btn) {
+    _dcActiveSev = sev;
+    document.querySelectorAll('#dc-filter-row .dc-sev-tab').forEach(t => t.classList.remove('dc-sev-tab--active'));
+    if (btn) btn.classList.add('dc-sev-tab--active');
+    _dcApplyFilter();
+}
+
+function _dcApplyFilter() {
+    const items  = document.querySelectorAll('#dead-list .dc-item');
+    const toShow = [];
+
+    // Pass 1: hide immediately — no transitions, no per-item reflow
+    items.forEach(item => {
+        const typeOk = _dcActiveType === 'all' || item.dataset.type     === _dcActiveType;
+        const sevOk  = _dcActiveSev  === 'all' || item.dataset.severity === _dcActiveSev;
+        if (typeOk && sevOk) {
+            toShow.push(item);
+        } else {
+            item.style.display = 'none';
+            item.classList.remove('is-hiding');
+        }
+    });
+
+    // Pass 2: make visible items ready, disable their animation
+    toShow.forEach((item, i) => {
+        item.style.display = '';
+        item.classList.remove('is-hiding');
+        item.style.setProperty('--di', String(i));
+        item.style.animation = 'none';
+    });
+
+    // Single reflow for ALL visible items at once (instead of one per item)
+    const list = document.getElementById('dead-list');
+    if (list && toShow.length) void list.offsetHeight;
+
+    // Re-enable animation on all at once
+    toShow.forEach(item => { item.style.animation = ''; });
+}
+
+function dcCopyPath(path, btn) {
+    navigator.clipboard.writeText(path).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<svg style="width:10px;height:10px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 1800);
+    }).catch(() => {});
+}
 </script>
 
 

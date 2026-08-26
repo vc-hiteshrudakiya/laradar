@@ -52,10 +52,15 @@ class EventAnalyzer
         return [
             'name'             => $name,
             'namespace'        => $namespace,
-            'path'             => $file->getRelativePathname(),
+            'path'             => $this->relativePath($file->getRealPath()),
             'should_broadcast' => str_contains($content, 'ShouldBroadcast'),
             'broadcastNow'     => str_contains($content, 'ShouldBroadcastNow'),
             'properties'       => $properties,
         ];
+    }
+
+    private function relativePath(string $absolutePath): string
+    {
+        return ltrim(str_replace(base_path(), '', $absolutePath), DIRECTORY_SEPARATOR);
     }
 }

@@ -200,6 +200,17 @@
             </button>
             @endif
 
+            @php $dcTotal = $data['dead_code']['summary']['total'] ?? 0; @endphp
+            <button onclick="showSection('deadcode')" data-nav="deadcode"
+                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all text-sm">
+                <span class="flex items-center gap-2.5">
+                    <span class="w-6 text-center">🚫</span> Dead Code
+                </span>
+                @if($dcTotal > 0)
+                <span class="bg-red-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $dcTotal }}</span>
+                @endif
+            </button>
+
             @if(!empty($data['errors']))
             <button onclick="showSection('errors')" data-nav="errors"
                 class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 transition-all text-sm">
@@ -971,11 +982,11 @@
                 {{-- Table --}}
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="overflow-x-auto">
-                    <table class="w-full text-xs" style="min-width:800px">
+                    <table class="w-full text-xs" style="min-width:900px">
                         <thead>
                             <tr class="bg-gray-50 border-b border-gray-100 text-gray-400 uppercase tracking-wider">
                                 <th class="text-left px-5 py-3 w-20 whitespace-nowrap">Method</th>
-                                <th class="text-left px-5 py-3 whitespace-nowrap">URI</th>
+                                <th class="text-left px-5 py-3 whitespace-nowrap" style="min-width:220px">URI</th>
                                 <th class="text-left px-5 py-3 whitespace-nowrap">Controller</th>
                                 <th class="text-left px-5 py-3 whitespace-nowrap">Action</th>
                                 <th class="text-left px-5 py-3 whitespace-nowrap">Name</th>
@@ -996,7 +1007,7 @@
                                 <td class="px-5 py-3">
                                     <span class="font-bold px-2 py-0.5 rounded text-xs {{ $badge }}">{{ $primary }}</span>
                                 </td>
-                                <td class="px-5 py-3 font-mono text-gray-800 break-all">{{ $route['uri'] }}</td>
+                                <td class="px-5 py-3 font-mono text-gray-800 whitespace-nowrap">{{ $route['uri'] }}</td>
                                 <td class="px-5 py-3 text-gray-600 whitespace-nowrap">{{ class_basename($route['controller']['class']) }}</td>
                                 <td class="px-5 py-3 text-gray-400 font-mono whitespace-nowrap">{{ $route['controller']['method'] ?? '—' }}</td>
                                 <td class="px-5 py-3 text-gray-400 whitespace-nowrap">{{ $route['name'] ?? '—' }}</td>
@@ -1311,6 +1322,89 @@
             </section>
             @endif
 
+            {{-- ====================================================== --}}
+            {{-- DEAD CODE                                                --}}
+            {{-- ====================================================== --}}
+            @php
+                $dc      = $data['dead_code'] ?? [];
+                $dcItems = $dc['items']   ?? [];
+                $dcSum   = $dc['summary'] ?? [];
+                $dcTotal = $dcSum['total']  ?? 0;
+                $dcHigh  = $dcSum['high']   ?? 0;
+                $dcMed   = $dcSum['medium'] ?? 0;
+                $dcLow   = $dcSum['low']    ?? 0;
+                $sevColor = fn($s) => match($s) { 'high' => ['bg-red-100','text-red-700','border-red-200'], 'medium' => ['bg-amber-100','text-amber-700','border-amber-200'], default => ['bg-slate-100','text-slate-600','border-slate-200'] };
+                $typeIcon = fn($t) => match($t) {
+                    'debug_statement'  => '🐛',
+                    'commented_code'   => '💬',
+                    'unused_model'     => '📦',
+                    'orphan_method'    => '⚡',
+                    'undispatched_job' => '📮',
+                    'unfired_event'    => '🔔',
+                    'unused_service'   => '🔧',
+                    default            => '📋',
+                };
+            @endphp
+            <section id="deadcode" class="section-panel">
+                <div class="flex items-center gap-3 mb-6">
+                    <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Dead Code</p>
+                    @if($dcTotal > 0)
+                    <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $dcTotal }} issues</span>
+                    @endif
+                </div>
+
+                @if($dcTotal === 0)
+                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl px-6 py-8 text-center">
+                    <p class="text-2xl mb-2">✅</p>
+                    <p class="text-sm font-semibold text-emerald-700">No dead code detected</p>
+                    <p class="text-xs text-emerald-500 mt-1">Every class, method, job and event appears to be in use.</p>
+                </div>
+                @else
+
+                {{-- Summary cards --}}
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-center">
+                        <p class="text-2xl font-bold text-red-600">{{ $dcHigh }}</p>
+                        <p class="text-xs text-red-400 mt-1 uppercase tracking-wide font-semibold">High</p>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-center">
+                        <p class="text-2xl font-bold text-amber-600">{{ $dcMed }}</p>
+                        <p class="text-xs text-amber-400 mt-1 uppercase tracking-wide font-semibold">Medium</p>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-center">
+                        <p class="text-2xl font-bold text-slate-500">{{ $dcLow }}</p>
+                        <p class="text-xs text-slate-400 mt-1 uppercase tracking-wide font-semibold">Low</p>
+                    </div>
+                </div>
+
+                {{-- Items list --}}
+                <div class="space-y-3">
+                    @foreach($dcItems as $item)
+                    @php [$sevBg, $sevText, $sevBorder] = $sevColor($item['severity'] ?? 'low'); @endphp
+                    <div class="bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-sm">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl shrink-0 mt-0.5">{{ $typeIcon($item['type'] ?? '') }}</span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap mb-1">
+                                    <span class="text-sm font-semibold text-gray-800 truncate">{{ $item['name'] ?? '—' }}</span>
+                                    <span class="text-xs px-2 py-0.5 rounded-full border font-semibold {{ $sevBg }} {{ $sevText }} {{ $sevBorder }}">{{ strtoupper($item['severity'] ?? 'low') }}</span>
+                                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{{ str_replace('_', ' ', $item['type'] ?? '') }}</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-1">{{ $item['detail'] ?? '' }}</p>
+                                @if(!empty($item['path']))
+                                <p class="text-xs font-mono text-gray-400 truncate">{{ $item['path'] }}@if(!empty($item['line'])):{{ $item['line'] }}@endif</p>
+                                @endif
+                                @if(!empty($item['snippet']))
+                                <pre class="mt-2 text-xs font-mono bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 overflow-x-auto text-gray-600 whitespace-pre-wrap">{{ $item['snippet'] }}</pre>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+            </section>
+
             {{-- Footer --}}
             <footer class="text-center text-xs text-gray-300 border-t border-gray-100 pt-6 pb-2">
                 Generated by <strong class="text-gray-400">Laradar</strong> v{{ $data['package_version'] }}
@@ -1349,7 +1443,7 @@
         models: 'Models', controllers: 'Controllers', routes: 'Routes',
         jobs: 'Jobs', events: 'Events', services: 'Services', repositories: 'Repositories',
         observers: 'Observers', policies: 'Policies', modules: 'Modules', packages: 'Packages',
-        apidocs: 'API Docs', errors: 'Errors',
+        apidocs: 'API Docs', errors: 'Errors', deadcode: 'Dead Code',
     };
 
     function showSection(id) {

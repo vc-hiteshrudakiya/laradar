@@ -54,6 +54,13 @@ class LaradarCommand extends Command
         $this->line('  <fg=green>✓</> ' . str_pad('Routes', 18) . '<fg=white;options=bold>' . $summary['routes'] . '</>');
         $this->line('  <fg=green>✓</> ' . str_pad('Dependencies', 18) . '<fg=white;options=bold>' . count($data['dependencies']['edges']) . '</>');
 
+        $dcTotal = $data['dead_code']['summary']['total'] ?? 0;
+        if ($dcTotal > 0) {
+            $this->line('  <fg=red>!</> ' . str_pad('Dead Code', 18) . '<fg=red;options=bold>' . $dcTotal . '</> issues');
+        } else {
+            $this->line('  <fg=green>✓</> ' . str_pad('Dead Code', 18) . '<fg=white;options=bold>0</>');
+        }
+
         $this->newLine();
         $this->line('  <fg=gray>⏱  ' . $data['performance']['execution_time_ms'] . 'ms &nbsp; 💾 ' . $data['performance']['memory_usage_mb'] . 'MB</>');
         $this->newLine();

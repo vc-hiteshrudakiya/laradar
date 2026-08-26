@@ -23,6 +23,8 @@ class RouteAnalyzer
 
                 [$class, $method] = $this->parseAction($action);
 
+                $middleware = array_values($route->gatherMiddleware());
+
                 $items[] = [
                     'uri'        => $route->uri(),
                     'methods'    => $route->methods(),
@@ -31,7 +33,10 @@ class RouteAnalyzer
                         'method' => $method,
                     ],
                     'name'       => $route->getName(),
-                    'middleware' => array_values($route->gatherMiddleware()),
+                    'middleware' => $middleware,
+                    'prefix'     => $this->extractPrefix($route),
+                    'domain'     => $route->getDomain() ?: null,
+                    'rate_limit' => $this->extractRateLimit($middleware),
                 ];
             } catch (\Throwable $e) {
                 $errors[] = [
@@ -42,6 +47,27 @@ class RouteAnalyzer
         }
 
         return ['items' => $items, 'errors' => $errors];
+    }
+
+    private function extractPrefix($route): ?string
+    {
+        $action = $route->getAction();
+        $prefix = $action['prefix'] ?? null;
+        $prefix = $prefix ? trim($prefix, '/') : null;
+        return $prefix ?: null;
+    }
+
+    private function extractRateLimit(array $middleware): ?string
+    {
+        foreach ($middleware as $mw) {
+            if (str_starts_with($mw, 'throttle:')) {
+                return substr($mw, 9);
+            }
+            if ($mw === 'throttle') {
+                return 'default';
+            }
+        }
+        return null;
     }
 
     private function isVendorRoute(string $action): bool

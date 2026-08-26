@@ -303,6 +303,36 @@ class ReportExporter
         }
         $out[] = '';
 
+        // ── Dead Code ─────────────────────────────────────────────
+        $dc      = $data['dead_code'] ?? [];
+        $dcItems = $dc['items']   ?? [];
+        $dcSum   = $dc['summary'] ?? [];
+        $dcTotal = $dcSum['total'] ?? 0;
+
+        if ($dcTotal > 0) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Dead Code';
+            $out[] = '';
+            $out[] = "**{$dcTotal} issues** — "
+                . ($dcSum['high']   ?? 0) . ' high · '
+                . ($dcSum['medium'] ?? 0) . ' medium · '
+                . ($dcSum['low']    ?? 0) . ' low';
+            $out[] = '';
+            $out[] = '| Severity | Type | Name | Path | Detail |';
+            $out[] = '|----------|------|------|------|--------|';
+            foreach ($dcItems as $item) {
+                $sev    = strtoupper($item['severity'] ?? 'low');
+                $type   = str_replace('_', ' ', $item['type'] ?? '');
+                $name   = $item['name']   ?? '—';
+                $path   = $item['path']   ?? '—';
+                $line   = !empty($item['line']) ? ':' . $item['line'] : '';
+                $detail = $item['detail'] ?? '—';
+                $out[]  = "| {$sev} | {$type} | `{$name}` | `{$path}{$line}` | {$detail} |";
+            }
+            $out[] = '';
+        }
+
         return implode("\n", $out);
     }
 }

@@ -31,7 +31,10 @@ class ModelAnalyzer
             }
 
             try {
-                $items[] = $this->processFile($file);
+                $item = $this->processFile($file);
+                if ($item !== null) {
+                    $items[] = $item;
+                }
             } catch (\Throwable $e) {
                 $errors[] = [
                     'file'    => $this->relativePath($file->getRealPath()),
@@ -43,9 +46,15 @@ class ModelAnalyzer
         return ['items' => $items, 'errors' => $errors];
     }
 
-    private function processFile(SplFileInfo $file): array
+    private function processFile(SplFileInfo $file): ?array
     {
-        $content   = file_get_contents($file->getRealPath());
+        $content = file_get_contents($file->getRealPath());
+
+        // Skip interfaces, traits, and abstract classes — not concrete Eloquent models
+        if (preg_match('/^\s*(?:interface|trait|abstract\s+class)\s+\w/m', $content)) {
+            return null;
+        }
+
         $modelName = $file->getFilenameWithoutExtension();
         $namespace = $this->detectNamespace($content);
 
@@ -55,9 +64,17 @@ class ModelAnalyzer
             'namespace'     => $namespace,
             'full_class'    => $namespace ? $namespace . '\\' . $modelName : $modelName,
             'table'         => $this->detectTable($content, $modelName),
+            'primary_key'   => $this->detectStringProperty($content, 'primaryKey', 'id'),
+            'key_type'      => $this->detectStringProperty($content, 'keyType', 'int'),
+            'incrementing'  => $this->detectBoolProperty($content, 'incrementing', true),
+            'timestamps'    => $this->detectBoolProperty($content, 'timestamps', true),
+            'date_format'   => $this->detectStringProperty($content, 'dateFormat', null),
+            'connection'    => $this->detectStringProperty($content, 'connection', null),
             'fillable'      => $this->detectArrayProperty($content, 'fillable'),
             'guarded'       => $this->detectArrayProperty($content, 'guarded'),
             'hidden'        => $this->detectArrayProperty($content, 'hidden'),
+            'appends'       => $this->detectArrayProperty($content, 'appends'),
+            'with'          => $this->detectArrayProperty($content, 'with'),
             'casts'         => $this->detectCasts($content),
             'relationships' => $this->detectRelationships($content),
             'traits'        => $this->detectTraits($content),
@@ -74,6 +91,20 @@ class ModelAnalyzer
     {
         preg_match('/^namespace\s+([^;]+);/m', $content, $match);
         return isset($match[1]) ? trim($match[1]) : '';
+    }
+
+    private function detectStringProperty(string $content, string $property, ?string $default): ?string
+    {
+        preg_match('/(?:public|protected)\s+(?:string\s+)?\$' . $property . '\s*=\s*[\'"]([^\'"]+)[\'"]/', $content, $match);
+        return $match[1] ?? $default;
+    }
+
+    private function detectBoolProperty(string $content, string $property, bool $default): bool
+    {
+        if (preg_match('/(?:public|protected)\s+(?:bool\s+)?\$' . $property . '\s*=\s*(true|false)\b/i', $content, $match)) {
+            return strtolower($match[1]) === 'true';
+        }
+        return $default;
     }
 
     private function detectTable(string $content, string $modelName): string

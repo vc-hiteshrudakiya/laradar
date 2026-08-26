@@ -22,6 +22,7 @@ class ArchitectureReport
     private array $modules      = [];
     private array $packages     = [];
     private array $apiDocs      = [];
+    private array $deadCode     = ['items' => [], 'summary' => [], 'errors' => []];
 
     public function __construct(
         private string $projectName,
@@ -63,6 +64,7 @@ class ArchitectureReport
     public function addModule(array $m): void        { $this->modules[]      = $m; }
     public function addPackage(array $p): void       { $this->packages[]     = $p; }
     public function addApiDoc(array $e): void        { $this->apiDocs[]      = $e; }
+    public function setDeadCode(array $result): void { $this->deadCode       = $result; }
 
     public function getReport(): array
     {
@@ -105,6 +107,7 @@ class ArchitectureReport
             'modules'       => $this->modules,
             'packages'      => $this->packages,
             'api_docs'      => $this->apiDocs,
+            'dead_code'     => $this->deadCode,
             'errors'        => $this->errors,
         ];
     }
