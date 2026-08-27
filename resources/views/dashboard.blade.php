@@ -668,6 +668,11 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 Models
                 @if(($summary['models']??0)>0)<span class="nav-badge">{{ $summary['models'] }}</span>@endif
             </button>
+            <button onclick="navigate('modelmap')" id="nav-modelmap" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                Relation Graph
+            </button>
+            <button onclick="navigate('controllers')" id="nav-controllers" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
                 Controllers
                 @if(($summary['controllers']??0)>0)<span class="nav-badge">{{ $summary['controllers'] }}</span>@endif
@@ -1100,6 +1105,303 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     <div id="controllers-detail" style="display:none">
         <div id="controllers-detail-content"></div>
     </div>
+</section>
+
+{{-- Model Relationships Map --}}
+<section id="sec-modelmap" class="p-6" style="display:none">
+
+    @php
+    $mmErPairs = [];
+    foreach ($data['models'] as $mmModel) {
+        foreach ($mmModel['relationships'] ?? [] as $mmRel) {
+            $mmTo = class_basename($mmRel['related'] ?? '');
+            if (!$mmTo || $mmTo === $mmModel['name']) continue;
+            $mmPair = $mmModel['name'] . ':' . $mmTo;
+            $mmRev  = $mmTo . ':' . $mmModel['name'];
+            if (!isset($mmErPairs[$mmPair]) && !isset($mmErPairs[$mmRev])) {
+                $mmType = $mmRel['type'];
+                if (str_contains($mmType, 'BelongsToMany') || str_contains($mmType, 'MorphToMany')) { $mmL = '}o'; $mmR = 'o{'; }
+                elseif (str_contains($mmType, 'BelongsTo') || str_contains($mmType, 'MorphTo'))     { $mmL = '}o'; $mmR = '||'; }
+                elseif (str_contains($mmType, 'HasOne') || str_contains($mmType, 'MorphOne'))        { $mmL = '||'; $mmR = 'o|'; }
+                else                                                                                  { $mmL = '||'; $mmR = 'o{'; }
+                $mmErPairs[$mmPair] = "    {$mmModel['name']} {$mmL}--{$mmR} {$mmTo} : \"{$mmRel['method']}\"";
+            }
+        }
+    }
+    $mmMentioned = [];
+    foreach (array_keys($mmErPairs) as $mmPk) { [$mmA,$mmB]=explode(':',$mmPk); $mmMentioned[$mmA]=true; $mmMentioned[$mmB]=true; }
+    $mmStandalone = [];
+    foreach ($data['models'] as $mmModel) {
+        if (!isset($mmMentioned[$mmModel['name']])) {
+            $mmStandalone[] = "    {$mmModel['name']} {"; $mmStandalone[] = "        string table \"{$mmModel['table']}\""; $mmStandalone[] = "    }";
+        }
+    }
+    $mmErCode = "erDiagram\n".implode("\n",$mmStandalone).(!empty($mmStandalone)?"\n":'').implode("\n",$mmErPairs);
+
+    // Per-model focused ER codes (model + its direct neighbors only)
+    $mmFocused = [];
+    foreach ($data['models'] as $mmFm) {
+        $mmFn  = $mmFm['name'];
+        $mmFps = [];
+        foreach ($mmErPairs as $mmPk => $mmPl) {
+            [$mmPa, $mmPb] = explode(':', $mmPk, 2);
+            if ($mmPa === $mmFn || $mmPb === $mmFn) $mmFps[] = $mmPl;
+        }
+        $mmFocused[$mmFn] = empty($mmFps) ? '' : ("erDiagram\n" . implode("\n", $mmFps));
+    }
+    $mmFirstFocusModel = '';
+    foreach ($data['models'] as $mmFm) {
+        if (!empty($mmFm['relationships'])) { $mmFirstFocusModel = $mmFm['name']; break; }
+    }
+    @endphp
+
+    {{-- Header --}}
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#6366F1 0%,#818CF8 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(99,102,241,0.25);">
+                <svg viewBox="0 0 20 20" fill="none" style="width:20px;height:20px;" stroke-linecap="round"><circle cx="10" cy="10" r="2.5" fill="white"/><circle cx="3.5" cy="4" r="1.5" fill="white"/><circle cx="16.5" cy="4" r="1.5" fill="white"/><circle cx="3.5" cy="16" r="1.5" fill="white"/><circle cx="16.5" cy="16" r="1.5" fill="white"/><line x1="10" y1="7.5" x2="3.5" y2="4" stroke="white" stroke-width="1.2" opacity="0.7"/><line x1="10" y1="7.5" x2="16.5" y2="4" stroke="white" stroke-width="1.2" opacity="0.7"/><line x1="10" y1="12.5" x2="3.5" y2="16" stroke="white" stroke-width="1.2" opacity="0.7"/><line x1="10" y1="12.5" x2="16.5" y2="16" stroke="white" stroke-width="1.2" opacity="0.7"/></svg>
+            </div>
+            <div>
+                <h1 style="font-size:20px;font-weight:700;color:#111827;margin:0;line-height:1.2;letter-spacing:-0.3px;">Relation Graph</h1>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:5px;">
+                    <span style="display:inline-flex;align-items:center;background:rgba(99,102,241,.08);color:#6366F1;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;">{{ count($data['models']) }} models</span>
+                    <span style="display:inline-flex;align-items:center;background:#F0FDF4;color:#16A34A;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;">{{ count($mmErPairs) }} relationships</span>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex;background:#F3F4F6;border-radius:8px;padding:3px;gap:2px;">
+            <button id="map-tab-graph" onclick="setMapTab('graph')" style="padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;background:#6366F1;color:#FFFFFF;border:none;cursor:pointer;transition:background .15s,color .15s;">Relation Graph</button>
+            <button id="map-tab-tree"  onclick="setMapTab('tree')"  style="padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;background:transparent;color:#6B7280;border:none;cursor:pointer;transition:background .15s,color .15s;">Tree View</button>
+            <button id="map-tab-er"    onclick="setMapTab('er')"    style="padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;background:transparent;color:#6B7280;border:none;cursor:pointer;transition:background .15s,color .15s;">ER Diagram</button>
+        </div>
+    </div>
+
+    {{-- ── TAB: Relation Graph (force-directed SVG) ── --}}
+    <div id="map-graph">
+
+        {{-- Controls row --}}
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;min-height:38px;flex-wrap:wrap;">
+            <div style="position:relative;">
+                <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;pointer-events:none;" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input id="rg-search-input" type="text" placeholder="Search model…" oninput="graphSearch(this.value)"
+                    style="font-size:13px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px 8px 32px;color:#111827;outline:none;width:200px;transition:border-color .15s,box-shadow .15s;"
+                    onfocus="this.style.borderColor='#6366F1';this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)'"
+                    onblur="this.style.borderColor='#E5E7EB';this.style.boxShadow='none'">
+            </div>
+            <button id="rg-clear-btn" onclick="rgDiagClear()" style="display:none;font-size:12px;color:#6B7280;padding:7px 14px;border-radius:8px;border:1px solid #E5E7EB;background:#FFFFFF;cursor:pointer;font-weight:500;">✕ Clear</button>
+            {{-- Legend --}}
+            <div id="rg-legend" style="margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;">
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;font-weight:500;"><span style="display:inline-block;width:18px;height:2px;background:#818cf8;border-radius:2px;"></span>hasMany</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;font-weight:500;"><span style="display:inline-block;width:18px;height:2px;background:#2dd4bf;border-radius:2px;"></span>hasOne</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;font-weight:500;"><span style="display:inline-block;width:18px;height:2px;background:#34d399;border-radius:2px;"></span>belongsTo</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;font-weight:500;"><span style="display:inline-block;width:18px;height:2px;background:#c084fc;border-radius:2px;"></span>M:M</span>
+            </div>
+            {{-- Selected node info --}}
+            <div id="rg-info-row" style="display:none;margin-left:auto;align-items:center;gap:8px;">
+                <span id="rg-info-name"  style="font-weight:700;color:#6366F1;font-size:13px;"></span>
+                <span id="rg-info-table" style="font-size:11px;background:rgba(99,102,241,.08);color:#6366F1;padding:2px 8px;border-radius:6px;font-weight:500;"></span>
+                <button id="rg-rels-btn" onclick="rgToggleRels()"
+                    style="font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid #E5E7EB;background:#FFFFFF;color:#374151;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:4px;">
+                    <span id="rg-info-count"></span>
+                    <svg id="rg-rels-chevron" style="width:10px;height:10px;transition:transform .2s;" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
+                </button>
+            </div>
+        </div>
+
+        {{-- Relationship cards panel --}}
+        <div id="rg-rels-panel" style="display:none;margin-bottom:14px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:16px 20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+            <p id="rg-rels-title" style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;"></p>
+            <div id="rg-rels-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;"></div>
+        </div>
+
+        {{-- Canvas --}}
+        <div style="position:relative;border-radius:16px;border:1px solid #E5E7EB;overflow:hidden;background:#FFFFFF;box-shadow:0 4px 6px -1px rgba(0,0,0,0.07),0 2px 4px -1px rgba(0,0,0,0.04);">
+            <svg id="rg-canvas" xmlns="http://www.w3.org/2000/svg"
+                 style="width:100%;height:600px;display:block;cursor:grab;user-select:none">
+                <defs>
+                    <pattern id="rg-dot-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+                        <circle cx="1" cy="1" r="0.8" fill="rgba(0,0,0,0.06)" opacity="1"/>
+                    </pattern>
+                    <marker id="rg-arr-many"      viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                    <marker id="rg-arr-one"       viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#2dd4bf" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                    <marker id="rg-arr-belongs"   viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                    <marker id="rg-arr-mm"        viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                    <marker id="rg-arr-many-a"    viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                    <marker id="rg-arr-one-a"     viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                    <marker id="rg-arr-belongs-a" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                    <marker id="rg-arr-mm-a"      viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                    <filter id="rg-f-node"     x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="1" stdDeviation="3"  flood-color="rgba(0,0,0,0.08)"/></filter>
+                    <filter id="rg-f-node-sel" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="rgba(99,102,241,0.35)"/></filter>
+                    <filter id="rg-f-node-rel" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="7"  flood-color="rgba(52,211,153,0.30)"/></filter>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#rg-dot-grid)"/>
+                <g id="rg-vp">
+                    <g id="rg-edges-g"></g>
+                    <g id="rg-nodes-g"></g>
+                </g>
+            </svg>
+
+            {{-- Zoom controls --}}
+            <div style="position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:4px;">
+                <button onclick="graphZoom(1.25)" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;color:#6B7280;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08);transition:border-color .15s,color .15s;" onmouseenter="this.style.borderColor='#6366F1';this.style.color='#6366F1'" onmouseleave="this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">+</button>
+                <button onclick="graphZoom(0.8)"  style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;color:#6B7280;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08);transition:border-color .15s,color .15s;" onmouseenter="this.style.borderColor='#6366F1';this.style.color='#6366F1'" onmouseleave="this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">−</button>
+                <button onclick="graphFit()"      style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;color:#6B7280;font-size:14px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08);transition:border-color .15s,color .15s;" title="Fit to screen" onmouseenter="this.style.borderColor='#6366F1';this.style.color='#6366F1'" onmouseleave="this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">⊡</button>
+                <button onclick="graphReset()"    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;color:#6B7280;font-size:14px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08);transition:border-color .15s,color .15s;" title="Reset" onmouseenter="this.style.borderColor='#6366F1';this.style.color='#6366F1'" onmouseleave="this.style.borderColor='#E5E7EB';this.style.color='#6B7280'">⟳</button>
+            </div>
+
+            {{-- Minimap --}}
+            <div style="position:absolute;bottom:12px;right:12px;border-radius:10px;border:1px solid #E5E7EB;background:rgba(255,255,255,0.95);overflow:hidden;width:160px;height:100px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <svg id="rg-minimap" width="160" height="100" style="display:block"></svg>
+            </div>
+
+            {{-- Hint --}}
+            <div style="position:absolute;bottom:12px;left:12px;font-size:11px;color:#9CA3AF;background:rgba(255,255,255,0.92);padding:4px 10px;border-radius:8px;border:1px solid #F3F4F6;pointer-events:none;font-weight:500;">
+                Click node · Drag to pan · Scroll to zoom
+            </div>
+        </div>
+
+    </div>
+
+    {{-- ── TAB: Tree View ── --}}
+    <div id="map-tree" style="display:none">
+        <div style="margin-bottom:16px;">
+            <input id="map-search" oninput="filterModelTree()" type="search" placeholder="Filter models…"
+                style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;color:var(--text);font-family:var(--font-sans);width:220px;outline:none;">
+        </div>
+        <div id="map-tree-content" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
+    {{-- ── TAB: ER Diagram ── --}}
+    <div id="map-er" style="display:none">
+        @if(empty($mmErPairs) && empty($mmStandalone))
+        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:48px;text-align:center;">
+            <p style="color:var(--text-faint);font-size:13px;">No relationships found across models.</p>
+        </div>
+        @else
+
+        {{-- Toolbar --}}
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+
+            {{-- Focus model selector --}}
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">Focus:</span>
+                <select id="er-focus-select" onchange="erFocus(this.value)"
+                    style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:9px;padding:7px 28px 7px 12px;font-size:12px;color:var(--text);font-family:var(--font-mono);cursor:pointer;outline:none;">
+                    <option value="__all__">All Models</option>
+                    @foreach($data['models'] as $erM)
+                    <option value="{{ $erM['name'] }}">{{ $erM['name'] }}{{ count($erM['relationships']??[]) ? ' ('.count($erM['relationships']).' rels)' : '' }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Stats --}}
+            <span style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($data['models']) }} models · {{ count($mmErPairs) }} relationships</span>
+
+            {{-- Large-project warning — compact inline badge with tooltip --}}
+            @if(count($data['models']) > 20)
+            <span title="Large project — auto-focused on a single model. Select All Models to see everything." style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:20px;font-size:10px;font-weight:600;color:var(--amber);cursor:default;white-space:nowrap;">
+                <svg viewBox="0 0 20 20" fill="currentColor" style="width:11px;height:11px;flex:none;"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                Large project
+            </span>
+            @endif
+
+            {{-- Right-side controls --}}
+            <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+
+                {{-- Layout direction toggle --}}
+                <button id="er-layout-btn" onclick="erToggleLayout()"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;font-weight:600;color:#374151;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:background .15s;font-family:var(--font-sans);"
+                    onmouseenter="this.style.background='#F3F4F6'" onmouseleave="this.style.background='#F9FAFB'" title="Toggle layout direction">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex:none;"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
+                    TB
+                </button>
+
+                {{-- Zoom group --}}
+                <div style="display:flex;align-items:center;gap:2px;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:8px;padding:3px;">
+                    <button onclick="erZoom(1.2)" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:5px;color:#6B7280;font-weight:700;font-size:15px;cursor:pointer;transition:background .12s;" onmouseenter="this.style.background='#E5E7EB'" onmouseleave="this.style.background='transparent'">+</button>
+                    <span id="er-zoom-lbl" style="font-size:10px;color:#6B7280;font-family:ui-monospace,monospace;min-width:36px;text-align:center;line-height:1;">100%</span>
+                    <button onclick="erZoom(0.8)" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:5px;color:#6B7280;font-weight:700;font-size:15px;cursor:pointer;transition:background .12s;" onmouseenter="this.style.background='#E5E7EB'" onmouseleave="this.style.background='transparent'">−</button>
+                    <button onclick="erZoomFit()" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:5px;color:#6B7280;font-size:13px;cursor:pointer;transition:background .12s;" title="Reset zoom" onmouseenter="this.style.background='#E5E7EB'" onmouseleave="this.style.background='transparent'">⊡</button>
+                </div>
+
+                {{-- Fullscreen --}}
+                <button onclick="erFullScreen()"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;font-weight:600;color:#374151;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:background .15s;font-family:var(--font-sans);"
+                    onmouseenter="this.style.background='#F3F4F6'" onmouseleave="this.style.background='#F9FAFB'" title="Full-screen view">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex:none;"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                    Full
+                </button>
+
+                {{-- Divider --}}
+                <div style="width:1px;height:22px;background:#E5E7EB;"></div>
+
+                {{-- Download SVG --}}
+                <button id="er-dl-svg" onclick="erDownloadSVG()"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;font-weight:600;color:#6366F1;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,0.25);border-radius:8px;cursor:pointer;transition:background .15s;font-family:var(--font-sans);"
+                    onmouseenter="this.style.background='rgba(99,102,241,.14)'" onmouseleave="this.style.background='rgba(99,102,241,.08)'"
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex:none;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    SVG
+                </button>
+
+                {{-- Download PNG --}}
+                <button id="er-dl-png" onclick="erDownloadPNG()"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;font-weight:600;color:#374151;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:background .15s;font-family:var(--font-sans);"
+                    onmouseenter="this.style.background='#F3F4F6'" onmouseleave="this.style.background='#F9FAFB'">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex:none;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    PNG
+                </button>
+
+            </div>
+
+        </div>
+
+        {{-- Canvas + Model info panel --}}
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+
+            {{-- Mermaid ER canvas — dot-grid background --}}
+            <div id="er-canvas-wrap" style="flex:1;min-width:0;background-color:#FAFAFA;background-image:radial-gradient(circle,rgba(99,102,241,.12) 1.5px,transparent 1.5px);background-size:24px 24px;border:1px solid var(--border);border-radius:14px;overflow:hidden;height:70vh;cursor:grab;position:relative;user-select:none;">
+                <div id="er-transform-wrap" style="padding:20px;display:inline-block;transform-origin:0 0;">
+                    <pre class="mermaid" id="er-mermaid">{{ $mmErCode }}</pre>
+                </div>
+            </div>
+
+            {{-- Model info panel --}}
+            <div id="er-info-panel" style="width:256px;flex:none;height:70vh;background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;">
+                <div style="padding:13px 16px 11px;border-bottom:1px solid var(--border);flex:none;">
+                    <p style="font-size:10px;font-weight:700;color:var(--text-faint);letter-spacing:0.08em;text-transform:uppercase;margin:0;">Model Details</p>
+                </div>
+                <div id="er-info-content" style="flex:1;padding:14px 16px;overflow-y:auto;">
+                    <p style="font-size:12px;color:var(--text-faint);text-align:center;margin-top:40px;">Select a model<br>to see details</p>
+                </div>
+            </div>
+
+        </div>
+
+        {{-- Fullscreen modal --}}
+        <div id="er-fs-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;flex-direction:column;">
+            <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#0F172A;border-bottom:1px solid rgba(255,255,255,0.08);">
+                <span style="color:#E2E8F0;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="10" cy="10" r="2.5"/><circle cx="3.5" cy="4" r="1.5"/><circle cx="16.5" cy="4" r="1.5"/><circle cx="3.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/><line x1="10" y1="7.5" x2="3.5" y2="4"/><line x1="10" y1="7.5" x2="16.5" y2="4"/><line x1="10" y1="12.5" x2="3.5" y2="16"/><line x1="10" y1="12.5" x2="16.5" y2="16"/></svg>
+                    ER Diagram — Full View
+                </span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:11px;color:#475569;font-family:ui-monospace,monospace;">Scroll to zoom · Drag to pan · Esc to close</span>
+                    <button onclick="erCloseFullScreen()"
+                        style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:12px;font-weight:600;color:#E2E8F0;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:8px;cursor:pointer;transition:background .15s;"
+                        onmouseenter="this.style.background='rgba(255,255,255,0.14)'" onmouseleave="this.style.background='rgba(255,255,255,0.08)'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        Close
+                    </button>
+                </div>
+            </div>
+            <div id="er-fs-content" style="flex:1;overflow:hidden;background:#F8FAFC;cursor:grab;position:relative;">
+                <div id="er-fs-transform" style="display:inline-block;padding:32px;transform-origin:0 0;"></div>
+            </div>
+        </div>
+
+        @endif
+    </div>
+
 </section>
 
 {{-- Routes --}}
@@ -2240,10 +2542,11 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','models','controllers','routes','apidocs','ai','chat','aidocs'];
+const SECTIONS = ['overview','modules','models','modelmap','controllers','routes','apidocs','ai','chat','aidocs'];
 
 let mapTreeRendered = false;
 let erRendered      = false;
+let graphRendered   = false;
 
 // ── ER Diagram — Mermaid erDiagram ──────────────────────────────────────────
 const _erFull    = @json($mmErCode);
@@ -2727,7 +3030,7 @@ function navigate(s) {
     });
     _moveNavIndicator(s);
     const sectionNames = {
-        overview:'Overview', models:'Models', controllers:'Controllers',
+        overview:'Overview', models:'Models', modelmap:'Relation Graph', controllers:'Controllers',
         routes:'Routes', apidocs:'API Docs',
         ai:'AI Insights', chat:'AI Chat',
         aidocs:'AI Docs', modules:'Modules'
@@ -2757,6 +3060,9 @@ function navigate(s) {
                 sec.classList.remove('sec-out');
             }
         });
+        if (s === 'modelmap' && !graphRendered) {
+            setTimeout(initRelGraph, 50);
+        }
         if (s === 'controllers') {
             setTimeout(() => {
                 document.querySelectorAll('.ctrl-complexity-fill').forEach(bar => {
@@ -4089,6 +4395,72 @@ function buildRelBranch(modelName, depth, visited) {
     return html;
 }
 
+function renderModelTree() {
+    const search    = (document.getElementById('map-search')?.value || '').toLowerCase();
+    const allModels = APP.models || [];
+    const models    = allModels.filter(m => !search || m.name.toLowerCase().includes(search));
+    const container = document.getElementById('map-tree-content');
+
+    if (!models.length) {
+        container.innerHTML = '<p style="color:var(--text-faint);font-size:13px;padding:20px 0;">No models match your search.</p>';
+        return;
+    }
+
+    // Sort: models with rels first, then alphabetically
+    const sorted = [...models].sort((a, b) => {
+        const da = (b.relationships||[]).length - (a.relationships||[]).length;
+        return da !== 0 ? da : a.name.localeCompare(b.name);
+    });
+
+    const PALETTE = ['#6366F1','#A78BFA','#34D399','#FBBF24','#F87171','#60A5FA'];
+
+    let html = `<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:hidden;">`;
+
+    sorted.forEach((model, idx) => {
+        const rels    = model.relationships || [];
+        const total   = rels.length;
+        const color   = PALETTE[idx % PALETTE.length];
+        const domId   = 'tv-body-' + idx;
+        const isLast  = idx === sorted.length - 1;
+        const hasRels = total > 0;
+
+        html += `
+        <div class="model-tree-card" data-name="${model.name.toLowerCase()}"
+             style="border-bottom:${isLast ? 'none' : '1px solid var(--border)'};">
+
+            <div onclick="tvToggle('${domId}','${domId}-arrow',${hasRels})"
+                 style="display:flex;align-items:center;gap:12px;padding:12px 18px;cursor:${hasRels ? 'pointer' : 'default'};transition:background .18s;user-select:none;"
+                 onmouseenter="if(${hasRels})this.style.background='rgba(255,255,255,.03)'" onmouseleave="this.style.background=''">
+
+                <svg id="${domId}-arrow" viewBox="0 0 10 10" style="width:10px;height:10px;flex:none;transition:transform .2s;opacity:${hasRels ? '1' : '.2'};" fill="currentColor" color="var(--text-faint)">
+                    <path d="M3 2l4 3-4 3z"/>
+                </svg>
+
+                <div style="width:32px;height:32px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;background:${color}18;color:${color};border:1px solid ${color}35;">
+                    ${model.name[0]}
+                </div>
+
+                <span style="font-size:13.5px;font-weight:700;color:var(--text);flex:1;">${model.name}</span>
+                <code style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);margin-right:4px;">${model.table || ''}</code>
+
+                ${model.observer ? '<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.2);font-family:var(--font-mono);flex:none;">obs</span>' : ''}
+
+                ${hasRels
+                    ? `<span style="font-family:var(--font-mono);font-size:10px;padding:2px 8px;border-radius:10px;background:${color}14;color:${color};border:1px solid ${color}30;flex:none;margin-left:6px;">${total} rel${total !== 1 ? 's' : ''}</span>`
+                    : `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);opacity:.45;margin-left:6px;">no rels</span>`
+                }
+            </div>
+
+            <div id="${domId}" style="display:none;padding:0 18px 14px 56px;">
+                ${hasRels ? buildRelBranch(model.name, 0, new Set()) : ''}
+            </div>
+        </div>`;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
 function tvToggle(bodyId, arrowId, hasRels) {
     if (!hasRels) return;
     const body  = document.getElementById(bodyId);
@@ -4146,6 +4518,294 @@ function rgEdgeTheme(type) {
     return     { stroke:'#2dd4bf', marker:'url(#rg-arr-one)',     markerA:'url(#rg-arr-one-a)',     dash:'5,3' };
 }
 
+function initRelGraph() {
+    if (graphRendered) return;
+    graphRendered = true;
+
+    const models = APP.models || [];
+    const svg    = document.getElementById('rg-canvas');
+    if (!svg) return;
+    _rgW = svg.clientWidth  || 900;
+    _rgH = svg.clientHeight || 600;
+    const W = _rgW, H = _rgH;
+
+    const edgesG = document.getElementById('rg-edges-g');
+    const nodesG = document.getElementById('rg-nodes-g');
+
+    if (!models.length) {
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', W/2); t.setAttribute('y', H/2);
+        t.setAttribute('text-anchor', 'middle'); t.setAttribute('fill', '#9CA3AF');
+        t.setAttribute('font-size', '14'); t.setAttribute('font-family', 'system-ui,sans-serif');
+        t.textContent = 'No models found';
+        nodesG.appendChild(t);
+        return;
+    }
+
+    // Deduplicate by name — avoids duplicate node IDs when two namespaces share a class basename
+    const nById = {};
+    const seenName = new Set();
+    const nodes = [];
+    models.forEach(m => {
+        if (!m.name || seenName.has(m.name)) return;
+        seenName.add(m.name);
+        const node = { id: m.name, table: m.table || m.name.toLowerCase() + 's', rels: (m.relationships || []).length, x: 0, y: 0, vx: 0, vy: 0 };
+        nById[m.name] = node;
+        nodes.push(node);
+    });
+
+    // Build deduplicated edge list
+    const edgeSet = new Map();
+    models.forEach(m => {
+        (m.relationships || []).forEach(rel => {
+            const toName = rel.related ? rel.related.split('\\').pop() : null;
+            if (!toName || !nById[toName] || toName === m.name) return;
+            const k = m.name + '→' + toName + ':' + rel.type;
+            if (!edgeSet.has(k)) edgeSet.set(k, { from: m.name, to: toName, type: rel.type });
+        });
+    });
+    const edges = [...edgeSet.values()];
+
+    // Separate connected nodes (have edges) from isolated ones (no edges)
+    const connIds  = new Set();
+    edges.forEach(e => { connIds.add(e.from); connIds.add(e.to); });
+    const simNodes = nodes.filter(n =>  connIds.has(n.id));
+    const isoNodes = nodes.filter(n => !connIds.has(n.id));
+    const NC = simNodes.length;
+
+    // Virtual canvas — generous but bounded so nodes stay navigable
+    const VW = Math.max(W * 2.2, 1600), VH = Math.max(H * 2.2, 1200);
+    const CX = VW / 2, CY = VH / 2;
+
+    // Start connected nodes in a non-overlapping grid (circle start causes hairball collapse)
+    // Spacing > node diagonal (sqrt(150²+60²) ≈ 161px) so nodes never overlap at t=0
+    const SP    = 192;
+    const gcols = Math.max(2, Math.ceil(Math.sqrt(NC * 1.4)));
+    const grows  = Math.ceil(NC / gcols);
+    simNodes.forEach((n, i) => {
+        const col = i % gcols, row = Math.floor(i / gcols);
+        n.x = CX - (gcols * SP) / 2 + col * SP + SP / 2 + Math.sin(i * 2.4) * 18;
+        n.y = CY - (grows * SP) / 2 + row * SP + SP / 2 + Math.cos(i * 2.4) * 18;
+    });
+
+    // Force simulation — strong repel to maintain non-overlap, spring for edges
+    const REPEL  = Math.max(18000, NC * 400);
+    const IDEAL  = Math.max(180, Math.min(240, SP + NC * 2));
+    const SPRING = 0.05, GRAV = 0.004, DAMP = 0.82;
+    for (let it = 0; it < 320; it++) {
+        for (let a = 0; a < NC; a++) {
+            for (let b = a + 1; b < NC; b++) {
+                const na = simNodes[a], nb = simNodes[b];
+                const dx = na.x - nb.x, dy = na.y - nb.y;
+                const d2 = Math.max(dx*dx + dy*dy, 1600), d = Math.sqrt(d2), f = REPEL / d2;
+                na.vx += dx/d*f; na.vy += dy/d*f;
+                nb.vx -= dx/d*f; nb.vy -= dy/d*f;
+            }
+        }
+        edges.forEach(e => {
+            const na = nById[e.from], nb = nById[e.to];
+            if (!na || !nb) return;
+            const dx = nb.x - na.x, dy = nb.y - na.y;
+            const d = Math.sqrt(dx*dx + dy*dy) || 1, f = (d - IDEAL) * SPRING;
+            na.vx += dx/d*f; na.vy += dy/d*f;
+            nb.vx -= dx/d*f; nb.vy -= dy/d*f;
+        });
+        simNodes.forEach(n => {
+            n.vx += (CX - n.x) * GRAV; n.vy += (CY - n.y) * GRAV;
+            n.vx *= DAMP; n.vy *= DAMP;
+            n.x = Math.max(RG_NW/2 + 20, Math.min(VW - RG_NW/2 - 20, n.x + n.vx));
+            n.y = Math.max(RG_NH/2 + 20, Math.min(VH - RG_NH/2 - 20, n.y + n.vy));
+        });
+    }
+
+    // Place isolated nodes in a tidy labelled section below the connected cluster
+    if (isoNodes.length > 0) {
+        const cxArr  = simNodes.length ? simNodes.map(n => n.x) : [CX];
+        const cyArr  = simNodes.length ? simNodes.map(n => n.y) : [CY];
+        const clMinX = Math.min(...cxArr) - RG_NW / 2;
+        const clMaxX = Math.max(...cxArr) + RG_NW / 2;
+        const clMaxY = Math.max(...cyArr) + RG_NH / 2;
+        const gridW  = Math.max(clMaxX - clMinX, (RG_NW + 16) * 5);
+        const isoCols = Math.max(5, Math.floor(gridW / (RG_NW + 14)));
+        // Draw a section label
+        const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lbl.setAttribute('x',           clMinX);
+        lbl.setAttribute('y',           clMaxY + 40);
+        lbl.setAttribute('font-size',   '11');
+        lbl.setAttribute('font-weight', '600');
+        lbl.setAttribute('font-family', 'ui-monospace,monospace');
+        lbl.setAttribute('fill',        '#9CA3AF');
+        lbl.setAttribute('letter-spacing', '0.08em');
+        lbl.textContent = 'STANDALONE MODELS (' + isoNodes.length + ')';
+        nodesG.appendChild(lbl);
+        isoNodes.forEach((n, i) => {
+            n.x = clMinX + RG_NW / 2 + (i % isoCols) * (RG_NW + 14);
+            n.y = clMaxY + 60 + RG_NH / 2 + Math.floor(i / isoCols) * (RG_NH + 10);
+        });
+    }
+
+    _rgNodes = nodes;
+
+    // Draw edges via createElementNS
+    edges.forEach(e => {
+        const na = nById[e.from], nb = nById[e.to];
+        if (!na || !nb) return;
+        const th   = rgEdgeTheme(e.type);
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('class', 'rg-edge-path g-edge');
+        path.setAttribute('data-from', e.from);
+        path.setAttribute('data-to',   e.to);
+        path.setAttribute('data-type', e.type);
+        path.setAttribute('fill',           'none');
+        path.setAttribute('stroke',         th.stroke);
+        path.setAttribute('stroke-width',   '1.5');
+        path.setAttribute('stroke-opacity', '0.4');
+        path.setAttribute('marker-end',     th.marker);
+        if (th.dash !== 'none') path.setAttribute('stroke-dasharray', th.dash);
+        _rgSetEdgePath(path, na, nb);
+        edgesG.appendChild(path);
+    });
+
+    // Draw nodes via createElementNS
+    const _rgScaleInners = [];
+    nodes.forEach(n => {
+        const isIso = !connIds.has(n.id);
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class',     'rg-node-g g-node');
+        g.setAttribute('data-id',   n.id);
+        g.style.cursor = 'pointer';
+        g.setAttribute('transform', 'translate(' + (n.x - RG_NW/2) + ',' + (n.y - RG_NH/2) + ')');
+
+        const inner = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        inner.style.transformOrigin = (RG_NW/2) + 'px ' + (RG_NH/2) + 'px';
+        inner.style.opacity   = '0';
+        inner.style.transform = 'scale(0)';
+
+        const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        bg.setAttribute('class',        'rg-node-bg g-node-bg');
+        bg.setAttribute('width',        RG_NW);
+        bg.setAttribute('height',       RG_NH);
+        bg.setAttribute('rx',           '10');
+        bg.setAttribute('fill',         isIso ? '#F8FAFC' : '#FFFFFF');
+        bg.setAttribute('stroke',       isIso ? '#CBD5E1' : '#E5E7EB');
+        bg.setAttribute('stroke-width', '1.5');
+        bg.setAttribute('filter',       'url(#rg-f-node)');
+
+        const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        bar.setAttribute('class',  'rg-node-bar g-node-bar');
+        bar.setAttribute('width',  RG_NW);
+        bar.setAttribute('height', '5');
+        bar.setAttribute('rx',     '5');
+        bar.setAttribute('fill',   isIso ? '#94A3B8' : '#6366F1');
+
+        const nm = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        nm.setAttribute('x',           RG_NW/2);
+        nm.setAttribute('y',           '26');
+        nm.setAttribute('text-anchor', 'middle');
+        nm.setAttribute('font-family', 'ui-monospace,monospace');
+        nm.setAttribute('font-size',   '13');
+        nm.setAttribute('font-weight', '700');
+        nm.setAttribute('fill',        isIso ? '#334155' : '#111827');
+        nm.textContent = n.id.length > 17 ? n.id.slice(0, 16) + '…' : n.id;
+
+        const tb = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        tb.setAttribute('x',           RG_NW/2);
+        tb.setAttribute('y',           '40');
+        tb.setAttribute('text-anchor', 'middle');
+        tb.setAttribute('font-family', 'ui-monospace,monospace');
+        tb.setAttribute('font-size',   '10');
+        tb.setAttribute('fill',        '#6B7280');
+        tb.textContent = n.table.length > 20 ? n.table.slice(0, 19) + '…' : n.table;
+
+        inner.appendChild(bg); inner.appendChild(bar); inner.appendChild(nm); inner.appendChild(tb);
+
+        if (n.rels > 0) {
+            const rb = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            rb.setAttribute('x',           RG_NW - 8);
+            rb.setAttribute('y',           '56');
+            rb.setAttribute('text-anchor', 'end');
+            rb.setAttribute('font-size',   '9');
+            rb.setAttribute('font-weight', '700');
+            rb.setAttribute('fill',        '#818CF8');
+            rb.textContent = n.rels + 'r';
+            inner.appendChild(rb);
+        }
+        g.appendChild(inner);
+        g.addEventListener('click', ev => { ev.stopPropagation(); rgSelect(n.id); });
+        nodesG.appendChild(g);
+        _rgScaleInners.push(inner);
+    });
+
+    // Node scale-in: stagger each node popping from scale(0) → scale(1)
+    _rgScaleInners.forEach((inn, i) => {
+        setTimeout(() => {
+            inn.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            inn.style.opacity    = '1';
+            inn.style.transform  = 'scale(1)';
+        }, i * 20);
+    });
+
+    // Build adjacency map
+    _rgAdj = {};
+    nodes.forEach(n => { _rgAdj[n.id] = new Set(); });
+    edges.forEach(e => {
+        if (nById[e.from] && nById[e.to]) {
+            _rgAdj[e.from].add(e.to);
+            _rgAdj[e.to].add(e.from);
+        }
+    });
+
+    // Pan & zoom interaction
+    let isPan = false, panOrigin = { x: 0, y: 0 };
+    const vpEl = document.getElementById('rg-vp');
+
+    function applyVp() {
+        vpEl.setAttribute('transform',
+            'translate(' + (-_rgVp.x * _rgVp.z) + ',' + (-_rgVp.y * _rgVp.z) + ') scale(' + _rgVp.z + ')');
+        _rgUpdateMinimap();
+    }
+
+    svg.addEventListener('mousedown', e => {
+        if (!e.target.closest('.g-node')) {
+            isPan = true; panOrigin = { x: e.clientX, y: e.clientY }; svg.style.cursor = 'grabbing';
+        }
+    });
+    window.addEventListener('mousemove', e => {
+        if (!isPan) return;
+        _rgVp.x -= (e.clientX - panOrigin.x) / _rgVp.z;
+        _rgVp.y -= (e.clientY - panOrigin.y) / _rgVp.z;
+        panOrigin = { x: e.clientX, y: e.clientY };
+        applyVp();
+    });
+    window.addEventListener('mouseup', () => { isPan = false; svg.style.cursor = 'grab'; });
+    svg.addEventListener('wheel', e => {
+        e.preventDefault();
+        const rect   = svg.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
+        const dataX  = _rgVp.x + mouseX / _rgVp.z, dataY = _rgVp.y + mouseY / _rgVp.z;
+        _rgVp.z = Math.max(0.25, Math.min(4, _rgVp.z * (e.deltaY > 0 ? 0.88 : 1.14)));
+        _rgVp.x = dataX - mouseX / _rgVp.z;
+        _rgVp.y = dataY - mouseY / _rgVp.z;
+        applyVp();
+    }, { passive: false });
+
+    svg.addEventListener('click', e => { if (e.target === svg) rgDiagClear(); });
+
+    _rgInitMinimap(nodes, VW, VH);
+
+    // Initial view: fit to connected cluster for readable zoom; press ⊡ to see all nodes
+    const _initNodes = simNodes.length ? simNodes : nodes;
+    const _ixs = _initNodes.map(n => n.x), _iys = _initNodes.map(n => n.y);
+    const _iMinX = Math.min(..._ixs) - RG_NW/2 - 40;
+    const _iMaxX = Math.max(..._ixs) + RG_NW/2 + 40;
+    const _iMinY = Math.min(..._iys) - RG_NH/2 - 40;
+    const _iMaxY = Math.max(..._iys) + RG_NH/2 + 40;
+    _rgVp.z = Math.max(0.45, Math.min(1.5, Math.min(W / (_iMaxX - _iMinX), H / (_iMaxY - _iMinY)) * 0.92));
+    _rgVp.x = _iMinX - (W / _rgVp.z - (_iMaxX - _iMinX)) / 2;
+    _rgVp.y = _iMinY - (H / _rgVp.z - (_iMaxY - _iMinY)) / 2;
+    applyVp();
+}
+
 function _rgSetEdgePath(path, na, nb) {
     const dx = nb.x - na.x, dy = nb.y - na.y;
     const d  = Math.sqrt(dx*dx + dy*dy) || 1, nx = dx/d, ny = dy/d;
@@ -4190,6 +4850,209 @@ function _rgInitMinimap(nodes, vW, vH) {
     mm.appendChild(vr);
 
     _rgMmParams = { scale, offX, offY, mmW, mmH };
+}
+
+function _rgUpdateMinimap() {
+    const vr = document.getElementById('rg-mm-vp');
+    if (!vr || !_rgMmParams) return;
+    const { scale, offX, offY, mmW, mmH } = _rgMmParams;
+    const W = _rgW, H = _rgH;
+    const vpW = W / _rgVp.z, vpH = H / _rgVp.z;
+    vr.setAttribute('x',      Math.max(0, offX + _rgVp.x * scale));
+    vr.setAttribute('y',      Math.max(0, offY + _rgVp.y * scale));
+    vr.setAttribute('width',  Math.min(mmW, vpW * scale));
+    vr.setAttribute('height', Math.min(mmH, vpH * scale));
+}
+
+function rgSelect(id) {
+    if (_rgSel === id) { rgDiagClear(); return; }
+    _rgSel = id;
+    const conn = _rgAdj[id] || new Set();
+
+    document.querySelectorAll('.g-node').forEach(g => {
+        const nid = g.getAttribute('data-id');
+        const bg  = g.querySelector('.g-node-bg'), bar = g.querySelector('.g-node-bar');
+        if (!bg || !bar) return;
+        if (nid === id) {
+            bg.setAttribute('stroke',       '#6366F1');
+            bg.setAttribute('stroke-width', '2.5');
+            bg.setAttribute('filter',       'url(#rg-f-node-sel)');
+            bar.setAttribute('fill', '#6366F1');
+            g.setAttribute('opacity', '1');
+        } else if (conn.has(nid)) {
+            bg.setAttribute('stroke',       '#34D399');
+            bg.setAttribute('stroke-width', '2');
+            bg.setAttribute('filter',       'url(#rg-f-node-rel)');
+            bar.setAttribute('fill', '#34D399');
+            g.setAttribute('opacity', '1');
+        } else {
+            bg.setAttribute('stroke',       'rgba(229,231,235,0.5)');
+            bg.setAttribute('stroke-width', '1.5');
+            bg.setAttribute('filter',       'url(#rg-f-node)');
+            bar.setAttribute('fill', '#6366F1');
+            g.setAttribute('opacity', '0.2');
+        }
+    });
+
+    document.querySelectorAll('.g-edge').forEach(p => {
+        const from = p.getAttribute('data-from'), to = p.getAttribute('data-to');
+        const type = p.getAttribute('data-type');
+        if (from === id || to === id) {
+            const th = rgEdgeTheme(type);
+            p.setAttribute('stroke-width',   '2.5');
+            p.setAttribute('stroke-opacity', '0.95');
+            p.setAttribute('marker-end',     th.markerA);
+        } else {
+            p.setAttribute('stroke-width',   '1');
+            p.setAttribute('stroke-opacity', '0.07');
+        }
+    });
+
+    // Update info strip
+    const n     = _rgNodes.find(n => n.id === id);
+    const model = (APP.models || []).find(m => m.name === id);
+    const rels  = model ? (model.relationships || []) : [];
+    document.getElementById('rg-info-name').textContent  = id;
+    document.getElementById('rg-info-table').textContent = n ? n.table : '';
+    document.getElementById('rg-info-count').textContent =
+        rels.length + ' relationship' + (rels.length !== 1 ? 's' : '');
+
+    // Populate relationship cards
+    const cardsEl = document.getElementById('rg-rels-cards');
+    cardsEl.innerHTML = '';
+    document.getElementById('rg-rels-title').textContent = id + ' relationships';
+    rels.forEach(e => {
+        const other = e.related ? e.related.split('\\').pop() : '?';
+        const th    = rgEdgeTheme(e.type);
+        const card  = document.createElement('div');
+        card.style.cssText = 'display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:10px;border:1px solid #E5E7EB;border-left:3px solid ' + th.stroke + ';background:#FFFFFF;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.06);transition:box-shadow 0.2s;';
+        card.innerHTML =
+            '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
+                '<span style="font-size:11px;font-weight:700;color:#111827;font-family:ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + other + '</span>' +
+                '<span style="font-size:10px;font-family:ui-monospace,monospace;padding:2px 6px;border-radius:4px;background:' + th.stroke + '22;color:' + th.stroke + '">→</span>' +
+            '</div>' +
+            '<span style="font-size:10px;font-weight:600;color:' + th.stroke + ';font-family:ui-monospace,monospace;">' + e.type + '</span>' +
+            '<span style="font-size:10px;color:#6B7280;font-family:ui-monospace,monospace;">' + (e.method || '') + '()</span>';
+        cardsEl.appendChild(card);
+    });
+
+    document.getElementById('rg-rels-panel').style.display = 'none';
+    document.getElementById('rg-rels-chevron').style.transform = '';
+    document.getElementById('rg-info-row').style.display = 'flex';
+    document.getElementById('rg-legend').style.display = 'none';
+    document.getElementById('rg-clear-btn').style.display = '';
+}
+
+function rgDiagClear() {
+    _rgSel = null;
+    const si = document.getElementById('rg-search-input');
+    if (si) si.value = '';
+    document.querySelectorAll('.g-node').forEach(g => {
+        g.setAttribute('opacity', '1');
+        const bg  = g.querySelector('.g-node-bg'), bar = g.querySelector('.g-node-bar');
+        if (bg)  { bg.setAttribute('stroke', '#E5E7EB'); bg.setAttribute('stroke-width', '1.5'); bg.setAttribute('filter', 'url(#rg-f-node)'); }
+        if (bar) bar.setAttribute('fill', '#6366F1');
+    });
+    document.querySelectorAll('.g-edge').forEach(p => {
+        const th = rgEdgeTheme(p.getAttribute('data-type'));
+        p.setAttribute('stroke',         th.stroke);
+        p.setAttribute('stroke-width',   '1.5');
+        p.setAttribute('stroke-opacity', '0.4');
+        p.setAttribute('marker-end',     th.marker);
+    });
+    document.getElementById('rg-info-row').style.display = 'none';
+    document.getElementById('rg-rels-panel').style.display = 'none';
+    document.getElementById('rg-rels-chevron').style.transform = '';
+    document.getElementById('rg-legend').style.display = 'flex';
+    document.getElementById('rg-clear-btn').style.display = 'none';
+}
+
+function rgToggleRels() {
+    const panel   = document.getElementById('rg-rels-panel');
+    const chevron = document.getElementById('rg-rels-chevron');
+    const isHidden = panel.style.display === 'none';
+    panel.style.display = isHidden ? 'block' : 'none';
+    chevron.style.transform = isHidden ? 'rotate(180deg)' : '';
+}
+
+function graphZoom(factor) {
+    if (!_rgW) return;
+    const W = _rgW, H = _rgH;
+    const cx = _rgVp.x + W / (2 * _rgVp.z);
+    const cy = _rgVp.y + H / (2 * _rgVp.z);
+    _rgVp.z  = Math.max(0.25, Math.min(4, _rgVp.z * factor));
+    _rgVp.x  = cx - W / (2 * _rgVp.z);
+    _rgVp.y  = cy - H / (2 * _rgVp.z);
+    const vpEl = document.getElementById('rg-vp');
+    if (vpEl) vpEl.setAttribute('transform',
+        'translate(' + (-_rgVp.x * _rgVp.z) + ',' + (-_rgVp.y * _rgVp.z) + ') scale(' + _rgVp.z + ')');
+    _rgUpdateMinimap();
+}
+
+function graphFit() {
+    if (!_rgNodes.length || !_rgW) return;
+    const W = _rgW, H = _rgH;
+    const xs = _rgNodes.map(n => n.x), ys = _rgNodes.map(n => n.y);
+    const minX = Math.min(...xs) - RG_NW/2 - 20, maxX = Math.max(...xs) + RG_NW/2 + 20;
+    const minY = Math.min(...ys) - RG_NH/2 - 20, maxY = Math.max(...ys) + RG_NH/2 + 20;
+    _rgVp.z = Math.max(0.25, Math.min(4, Math.min(W / (maxX - minX), H / (maxY - minY))));
+    _rgVp.x = minX - (W/_rgVp.z - (maxX - minX)) / 2;
+    _rgVp.y = minY - (H/_rgVp.z - (maxY - minY)) / 2;
+    const vpEl = document.getElementById('rg-vp');
+    if (vpEl) vpEl.setAttribute('transform',
+        'translate(' + (-_rgVp.x * _rgVp.z) + ',' + (-_rgVp.y * _rgVp.z) + ') scale(' + _rgVp.z + ')');
+    _rgUpdateMinimap();
+}
+
+function graphCenterView() {
+    if (!_rgNodes.length || !_rgW) return;
+    const W = _rgW, H = _rgH;
+    const xs = _rgNodes.map(n => n.x), ys = _rgNodes.map(n => n.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const bx = maxX - minX + RG_NW + 40, by = maxY - minY + RG_NH + 40;
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    const fitZ = Math.min(W / bx, H / by);
+    // Start at min 0.75× so node text (~10px) stays legible; user can zoom/fit for overview
+    _rgVp.z = Math.max(0.75, Math.min(4, fitZ));
+    _rgVp.x = cx - W / (2 * _rgVp.z);
+    _rgVp.y = cy - H / (2 * _rgVp.z);
+    const vpEl = document.getElementById('rg-vp');
+    if (vpEl) vpEl.setAttribute('transform',
+        'translate(' + (-_rgVp.x * _rgVp.z) + ',' + (-_rgVp.y * _rgVp.z) + ') scale(' + _rgVp.z + ')');
+    _rgUpdateMinimap();
+}
+
+function graphReset() {
+    _rgVp = { x: 0, y: 0, z: 1 };
+    const vpEl = document.getElementById('rg-vp');
+    if (vpEl) vpEl.setAttribute('transform', 'translate(0,0) scale(1)');
+    _rgUpdateMinimap();
+    rgDiagClear();
+}
+
+function graphSearch(query) {
+    query = (query || '').toLowerCase().trim();
+    if (!query) { rgDiagClear(); return; }
+    document.querySelectorAll('.g-node').forEach(g => {
+        const nid   = g.getAttribute('data-id');
+        const match = nid.toLowerCase().includes(query);
+        g.setAttribute('opacity', match ? '1' : '0.12');
+        const bg = g.querySelector('.g-node-bg'), bar = g.querySelector('.g-node-bar');
+        if (bg) {
+            bg.setAttribute('stroke',       match ? '#6366F1' : 'rgba(229,231,235,0.5)');
+            bg.setAttribute('stroke-width', match ? '2.5'     : '1.5');
+            bg.setAttribute('filter',       match ? 'url(#rg-f-node-sel)' : 'url(#rg-f-node)');
+        }
+        if (bar) bar.setAttribute('fill', match ? '#6366F1' : 'rgba(99,102,241,0.15)');
+    });
+    document.querySelectorAll('.g-edge').forEach(p => {
+        const from  = p.getAttribute('data-from'), to = p.getAttribute('data-to');
+        const match = from.toLowerCase().includes(query) || to.toLowerCase().includes(query);
+        p.setAttribute('stroke-opacity', match ? '0.7'  : '0.04');
+        p.setAttribute('stroke-width',   match ? '2'    : '1');
+    });
+    document.getElementById('rg-clear-btn').style.display = '';
 }
 
 
