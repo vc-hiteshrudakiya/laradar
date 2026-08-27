@@ -23,7 +23,7 @@ return [
     */
     'dashboard' => [
         'enabled'    => true,
-        'path'       => 'architecture',
+        'path'       => 'laradar',
         'middleware' => ['web'],
     ],
 

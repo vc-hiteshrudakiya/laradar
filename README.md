@@ -51,10 +51,10 @@ php artisan vendor:publish --tag=laradar-config
 
 ## Interactive Dashboard
 
-Visit `/architecture` in your browser (only available when `APP_ENV=local` or `APP_ENV=development` by default):
+Visit `/laradar` in your browser (only available when `APP_ENV=local` or `APP_ENV=development` by default):
 
 ```
-http://your-app.test/architecture
+http://your-app.test/laradar
 ```
 
 The dashboard provides:
@@ -96,7 +96,7 @@ Reports are saved to `storage/architecture/`.
 return [
     'dashboard' => [
         'enabled'    => true,
-        'path'       => 'architecture',   // URL path
+        'path'       => 'laradar',         // URL path
         'middleware' => ['web'],
     ],
 

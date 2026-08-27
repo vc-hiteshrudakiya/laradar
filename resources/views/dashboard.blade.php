@@ -690,14 +690,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
             </button>
         </div>
 
-        <div class="nav-group">
-            <span class="nav-group__label">Components</span>
-        </div>
-
-        <div class="nav-group">
-            <span class="nav-group__label">Architecture</span>
-            @php $deadTotal = $data['dead_code']['summary']['total'] ?? 0; @endphp
-
     </nav>
 
     <div class="sidebar__scan">
@@ -738,20 +730,36 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
     @php
     $kpiIcons = [
-        'Models'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>',
-        'Controllers'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>',
-        'Routes'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
-        'Jobs'         => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>',
-        'Modules'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
-        'Middleware'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>',
+        'Models'        => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>',
+        'Controllers'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>',
+        'Routes'        => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
+        'Modules'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
+        'Middleware'    => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>',
+        'Jobs'          => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>',
+        'Events'        => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>',
+        'Services'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>',
+        'Repositories'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>',
+        'Observers'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>',
+        'Policies'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
+        'Packages'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
+        'Dep. Edges'    => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/>',
+        'Dead Code'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>',
     ];
     $kpiColors = [
-        'Models'       => ['color'=>'var(--violet)', 'bg'=>'rgba(167,139,250,0.14)'],
-        'Controllers'  => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
-        'Routes'       => ['color'=>'var(--emerald)','bg'=>'rgba(52,211,153,0.14)'],
-        'Jobs'         => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
-        'Modules'      => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
-        'Middleware'   => ['color'=>'var(--emerald)', 'bg'=>'rgba(52,211,153,0.14)'],
+        'Models'        => ['color'=>'var(--violet)', 'bg'=>'rgba(167,139,250,0.14)'],
+        'Controllers'   => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
+        'Routes'        => ['color'=>'var(--emerald)','bg'=>'rgba(52,211,153,0.14)'],
+        'Modules'       => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
+        'Middleware'    => ['color'=>'var(--emerald)','bg'=>'rgba(52,211,153,0.14)'],
+        'Jobs'          => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
+        'Events'        => ['color'=>'var(--rose)',   'bg'=>'rgba(248,113,113,0.14)'],
+        'Services'      => ['color'=>'var(--violet)', 'bg'=>'rgba(139,92,246,0.14)'],
+        'Repositories'  => ['color'=>'var(--sky)',    'bg'=>'rgba(14,165,233,0.14)'],
+        'Observers'     => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
+        'Policies'      => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
+        'Packages'      => ['color'=>'#F97316',       'bg'=>'rgba(249,115,22,0.14)'],
+        'Dep. Edges'    => ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)'],
+        'Dead Code'     => ['color'=>'#EF4444',       'bg'=>'rgba(239,68,68,0.14)'],
     ];
     $stats = [
         ['Models',       $summary['models']??0],
@@ -759,6 +767,13 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         ['Routes',       $rs['total']??0],
         ['Modules',      $summary['modules']??0],
         ['Middleware',   count($rs['middleware_usage']??[])],
+        ['Jobs',         $summary['jobs']??0],
+        ['Events',       $summary['events']??0],
+        ['Services',     $summary['services']??0],
+        ['Repositories', $summary['repositories']??0],
+        ['Observers',    $summary['observers']??0],
+        ['Policies',     $summary['policies']??0],
+        ['Dead Code',    $data['dead_code']['summary']['total']??0],
     ];
     $kpiNav = [
         'Models'       => 'models',
@@ -771,7 +786,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     <div class="kpi-grid" style="margin-bottom:28px;grid-template-columns:repeat(4,1fr);">
         @foreach($stats as [$label,$count])
         @php $kc = $kpiColors[$label] ?? ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)']; $ki = $kpiIcons[$label] ?? ''; $kn = $kpiNav[$label] ?? ''; @endphp
-        <div class="kpi-card ov-reveal" data-ov-reveal style="transition-delay:{{ $loop->index * 45 }}ms;{{ $kn ? 'cursor:pointer;' : '' }}" @if($kn) onclick="navigate('{{ $kn }}')" @endif>
+        <div class="kpi-card ov-reveal" data-ov-reveal style="transition-delay:{{ $loop->index * 30 }}ms;{{ $kn ? 'cursor:pointer;' : '' }}" @if($kn) onclick="navigate('{{ $kn }}')" @endif>
             <div class="kpi-card__icon" style="background:{{ $kc['bg'] }};color:{{ $kc['color'] }};">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">{!! $ki !!}</svg>
             </div>
@@ -3017,7 +3032,6 @@ function navigate(s) {
     const sectionNames = {
         overview:'Overview', models:'Models', modelmap:'Relation Graph', controllers:'Controllers',
         routes:'Routes', apidocs:'API Docs',
-       ,
         ai:'AI Insights', chat:'AI Chat',
         aidocs:'AI Docs', modules:'Modules'
     };
@@ -3046,8 +3060,6 @@ function navigate(s) {
                 sec.classList.remove('sec-out');
             }
         });
-            requestAnimationFrame(() => requestAnimationFrame(initDepGraph));
-        }
         if (s === 'modelmap' && !graphRendered) {
             setTimeout(initRelGraph, 50);
         }
@@ -3092,7 +3104,6 @@ function _atlasTheme(el) {
 
 const _SECTION_LABELS = {
     models:'Models', controllers:'Controllers', routes:'Route Explorer',
-   ,
 };
 let _activeDetailType = null;
 

@@ -171,7 +171,7 @@ class LaradarServiceProvider extends ServiceProvider
             return;
         }
 
-        $path       = $config['path']       ?? 'architecture';
+        $path       = $config['path']       ?? 'laradar';
         $middleware = $config['middleware']  ?? ['web'];
 
         Route::middleware($middleware)
