@@ -697,11 +697,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         <div class="nav-group">
             <span class="nav-group__label">Architecture</span>
             @php $deadTotal = $data['dead_code']['summary']['total'] ?? 0; @endphp
-            <button onclick="navigate('deadcode')" id="nav-deadcode" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                Dead Code
-                @if($deadTotal > 0)<span class="nav-badge" style="background:rgba(239,68,68,0.15);color:#EF4444;">{{ $deadTotal }}</span>@endif
-            </button>
             <button onclick="navigate('export')" id="nav-export" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Export
@@ -2633,217 +2628,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 </section>
 
-{{-- ── Dead Code Section ───────────────────────────────────────────────────── --}}
-@php
-    $deadData    = $data['dead_code'] ?? ['items' => [], 'summary' => [], 'errors' => []];
-    $deadItems   = $deadData['items']   ?? [];
-    $deadSummary = $deadData['summary'] ?? [];
-    $dTotal  = $deadSummary['total']             ?? 0;
-    $dHigh   = $deadSummary['high']              ?? 0;
-    $dMedium = $deadSummary['medium']            ?? 0;
-    $dLow    = $deadSummary['low']               ?? 0;
-    $dDebug  = $deadSummary['debug_statements']  ?? 0;
-    $dComm   = $deadSummary['commented_code']    ?? 0;
-    $dModels = $deadSummary['unused_models']     ?? 0;
-    $dOrphan = $deadSummary['orphan_methods']    ?? 0;
-    $dJobs   = $deadSummary['undispatched_jobs'] ?? 0;
-    $dEvents = $deadSummary['unfired_events']    ?? 0;
-    $dSvc    = $deadSummary['unused_services']   ?? 0;
-    $dHighPct = $dTotal > 0 ? round($dHigh   / $dTotal * 100) : 0;
-    $dMedPct  = $dTotal > 0 ? round($dMedium / $dTotal * 100) : 0;
-    $dLowPct  = $dTotal > 0 ? max(0, 100 - $dHighPct - $dMedPct) : 0;
-@endphp
-<section id="sec-deadcode" class="p-6" style="display:none">
-
-    {{-- ── Header — matches every other section ── --}}
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-        <div class="sec-header" style="margin-bottom:0;">
-            <div class="sec-header__icon" style="background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.20);color:#EF4444;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            </div>
-            <div>
-                <h1 class="sec-header__title">Dead Code</h1>
-                <p class="sec-header__sub">Debug calls, unused models, orphan methods, jobs, events & services — detected by static analysis</p>
-            </div>
-        </div>
-    </div>
-
-    {{-- ── Stats banner — same pattern as Jobs / Events / Services ── --}}
-    <div class="sec-stats-banner" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
-        {{-- Total --}}
-        <div class="sec-stat-card">
-            <div class="sec-stat-icon" style="background:rgba(239,68,68,.10);color:#EF4444;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            </div>
-            <div>
-                <div class="sec-stat-num" style="color:#EF4444;">{{ $dTotal }}</div>
-                <div class="sec-stat-lbl">Total Issues</div>
-                {{-- Severity bar --}}
-                <div class="dc-sev-bar">
-                    @if($dHighPct>0)<div class="dc-sev-bar__seg" style="width:{{ $dHighPct }}%;background:#EF4444;"></div>@endif
-                    @if($dMedPct>0)<div class="dc-sev-bar__seg" style="width:{{ $dMedPct }}%;background:#F59E0B;"></div>@endif
-                    @if($dLowPct>0)<div class="dc-sev-bar__seg" style="width:{{ $dLowPct }}%;background:var(--sky);"></div>@endif
-                    @if($dTotal===0)<div class="dc-sev-bar__seg" style="width:100%;background:var(--border);"></div>@endif
-                </div>
-            </div>
-        </div>
-        {{-- High --}}
-        <div class="sec-stat-card" style="cursor:pointer;" onclick="dcSevFilter('high',document.querySelector('#dc-filter-row [data-sev=high]'))">
-            <div class="sec-stat-icon" style="background:rgba(239,68,68,.10);color:#EF4444;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            </div>
-            <div>
-                <div class="sec-stat-num" style="color:#EF4444;">{{ $dHigh }}</div>
-                <div class="sec-stat-lbl">High Severity</div>
-            </div>
-        </div>
-        {{-- Medium --}}
-        <div class="sec-stat-card" style="cursor:pointer;" onclick="dcSevFilter('medium',document.querySelector('#dc-filter-row [data-sev=medium]'))">
-            <div class="sec-stat-icon" style="background:rgba(245,158,11,.10);color:#F59E0B;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            </div>
-            <div>
-                <div class="sec-stat-num" style="color:#F59E0B;">{{ $dMedium }}</div>
-                <div class="sec-stat-lbl">Medium Severity</div>
-            </div>
-        </div>
-        {{-- Low --}}
-        <div class="sec-stat-card" style="cursor:pointer;" onclick="dcSevFilter('low',document.querySelector('#dc-filter-row [data-sev=low]'))">
-            <div class="sec-stat-icon" style="background:rgba(37,99,235,.10);color:var(--sky);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div>
-                <div class="sec-stat-num" style="color:var(--sky);">{{ $dLow }}</div>
-                <div class="sec-stat-lbl">Low Severity</div>
-            </div>
-        </div>
-    </div>
-
-    {{-- ── Type Grid ── --}}
-    @php
-        $typeCards = [
-            ['emoji'=>'🐛','label'=>'Debug Calls',      'type'=>'debug_statement',  'count'=>$dDebug,  'color'=>'#EF4444'],
-            ['emoji'=>'💬','label'=>'Commented Code',   'type'=>'commented_code',   'count'=>$dComm,   'color'=>'#F59E0B'],
-            ['emoji'=>'📦','label'=>'Unused Models',    'type'=>'unused_model',     'count'=>$dModels, 'color'=>'#7C3AED'],
-            ['emoji'=>'⚡','label'=>'Orphan Methods',   'type'=>'orphan_method',    'count'=>$dOrphan, 'color'=>'#F97316'],
-            ['emoji'=>'📮','label'=>'Undispatched Jobs','type'=>'undispatched_job', 'count'=>$dJobs,   'color'=>'#0EA5E9'],
-            ['emoji'=>'🔔','label'=>'Unfired Events',   'type'=>'unfired_event',    'count'=>$dEvents, 'color'=>'#10B981'],
-            ['emoji'=>'🔧','label'=>'Unused Services',  'type'=>'unused_service',   'count'=>$dSvc,    'color'=>'#EC4899'],
-        ];
-    @endphp
-    <div class="dc-type-grid" id="dc-type-grid">
-        <div class="dc-type-card dc-type-active{{ $dTotal===0?' dc-type-zero':'' }}"
-             data-type="all" onclick="dcTypeFilter('all',this)"
-             style="animation:dcTypeIn .32s var(--ease) both;">
-            <span class="tc-emoji">📋</span>
-            <span class="tc-label">All Issues</span>
-            <span class="tc-count">{{ $dTotal }}</span>
-        </div>
-        @foreach($typeCards as $tc)
-        <div class="dc-type-card{{ $tc['count']===0?' dc-type-zero':'' }}"
-             data-type="{{ $tc['type'] }}" onclick="dcTypeFilter('{{ $tc['type'] }}',this)"
-             style="animation:dcTypeIn .32s var(--ease) both;animation-delay:{{ ($loop->index+1)*35 }}ms;">
-            <span class="tc-emoji">{{ $tc['emoji'] }}</span>
-            <span class="tc-label">{{ $tc['label'] }}</span>
-            <span class="tc-count" style="color:{{ $tc['color'] }};">{{ $tc['count'] }}</span>
-        </div>
-        @endforeach
-    </div>
-
-    {{-- ── Severity Filter Row ── --}}
-    <div class="dc-filter-row" id="dc-filter-row">
-        <button class="dc-sev-tab dc-sev-tab--active" data-sev="all" onclick="dcSevFilter('all',this)">
-            All <span style="font-family:var(--font-mono);font-size:11px;opacity:.65;">{{ $dTotal }}</span>
-        </button>
-        <button class="dc-sev-tab dc-sev-tab--high" data-sev="high" onclick="dcSevFilter('high',this)">
-            <span style="width:7px;height:7px;border-radius:50%;background:#EF4444;flex:none;{{ $dHigh>0?'animation:severityPulse 1.8s ease infinite;':'' }}"></span>
-            High <span style="font-family:var(--font-mono);font-size:11px;opacity:.65;">{{ $dHigh }}</span>
-        </button>
-        <button class="dc-sev-tab dc-sev-tab--medium" data-sev="medium" onclick="dcSevFilter('medium',this)">
-            <span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;flex:none;"></span>
-            Medium <span style="font-family:var(--font-mono);font-size:11px;opacity:.65;">{{ $dMedium }}</span>
-        </button>
-        <button class="dc-sev-tab dc-sev-tab--low" data-sev="low" onclick="dcSevFilter('low',this)">
-            <span style="width:7px;height:7px;border-radius:50%;background:var(--sky);flex:none;"></span>
-            Low <span style="font-family:var(--font-mono);font-size:11px;opacity:.65;">{{ $dLow }}</span>
-        </button>
-    </div>
-
-    {{-- ── Item List ── --}}
-    @if(empty($deadItems))
-    <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:14px;padding:48px;text-align:center;">
-        <svg style="width:48px;height:48px;color:#10B981;margin:0 auto 14px;display:block;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <p style="font-size:17px;font-weight:800;color:#10B981;margin:0 0 6px;">Codebase is clean</p>
-        <p style="font-size:13px;color:var(--text-faint);margin:0;">No dead code detected. Every class, method, job, and event appears to be in use.</p>
-    </div>
-    @else
-    <div id="dead-list">
-        @foreach($deadItems as $di)
-        @php
-            $sev       = $di['severity'] ?? 'low';
-            $type      = $di['type'] ?? '';
-            $sevColor  = match($sev) { 'high' => '#EF4444', 'medium' => '#F59E0B', default => '#2563EB' };
-            $typeLabel = match($type) {
-                'debug_statement'  => 'Debug Call',
-                'commented_code'   => 'Commented Code',
-                'unused_model'     => 'Unused Model',
-                'orphan_method'    => 'Orphan Method',
-                'undispatched_job' => 'Undispatched Job',
-                'unfired_event'    => 'Unfired Event',
-                'unused_service'   => 'Unused Service',
-                default            => ucfirst(str_replace('_',' ',$type)),
-            };
-            $itemName   = $di['name'] ?? '';
-            $location   = ($di['path'] ?? '') . (isset($di['line']) && $di['line'] ? ':' . $di['line'] : '');
-            $hasSnippet = !empty($di['snippet']);
-            $isOrphan   = $type === 'orphan_method';
-            $methodOnly = $isOrphan ? ($di['method'] ?? $itemName) : null;
-            $ctrlOnly   = $isOrphan ? (str_contains($itemName,'::') ? explode('::',$itemName)[0] : null) : null;
-        @endphp
-        <div class="dc-item"
-             data-type="{{ $type }}"
-             data-severity="{{ $sev }}"
-             style="--di:{{ $loop->index }}">
-            <div class="dc-item__accent" style="background:{{ $sevColor }};{{ $sev==='high' ? 'animation:severityPulse 1.8s ease infinite;' : '' }}"></div>
-            <div class="dc-item__body">
-                <div class="dc-item__head">
-                    <div class="dc-item__badges">
-                        <span style="font-size:10px;font-weight:700;background:{{ $sevColor }}18;color:{{ $sevColor }};border:1px solid {{ $sevColor }}30;border-radius:10px;padding:2px 9px;letter-spacing:.05em;text-transform:uppercase;">{{ $sev }}</span>
-                        <span style="font-size:10.5px;font-weight:600;background:var(--bg-sunken);color:var(--text-dim);border:1px solid var(--border);border-radius:10px;padding:2px 9px;">{{ $typeLabel }}</span>
-                    </div>
-                    @if($location)
-                    <button class="dc-copy-btn" onclick="dcCopyPath('{{ addslashes($location) }}',this)">
-                        <svg style="width:10px;height:10px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                        Copy path
-                    </button>
-                    @endif
-                </div>
-                @if($isOrphan && $methodOnly)
-                <div class="dc-item__name">
-                    @if($ctrlOnly)<span style="color:var(--text-dim);font-weight:500;">{{ $ctrlOnly }}</span><span style="color:var(--border-strong);">::</span>@endif<span style="color:#F97316;">{{ $methodOnly }}</span><span style="color:var(--text-faint);">()</span>
-                </div>
-                @elseif($itemName)
-                <div class="dc-item__name">{{ $itemName }}</div>
-                @endif
-                @if($location)
-                <div class="dc-item__loc">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                    <span>{{ $location }}</span>
-                </div>
-                @endif
-                @if(!empty($di['detail']))
-                <div class="dc-item__detail">{{ $di['detail'] }}</div>
-                @endif
-                @if($hasSnippet)
-                <pre class="dc-item__snippet" style="border-left-color:{{ $sevColor }};">{{ $di['snippet'] }}</pre>
-                @endif
-            </div>
-        </div>
-        @endforeach
-    </div>
-    @endif
-</section>
-
 </main>
 
 {{-- ── Doc Preview Modal ──────────────────────────────────────────────────── --}}
@@ -2872,7 +2656,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','models','modelmap','controllers','routes','apidocs','export','ai','chat','aidocs','deadcode'];
+const SECTIONS = ['overview','modules','models','modelmap','controllers','routes','apidocs','export','ai','chat','aidocs'];
 
 let mapTreeRendered = false;
 let erRendered      = false;
@@ -3364,7 +3148,7 @@ function navigate(s) {
         routes:'Routes', apidocs:'API Docs',
        ,
         export:'Export', ai:'AI Insights', chat:'AI Chat',
-        aidocs:'AI Docs', modules:'Modules', deadcode:'Dead Code'
+        aidocs:'AI Docs', modules:'Modules'
     };
     const breadcrumb = document.getElementById('topbar-section');
     if (breadcrumb) breadcrumb.textContent = sectionNames[s] || s;
@@ -3395,20 +3179,6 @@ function navigate(s) {
         }
         if (s === 'modelmap' && !graphRendered) {
             setTimeout(initRelGraph, 50);
-        }
-        if (s === 'deadcode') {
-            _dcActiveType = 'all';
-            _dcActiveSev  = 'all';
-            document.querySelectorAll('#dc-type-grid .dc-type-card').forEach(c => c.classList.remove('dc-type-active'));
-            const allTypeCard = document.querySelector('#dc-type-grid .dc-type-card[data-type="all"]');
-            if (allTypeCard) allTypeCard.classList.add('dc-type-active');
-            document.querySelectorAll('#dc-filter-row .dc-sev-tab').forEach(t => t.classList.remove('dc-sev-tab--active'));
-            const allSevTab = document.querySelector('#dc-filter-row .dc-sev-tab[data-sev="all"]');
-            if (allSevTab) allSevTab.classList.add('dc-sev-tab--active');
-            document.querySelectorAll('#dead-list .dc-item').forEach(item => {
-                item.style.display = '';
-                item.classList.remove('is-hiding');
-            });
         }
         if (s === 'controllers') {
             setTimeout(() => {
@@ -7900,67 +7670,7 @@ window.addEventListener('resize', () => {
     }
 })();
 
-// ── Dead Code: count-up (no-op; numbers are server-rendered, kept for compatibility) ──
-function _deadCountUp() { /* numbers rendered server-side */ }
 
-// ── Dead Code: dual-axis filter state ────────────────────────────────────────
-let _dcActiveType = 'all';
-let _dcActiveSev  = 'all';
-
-function dcTypeFilter(type, btn) {
-    _dcActiveType = type;
-    document.querySelectorAll('#dc-type-grid .dc-type-card').forEach(c => c.classList.remove('dc-type-active'));
-    if (btn) btn.classList.add('dc-type-active');
-    _dcApplyFilter();
-}
-
-function dcSevFilter(sev, btn) {
-    _dcActiveSev = sev;
-    document.querySelectorAll('#dc-filter-row .dc-sev-tab').forEach(t => t.classList.remove('dc-sev-tab--active'));
-    if (btn) btn.classList.add('dc-sev-tab--active');
-    _dcApplyFilter();
-}
-
-function _dcApplyFilter() {
-    const items  = document.querySelectorAll('#dead-list .dc-item');
-    const toShow = [];
-
-    // Pass 1: hide immediately — no transitions, no per-item reflow
-    items.forEach(item => {
-        const typeOk = _dcActiveType === 'all' || item.dataset.type     === _dcActiveType;
-        const sevOk  = _dcActiveSev  === 'all' || item.dataset.severity === _dcActiveSev;
-        if (typeOk && sevOk) {
-            toShow.push(item);
-        } else {
-            item.style.display = 'none';
-            item.classList.remove('is-hiding');
-        }
-    });
-
-    // Pass 2: make visible items ready, disable their animation
-    toShow.forEach((item, i) => {
-        item.style.display = '';
-        item.classList.remove('is-hiding');
-        item.style.setProperty('--di', String(i));
-        item.style.animation = 'none';
-    });
-
-    // Single reflow for ALL visible items at once (instead of one per item)
-    const list = document.getElementById('dead-list');
-    if (list && toShow.length) void list.offsetHeight;
-
-    // Re-enable animation on all at once
-    toShow.forEach(item => { item.style.animation = ''; });
-}
-
-function dcCopyPath(path, btn) {
-    navigator.clipboard.writeText(path).then(() => {
-        btn.classList.add('copied');
-        const orig = btn.innerHTML;
-        btn.innerHTML = '<svg style="width:10px;height:10px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
-        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 1800);
-    }).catch(() => {});
-}
 </script>
 
 
