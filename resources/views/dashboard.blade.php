@@ -692,11 +692,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         <div class="nav-group">
             <span class="nav-group__label">Components</span>
-            <button onclick="navigate('policies')" id="nav-policies" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                Policies
-                @if(($summary['policies']??0)>0)<span class="nav-badge">{{ $summary['policies'] }}</span>@endif
-            </button>
             <button onclick="navigate('packages')" id="nav-packages" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                 Packages
@@ -767,7 +762,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Controllers'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>',
         'Routes'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
         'Jobs'         => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>',
-        'Policies'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
         'Modules'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
         'Dep. Edges'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/>',
         'Middleware'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>',
@@ -777,7 +771,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Controllers'  => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
         'Routes'       => ['color'=>'var(--emerald)','bg'=>'rgba(52,211,153,0.14)'],
         'Jobs'         => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
-        'Policies'     => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
         'Modules'      => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
         'Dep. Edges'   => ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)'],
         'Middleware'   => ['color'=>'var(--emerald)', 'bg'=>'rgba(52,211,153,0.14)'],
@@ -786,7 +779,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         ['Models',       $summary['models']??0],
         ['Controllers',  $summary['controllers']??0],
         ['Routes',       $rs['total']??0],
-        ['Policies',     $summary['policies']??0],
         ['Modules',      $summary['modules']??0],
         ['Dep. Edges',   count($data['dependencies']['edges']??[])],
         ['Middleware',   count($rs['middleware_usage']??[])],
@@ -795,7 +787,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Models'       => 'models',
         'Controllers'  => 'controllers',
         'Routes'       => 'routes',
-        'Policies'     => 'policies',
         'Modules'      => 'modules',
         'Dep. Edges'   => 'dependencies',
     ];
@@ -1988,56 +1979,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 </section>
 
 {{-- Jobs --}}
-
-{{-- Policies --}}
-<section id="sec-policies" class="p-6" style="display:none">
-    <div id="policies-list">
-        @php
-            $polActions = array_sum(array_map(fn($p) => count($p['actions']??[]), $data['policies']));
-        @endphp
-        <div class="mds-top-stats">
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($data['policies']) }}</span>
-                <span class="mds-top-stat-lbl">Total Policies</span>
-            </div>
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $polActions }}</span>
-                <span class="mds-top-stat-lbl">Total Actions</span>
-            </div>
-        </div>
-        <div class="mds-toolbar">
-            <input id="policies-search" oninput="filterGrid('policies')" type="search" placeholder="Search policies…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
-            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($data['policies']) }} policies</span>
-        </div>
-        @if(empty($data['policies']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No policies found in <code>app/Policies</code></p></div>
-        @else
-        <div id="policies-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
-            @foreach($data['policies'] as $i => $pol)
-            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#FF2D20;" onclick="showDetail('policies',{{$i}})" data-name="{{ strtolower($pol['name']) }}">
-                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-                    <div class="sec2-icon" style="background:rgba(255,45,32,.10);color:#FF2D20;">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    </div>
-                    <div style="min-width:0;flex:1;">
-                        <p class="sec2-name">{{ $pol['name'] }}</p>
-                        <p class="sec2-sub">guards: <span style="color:var(--text);">{{ $pol['model']??'Unknown' }}</span></p>
-                    </div>
-                </div>
-                @if(!empty($pol['actions']))
-                <div style="display:flex;flex-wrap:wrap;gap:5px;">
-                    @foreach($pol['actions'] as $a)
-                    <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);">{{ $a }}</span>
-                    @endforeach
-                </div>
-                @endif
-            </div>
-            @endforeach
-        </div>
-        @endif
-    </div>
-    <div id="policies-detail" style="display:none"><div id="policies-detail-content"></div></div>
-</section>
 
 {{-- Dependencies --}}
 <section id="sec-dependencies" class="p-6" style="display:none">
@@ -3249,7 +3190,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','policies','dependencies','export','ai','chat','aidocs','deadcode'];
+const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','dependencies','export','ai','chat','aidocs','deadcode'];
 
 let depRendered     = false;
 let mapTreeRendered = false;
@@ -3740,7 +3681,7 @@ function navigate(s) {
     const sectionNames = {
         overview:'Overview', models:'Models', modelmap:'Relation Graph', controllers:'Controllers',
         routes:'Routes', apidocs:'API Docs',
-        policies:'Policies',
+       ,
         dependencies:'Dependencies', export:'Export', ai:'AI Insights', chat:'AI Chat',
         aidocs:'AI Docs', modules:'Modules', packages:'Packages', deadcode:'Dead Code'
     };
@@ -3831,7 +3772,7 @@ function _atlasTheme(el) {
 
 const _SECTION_LABELS = {
     models:'Models', controllers:'Controllers', routes:'Route Explorer',
-    policies:'Policies',
+   ,
 };
 let _activeDetailType = null;
 
@@ -4432,7 +4373,7 @@ function rfRefreshPanel() {
 function renderDetail(type, item) {
     const map = {
         models: renderModel, controllers: renderController,
-        policies: renderPolicy,
+       
     };
     return (map[type] || (() => ''))(item);
 }
@@ -5076,63 +5017,6 @@ function renderService(s, type) {
             `<span style="font-size:11px;font-family:var(--font-mono);padding:5px 12px;border-radius:7px;background:rgba(${rgb},.08);color:${clr};border:1px solid rgba(${rgb},.18);">${esc(m)}</span>`
         ).join('');
         h += detailCard(`Public Methods (${s.methods.length})`, `<div style="display:flex;flex-wrap:wrap;gap:8px;">${methodItems}</div>`);
-    }
-    return h;
-}
-
-function renderPolicy(p) {
-    const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    const clr = '#6366F1', rgb = '99,102,241';
-    const actClr = {
-        viewAny:     {bg:'rgba(59,130,246,.1)',  color:'#2563EB'},
-        view:        {bg:'rgba(96,165,250,.1)',   color:'#3B82F6'},
-        create:      {bg:'rgba(16,185,129,.1)',   color:'#059669'},
-        update:      {bg:'rgba(245,158,11,.1)',   color:'#D97706'},
-        delete:      {bg:'rgba(239,68,68,.1)',    color:'#DC2626'},
-        restore:     {bg:'rgba(20,184,166,.1)',   color:'#0D9488'},
-        forceDelete: {bg:'rgba(244,63,94,.1)',    color:'#E11D48'},
-        before:      {bg:'rgba(139,92,246,.1)',   color:'#7C3AED'},
-    };
-    let h = `
-    <div style="background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border);padding:24px;margin-bottom:24px;">
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-            <div style="width:56px;height:56px;border-radius:14px;background:rgba(${rgb},.13);border:1px solid rgba(${rgb},.3);display:flex;align-items:center;justify-content:center;flex:none;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div style="flex:1;min-width:0;">
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
-                    <h2 style="font-size:22px;font-weight:700;color:var(--text);margin:0;">${esc(p.name)}</h2>
-                    <span style="font-size:11px;background:rgba(${rgb},.1);color:${clr};border:1px solid rgba(${rgb},.25);padding:2px 10px;border-radius:20px;font-weight:600;">Policy</span>
-                </div>
-                <p style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin:0 0 2px;">${esc(p.namespace)}</p>
-                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin:0;">${esc(p.path || '')}</p>
-            </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
-            <div style="background:rgba(${rgb},.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(${rgb},.18);">
-                <p style="font-size:15px;font-weight:700;color:${clr};margin:0 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.model || 'Unknown')}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin:0;">Guards Model</p>
-            </div>
-            <div style="background:rgba(52,211,153,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(52,211,153,.18);">
-                <p style="font-size:22px;font-weight:700;color:#34D399;margin:0 0 2px;">${(p.actions||[]).length}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin:0;">Policy Actions</p>
-            </div>
-        </div>
-    </div>`;
-    h += detailCard('Guards Model', `
-        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(${rgb},.06);border-radius:10px;border:1px solid rgba(${rgb},.15);">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2" style="flex:none;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-            <div>
-                <p style="font-size:15px;font-weight:700;color:var(--text);margin:0 0 2px;">${esc(p.model || 'Unknown')}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin:0;">Protected Eloquent Model</p>
-            </div>
-        </div>`);
-    if (p.actions?.length) {
-        const badges = p.actions.map(a => {
-            const c = actClr[a] || {bg:'rgba(100,116,139,.1)', color:'#64748B'};
-            return `<span style="font-size:11px;font-weight:600;padding:5px 13px;border-radius:7px;background:${c.bg};color:${c.color};">${esc(a)}</span>`;
-        }).join('');
-        h += detailCard('Policy Actions', `<div style="display:flex;flex-wrap:wrap;gap:8px;">${badges}</div>`);
     }
     return h;
 }
@@ -7392,7 +7276,6 @@ function _buildAIGraphicReport(d, ai, docs) {
         ['Controllers',  s.controllers??0,   '#3b82f6','#eff6ff','#dbeafe'],
         ['Routes',       s.routes??0,        '#10b981','#f0fdf4','#d1fae5'],
         ['Jobs',         s.jobs??0,          '#f97316','#fff7ed','#ffedd5'],
-        ['Policies',     s.policies??0,      '#64748b','#f8fafc','#f1f5f9'],
         ['API Routes',   rs.api??0,          '#0891b2','#ecfeff','#cffafe'],
         ['Named Routes', rs.named_count??0,  '#7c3aed','#f5f3ff','#ede9fe'],
     ];
@@ -7664,7 +7547,7 @@ function exportMarkdown() {
         ['Models', s.models], ['Controllers', s.controllers], ['Routes', s.routes],
         ,
         ,
-        ['Policies', s.policies], ['Modules', s.modules], ['Packages', s.packages],
+        ['Modules', s.modules], ['Packages', s.packages],
         ['Dep. Edges', (d.dependencies?.edges || []).length],
     ];
     rows.forEach(([label, count]) => { if (count) out.push('| ' + label + ' | ' + count + ' |'); });
@@ -7844,7 +7727,6 @@ function _buildGraphicReport(d) {
         ['Controllers',  s.controllers  ?? 0, '#3b82f6', '#eff6ff', '#dbeafe'],
         ['Routes',       s.routes       ?? 0, '#10b981', '#f0fdf4', '#d1fae5'],
         ['Jobs',         s.jobs         ?? 0, '#f97316', '#fff7ed', '#ffedd5'],
-        ['Policies',     s.policies     ?? 0, '#64748b', '#f8fafc', '#f1f5f9'],
         ['Modules',      s.modules      ?? 0, '#4f46e5', '#eef2ff', '#e0e7ff'],
         ['API Routes',   rs.api         ?? 0, '#0891b2', '#ecfeff', '#cffafe'],
         ['Named Routes', rs.named_count ?? 0, '#7c3aed', '#f5f3ff', '#ede9fe'],
