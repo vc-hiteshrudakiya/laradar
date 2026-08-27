@@ -692,11 +692,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         <div class="nav-group">
             <span class="nav-group__label">Components</span>
-            <button onclick="navigate('services')" id="nav-services" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                Services
-                @if(($summary['services']??0)>0)<span class="nav-badge">{{ $summary['services'] }}</span>@endif
-            </button>
             <button onclick="navigate('repositories')" id="nav-repositories" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                 Repositories
@@ -782,7 +777,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Controllers'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>',
         'Routes'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
         'Jobs'         => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>',
-        'Services'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>',
         'Repositories' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>',
         'Observers'    => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>',
         'Policies'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
@@ -795,7 +789,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Controllers'  => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
         'Routes'       => ['color'=>'var(--emerald)','bg'=>'rgba(52,211,153,0.14)'],
         'Jobs'         => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
-        'Services'     => ['color'=>'var(--violet)', 'bg'=>'rgba(167,139,250,0.14)'],
         'Repositories' => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
         'Observers'    => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
         'Policies'     => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
@@ -807,7 +800,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         ['Models',       $summary['models']??0],
         ['Controllers',  $summary['controllers']??0],
         ['Routes',       $rs['total']??0],
-        ['Services',     $summary['services']??0],
         ['Repositories', $summary['repositories']??0],
         ['Observers',    $summary['observers']??0],
         ['Policies',     $summary['policies']??0],
@@ -819,7 +811,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Models'       => 'models',
         'Controllers'  => 'controllers',
         'Routes'       => 'routes',
-        'Services'     => 'services',
         'Repositories' => 'repositories',
         'Observers'    => 'observers',
         'Policies'     => 'policies',
@@ -2015,54 +2006,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 </section>
 
 {{-- Jobs --}}
-
-{{-- Services --}}
-<section id="sec-services" class="p-6" style="display:none">
-    <div id="services-list">
-        @php
-            $svcTotal   = count($data['services']);
-            $svcMethods = $svcTotal > 0 ? round(array_sum(array_map(fn($s) => count($s['methods']??[]), $data['services'])) / $svcTotal) : 0;
-        @endphp
-        <div class="mds-top-stats">
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $svcTotal }}</span>
-                <span class="mds-top-stat-lbl">Total Services</span>
-            </div>
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $svcMethods }}</span>
-                <span class="mds-top-stat-lbl">Avg Methods</span>
-            </div>
-        </div>
-        <div class="mds-toolbar">
-            <input id="services-search" oninput="filterGrid('services')" type="search" placeholder="Search services…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
-            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ $svcTotal }} services</span>
-        </div>
-        @if(empty($data['services']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No services found in <code>app/Services</code></p></div>
-        @else
-        <div id="services-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
-            @foreach($data['services'] as $i => $svc)
-            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#FF2D20;" onclick="showDetail('services',{{$i}})" data-name="{{ strtolower($svc['name']) }}">
-                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-                    <div class="sec2-icon" style="background:rgba(255,45,32,.10);color:#FF2D20;">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                    <div style="min-width:0;flex:1;">
-                        <p class="sec2-name">{{ $svc['name'] }}</p>
-                        <p class="sec2-sub">{{ $svc['namespace'] }}</p>
-                    </div>
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);">{{ count($svc['methods']??[]) }} methods</span>
-                    @if(!empty($svc['dependencies']))<span class="sec2-chip" style="background:var(--bg-hover);color:var(--text-dim);border-color:var(--border);">{{ count($svc['dependencies']) }} deps</span>@endif
-                </div>
-            </div>
-            @endforeach
-        </div>
-        @endif
-    </div>
-    <div id="services-detail" style="display:none"><div id="services-detail-content"></div></div>
-</section>
 
 {{-- Repositories --}}
 <section id="sec-repositories" class="p-6" style="display:none">
@@ -3447,7 +3390,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','services','repositories','observers','policies','dependencies','export','ai','chat','aidocs','deadcode'];
+const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','repositories','observers','policies','dependencies','export','ai','chat','aidocs','deadcode'];
 
 let depRendered     = false;
 let mapTreeRendered = false;
@@ -3937,7 +3880,7 @@ function navigate(s) {
     _moveNavIndicator(s);
     const sectionNames = {
         overview:'Overview', models:'Models', modelmap:'Relation Graph', controllers:'Controllers',
-        routes:'Routes', apidocs:'API Docs', services:'Services',
+        routes:'Routes', apidocs:'API Docs',
         repositories:'Repositories', observers:'Observers', policies:'Policies',
         dependencies:'Dependencies', export:'Export', ai:'AI Insights', chat:'AI Chat',
         aidocs:'AI Docs', modules:'Modules', packages:'Packages', deadcode:'Dead Code'
@@ -4029,7 +3972,6 @@ function _atlasTheme(el) {
 
 const _SECTION_LABELS = {
     models:'Models', controllers:'Controllers', routes:'Route Explorer',
-    services:'Services',
     repositories:'Repositories', observers:'Observers', policies:'Policies',
 };
 let _activeDetailType = null;
@@ -4631,7 +4573,6 @@ function rfRefreshPanel() {
 function renderDetail(type, item) {
     const map = {
         models: renderModel, controllers: renderController,
-        services: x => renderService(x, 'Service'),
         repositories: x => renderService(x, 'Repository'),
         observers: renderObserver, policies: renderPolicy,
     };
@@ -7650,7 +7591,6 @@ function _buildAIGraphicReport(d, ai, docs) {
         ['Models',       s.models??0,        '#8b5cf6','#f5f3ff','#ede9fe'],
         ['Controllers',  s.controllers??0,   '#3b82f6','#eff6ff','#dbeafe'],
         ['Routes',       s.routes??0,        '#10b981','#f0fdf4','#d1fae5'],
-        ['Services',     s.services??0,      '#06b6d4','#ecfeff','#cffafe'],
         ['Repositories', s.repositories??0,  '#f59e0b','#fffbeb','#fef3c7'],
         ['Jobs',         s.jobs??0,          '#f97316','#fff7ed','#ffedd5'],
         ['Policies',     s.policies??0,      '#64748b','#f8fafc','#f1f5f9'],
@@ -7923,7 +7863,7 @@ function exportMarkdown() {
     out.push('|-----------|------:|');
     const rows = [
         ['Models', s.models], ['Controllers', s.controllers], ['Routes', s.routes],
-        ['Services', s.services],
+        ,
         ['Repositories', s.repositories], ['Observers', s.observers],
         ['Policies', s.policies], ['Modules', s.modules], ['Packages', s.packages],
         ['Dep. Edges', (d.dependencies?.edges || []).length],
@@ -8104,7 +8044,6 @@ function _buildGraphicReport(d) {
         ['Models',       s.models       ?? 0, '#8b5cf6', '#f5f3ff', '#ede9fe'],
         ['Controllers',  s.controllers  ?? 0, '#3b82f6', '#eff6ff', '#dbeafe'],
         ['Routes',       s.routes       ?? 0, '#10b981', '#f0fdf4', '#d1fae5'],
-        ['Services',     s.services     ?? 0, '#06b6d4', '#ecfeff', '#cffafe'],
         ['Repositories', s.repositories ?? 0, '#f59e0b', '#fffbeb', '#fef3c7'],
         ['Jobs',         s.jobs         ?? 0, '#f97316', '#fff7ed', '#ffedd5'],
         ['Observers',    s.observers    ?? 0, '#ec4899', '#fdf2f8', '#fce7f3'],
