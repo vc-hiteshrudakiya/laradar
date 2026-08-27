@@ -697,6 +697,11 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         <div class="nav-group">
             <span class="nav-group__label">Architecture</span>
             @php $deadTotal = $data['dead_code']['summary']['total'] ?? 0; @endphp
+            <button onclick="navigate('export')" id="nav-export" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Export
+            </button>
+        </div>
 
     </nav>
 
@@ -2087,6 +2092,130 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 </section>
 
+{{-- Export --}}
+<section id="sec-export" class="p-6" style="display:none">
+    <div class="sec-header" style="margin-bottom:30px;">
+        <div class="sec-header__icon" style="background:rgba(0,135,90,.10);border:1px solid rgba(0,135,90,.20);color:var(--emerald);">
+            <svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        </div>
+        <div>
+            <h1 class="sec-header__title">Export Architecture</h1>
+            <p class="sec-header__sub">Download your architecture report in multiple formats for sharing, documentation, or archiving.</p>
+        </div>
+    </div>
+
+    @php
+    $exportPath = rtrim(request()->getSchemeAndHttpHost() . request()->getBasePath(), '/') . '/' . ltrim(config('laradar.dashboard.path', 'architecture'), '/');
+    @endphp
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:880px;">
+
+        {{-- JSON --}}
+        <div class="export-card" style="--ei:0;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);display:flex;align-items:center;justify-content:center;flex:none;">
+                    <svg style="width:20px;height:20px;color:var(--amber);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                    <p style="font-weight:700;font-size:14px;color:var(--text);">JSON</p>
+                    <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">architecture.json</p>
+                </div>
+            </div>
+            <p style="font-size:13px;color:var(--text-dim);line-height:1.6;flex:1;">Full raw report data — all components, routes, dependencies, and scores in machine-readable format. Useful for CI pipelines and tooling integrations.</p>
+            <div style="display:flex;gap:8px;margin-top:auto;">
+                <button onclick="exportJson()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:var(--amber);font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);transition:background .15s;" onmouseenter="this.style.background='rgba(251,191,36,.25)'" onmouseleave="this.style.background='rgba(251,191,36,.15)'">
+                    <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Download
+                </button>
+                <button onclick="copyJson()" id="copy-json-btn" title="Copy to clipboard" style="padding:8px 12px;background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;color:var(--text-faint);cursor:pointer;transition:border-color .15s;" onmouseenter="this.style.borderColor='var(--amber)'" onmouseleave="this.style.borderColor='var(--border)'">
+                    <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        {{-- Markdown --}}
+        <div class="export-card" style="--ei:1;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:rgba(142,155,184,.1);border:1px solid rgba(142,155,184,.2);display:flex;align-items:center;justify-content:center;flex:none;">
+                    <svg style="width:20px;height:20px;color:var(--text-dim);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div>
+                    <p style="font-weight:700;font-size:14px;color:var(--text);">Markdown</p>
+                    <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">architecture.md</p>
+                </div>
+            </div>
+            <p style="font-size:13px;color:var(--text-dim);line-height:1.6;flex:1;">Human-readable report with summary tables, model relationships, and a Mermaid dependency graph. Renders beautifully on GitHub and Notion.</p>
+            <button onclick="exportMarkdown()" style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(142,155,184,.1);border:1px solid rgba(142,155,184,.2);color:var(--text-dim);font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);margin-top:auto;transition:background .15s;" onmouseenter="this.style.background='rgba(142,155,184,.2)'" onmouseleave="this.style.background='rgba(142,155,184,.1)'">
+                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download
+            </button>
+        </div>
+
+        {{-- HTML --}}
+        <div class="export-card" style="--ei:2;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.25);display:flex;align-items:center;justify-content:center;flex:none;">
+                    <svg style="width:20px;height:20px;color:#FB923C;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                </div>
+                <div>
+                    <p style="font-weight:700;font-size:14px;color:var(--text);">HTML</p>
+                    <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">architecture.html</p>
+                </div>
+            </div>
+            <p style="font-size:13px;color:var(--text-dim);line-height:1.6;flex:1;">Fully self-contained HTML report. Open in any browser, attach to Jira tickets, or share with stakeholders with no server required.</p>
+            <a href="{{ $exportPath }}/export/html" download="architecture.html" style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(251,146,60,.15);border:1px solid rgba(251,146,60,.3);color:#FB923C;font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);margin-top:auto;text-decoration:none;transition:background .15s;" onmouseenter="this.style.background='rgba(251,146,60,.25)'" onmouseleave="this.style.background='rgba(251,146,60,.15)'">
+                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download
+            </a>
+        </div>
+
+        {{-- Graphic Report --}}
+        <div class="export-card" style="--ei:3;border-width:2px;border-color:rgba(167,139,250,.35);position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;right:0;background:var(--violet);color:#fff;font-size:10px;font-weight:800;font-family:var(--font-mono);padding:4px 10px;border-radius:0 0 0 10px;letter-spacing:.08em;">NEW</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.25);display:flex;align-items:center;justify-content:center;flex:none;">
+                    <svg style="width:20px;height:20px;color:var(--violet);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p style="font-weight:700;font-size:14px;color:var(--text);">Graphic Report</p>
+                    <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">architecture-report.html</p>
+                </div>
+            </div>
+            <p style="font-size:13px;color:var(--text-dim);line-height:1.6;flex:1;">Beautiful standalone HTML report with SVG charts, score gauge, route distribution, dependency graph, and full component tables. No server required.</p>
+            <button onclick="exportGraphicHTML()" id="graphic-report-btn" style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--violet);font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);margin-top:auto;transition:background .15s,opacity .15s;" onmouseenter="if(!this.disabled)this.style.background='rgba(167,139,250,.25)'" onmouseleave="if(!this.disabled)this.style.background='rgba(167,139,250,.15)'">
+                <svg id="graphic-report-icon" style="width:14px;height:14px;flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <svg id="graphic-report-spinner" style="width:14px;height:14px;flex:none;display:none;animation:spin .7s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-width="2.5" d="M12 2a10 10 0 0 1 10 10"/></svg>
+                <span id="graphic-report-label">Generate &amp; Download</span>
+            </button>
+        </div>
+
+    </div>
+
+    {{-- CLI hint --}}
+    <div style="margin-top:32px;max-width:660px;background:var(--bg-sunken);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow);">
+        <p style="font-size:12px;color:var(--text-faint);margin-bottom:12px;font-weight:600;font-family:var(--font-mono);">Export from the command line</p>
+        <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--font-mono);font-size:12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--text-faint);">$</span>
+                <span style="color:var(--emerald);">php artisan laradar:scan</span>
+                <span style="color:var(--text-faint);font-size:11px;margin-left:4px;">— exports json + html (configured formats)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--text-faint);">$</span>
+                <span style="color:var(--emerald);">php artisan laradar:scan <span style="color:var(--amber);">--format=svg</span></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--text-faint);">$</span>
+                <span style="color:var(--emerald);">php artisan laradar:scan <span style="color:var(--amber);">--format=markdown --output=docs/architecture.md</span></span>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+
 {{-- AI Insights --}}
 <section id="sec-ai" class="p-6" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px;">
@@ -2527,7 +2656,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','models','modelmap','controllers','routes','apidocs','ai','chat','aidocs'];
+const SECTIONS = ['overview','modules','models','modelmap','controllers','routes','apidocs','export','ai','chat','aidocs'];
 
 let mapTreeRendered = false;
 let erRendered      = false;
@@ -3018,7 +3147,7 @@ function navigate(s) {
         overview:'Overview', models:'Models', modelmap:'Relation Graph', controllers:'Controllers',
         routes:'Routes', apidocs:'API Docs',
        ,
-        ai:'AI Insights', chat:'AI Chat',
+        export:'Export', ai:'AI Insights', chat:'AI Chat',
         aidocs:'AI Docs', modules:'Modules'
     };
     const breadcrumb = document.getElementById('topbar-section');
@@ -6788,6 +6917,14 @@ ${ai?.summary ? `<div style="background:#f0f9ff;border-bottom:2px solid #bfdbfe;
 
 // ── Export helpers ────────────────────────────────────────────────────────────
 
+function exportJson() {
+    _downloadBlob(
+        JSON.stringify(APP, null, 2),
+        'architecture.json',
+        'application/json'
+    );
+}
+
 function copyPkgKey(btn, key) {
     const cmd = 'composer require ' + key;
     navigator.clipboard.writeText(cmd).then(() => {
@@ -6797,11 +6934,422 @@ function copyPkgKey(btn, key) {
     }).catch(() => {});
 }
 
+function copyJson() {
+    const btn  = document.getElementById('copy-json-btn');
+    const text = JSON.stringify(APP, null, 2);
+    navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+        setTimeout(() => { btn.innerHTML = orig; }, 1800);
+    }).catch(() => {
+        btn.title = 'Copy failed — try JSON download instead';
+    });
+}
+
+function exportMarkdown() {
+    const d   = APP;
+    const s   = d.summary || {};
+    const rs  = d.route_summary || {};
+    const sc  = d.score || {};
+    const out = [];
+
+    out.push('# Architecture Report — ' + (d.project?.name || 'Laravel Application'));
+    out.push('');
+    out.push('> Generated: ' + d.generated_at);
+    out.push('> Laravel ' + d.laravel_version + ' · PHP ' + d.php_version + ' · laradar v' + d.package_version);
+    out.push('');
+    out.push('---');
+    out.push('');
+
+    if (sc.score !== undefined) {
+        out.push('## Architecture Score');
+        out.push('');
+        out.push('**' + sc.score + ' / ' + sc.max + '** — ' + sc.grade);
+        out.push('');
+        (sc.checks || []).forEach(c => {
+            const icon = c.status === 'pass' ? '✔' : c.status === 'warn' ? '⚠' : '✘';
+            out.push(icon + ' ' + c.label + (c.note ? ' — *' + c.note + '*' : ''));
+        });
+        out.push('');
+        out.push('---');
+        out.push('');
+    }
+
+    out.push('## Summary');
+    out.push('');
+    out.push('| Component | Count |');
+    out.push('|-----------|------:|');
+    const rows = [
+        ['Models', s.models], ['Controllers', s.controllers], ['Routes', s.routes],
+        ,
+        ,
+        ['Modules', s.modules],
+    ];
+    rows.forEach(([label, count]) => { if (count) out.push('| ' + label + ' | ' + count + ' |'); });
+    out.push('');
+
+    if ((d.dependencies?.edges || []).length > 0) {
+        out.push('---');
+        out.push('');
+        out.push('## Dependency Graph');
+        out.push('');
+        out.push('```mermaid');
+        out.push('flowchart TD');
+        const nodes = d.dependencies.nodes || [];
+        const edges = d.dependencies.edges || [];
+        const byLayer = {};
+        nodes.forEach(n => { const l = n.layer || 'model'; (byLayer[l] = byLayer[l] || []).push(n.name); });
+        ['controller','job','event','listener','service','repository','model'].forEach(layer => {
+            if (!(byLayer[layer] || []).length) return;
+            out.push('    subgraph ' + layer.charAt(0).toUpperCase() + layer.slice(1) + 's');
+            byLayer[layer].forEach(nm => out.push('        ' + nm));
+            out.push('    end');
+        });
+        edges.forEach(e => out.push('    ' + e.from + ' --> ' + e.to));
+        out.push('```');
+        out.push('');
+    }
+
+    out.push('---');
+    out.push('');
+    out.push('## Models');
+    out.push('');
+    (d.models || []).forEach(m => {
+        out.push('### ' + m.name);
+        out.push('');
+        out.push('**Table:** `' + m.table + '`');
+        if ((m.fillable || []).length) out.push('**Fillable:** `' + m.fillable.join('`, `') + '`');
+        if ((m.relationships || []).length) {
+            out.push('');
+            out.push('| Method | Type | Related |');
+            out.push('|--------|------|---------|');
+            m.relationships.forEach(r => out.push('| `' + r.method + '` | `' + r.type + '` | `' + (r.related || '').split('\\').pop() + '` |'));
+        }
+        out.push('');
+    });
+
+    out.push('---');
+    out.push('');
+    out.push('## Routes');
+    out.push('');
+    out.push('| Method | URI | Controller | Name |');
+    out.push('|--------|-----|------------|------|');
+    (d.routes || []).forEach(r => {
+        const methods = (r.methods || []).filter(m => m !== 'HEAD').join(',');
+        const ctrl    = (r.controller?.class || '').split('\\').pop() || '—';
+        const name    = r.name || '—';
+        out.push('| ' + methods + ' | `' + r.uri + '` | ' + ctrl + ' | ' + name + ' |');
+    });
+
+    _downloadBlob(out.join('\n'), 'architecture.md', 'text/markdown');
+}
+
 // ── Graphic Report ────────────────────────────────────────────────────────────
 
 // Module-level guard — true while a build+download is in progress.
 // Any number of clicks during that window are silently dropped.
 let _exportingHTML = false;
+
+function exportGraphicHTML() {
+    if (_exportingHTML) return;   // hard guard — drop every extra click
+    _exportingHTML = true;
+
+    const btn     = document.getElementById('graphic-report-btn');
+    const label   = document.getElementById('graphic-report-label');
+    const icon    = document.getElementById('graphic-report-icon');
+    const spinner = document.getElementById('graphic-report-spinner');
+
+    // Show busy state immediately
+    btn.disabled        = true;
+    btn.style.opacity   = '0.72';
+    btn.style.cursor    = 'not-allowed';
+    label.textContent   = 'Building…';
+    icon.style.display  = 'none';
+    spinner.style.display = '';
+
+    // Defer the heavy work by one paint so the browser renders the loading state
+    // before the main thread is blocked by report generation
+    setTimeout(() => {
+        try {
+            const html = _buildGraphicReport(APP);
+            const url  = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+            const a    = document.createElement('a');
+            a.href     = url;
+            a.download = 'architecture-report.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 3000);
+
+            // Brief success confirmation before restoring button
+            label.textContent     = 'Downloaded!';
+            spinner.style.display = 'none';
+            icon.innerHTML        = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+            icon.style.display    = '';
+            setTimeout(() => _exportGraphicHTMLReset(btn, label, icon, spinner), 2000);
+
+        } catch(e) {
+            spinner.style.display = 'none';
+            icon.innerHTML        = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+            icon.style.display    = '';
+            label.textContent     = 'Failed — try again';
+            btn.style.opacity     = '1';
+            btn.style.cursor      = 'pointer';
+            // Re-enable after showing error so user can retry
+            setTimeout(() => _exportGraphicHTMLReset(btn, label, icon, spinner), 2500);
+        }
+    }, 50);
+}
+
+function _exportGraphicHTMLReset(btn, label, icon, spinner) {
+    _exportingHTML        = false;
+    btn.disabled          = false;
+    btn.style.opacity     = '';
+    btn.style.cursor      = '';
+    spinner.style.display = 'none';
+    icon.style.display    = '';
+    icon.innerHTML        = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>';
+    label.textContent     = 'Generate & Download';
+}
+
+function _buildGraphicReport(d) {
+    const esc   = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const proj  = d.project?.name  ?? 'Laravel App';
+    const score = d.score?.score   ?? 0;
+    const grade = d.score?.grade   ?? '';
+    const s     = d.summary        ?? {};
+    const rs    = d.route_summary  ?? {};
+
+    // ── Score gauge SVG ──────────────────────────────────────────────────────
+    const R = 64, CX = 80, CY = 80, SW = 14;
+    const circ     = 2 * Math.PI * R;
+    const arc      = circ * 0.75;           // 270° sweep
+    const offset   = arc - (arc * score / 100);
+    const gColor   = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
+    const gaugeSvg = `<svg width="160" height="160" viewBox="0 0 160 160">
+        <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="#f1f5f9" stroke-width="${SW}" stroke-linecap="round"
+            stroke-dasharray="${arc} ${circ}" stroke-dashoffset="0" transform="rotate(135 ${CX} ${CY})"/>
+        <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${gColor}" stroke-width="${SW}" stroke-linecap="round"
+            stroke-dasharray="${arc} ${circ}" stroke-dashoffset="${offset}" transform="rotate(135 ${CX} ${CY})"/>
+        <text x="${CX}" y="${CY - 8}" text-anchor="middle" font-size="28" font-weight="800" fill="#1e293b" font-family="system-ui,sans-serif">${score}</text>
+        <text x="${CX}" y="${CY + 14}" text-anchor="middle" font-size="12" font-weight="600" fill="${gColor}" font-family="system-ui,sans-serif">${esc(grade)}</text>
+        <text x="${CX}" y="${CY + 30}" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="system-ui,sans-serif">/ 100</text>
+    </svg>`;
+
+    // ── Route method bars ────────────────────────────────────────────────────
+    const methodColors = { GET:'#10b981', POST:'#3b82f6', PUT:'#f59e0b', PATCH:'#f97316', DELETE:'#ef4444' };
+    const byMethod     = rs.by_method ?? {};
+    const maxMCount    = Math.max(1, ...Object.values(byMethod));
+    const routeBarsSvg = `<svg width="260" height="${Math.max(40, Object.keys(byMethod).length * 38 + 10)}" font-family="system-ui,sans-serif">
+        ${Object.entries(byMethod).map(([m, cnt], i) => {
+            const bw  = Math.max(4, Math.round((cnt / maxMCount) * 180));
+            const col = methodColors[m] ?? '#64748b';
+            const y   = i * 38 + 6;
+            return `<rect x="0" y="${y}" width="${bw}" height="22" rx="6" fill="${col}" opacity="0.85"/>
+                    <text x="${bw + 8}" y="${y + 15}" font-size="12" font-weight="700" fill="${col}">${cnt}</text>
+                    <text x="${bw + 34}" y="${y + 15}" font-size="11" fill="#64748b">${esc(m)}</text>`;
+        }).join('')}
+    </svg>`;
+
+    // ── Dependency graph SVG ─────────────────────────────────────────────────
+    const depNodes = d.dependencies?.nodes ?? [];
+    const depEdges = d.dependencies?.edges ?? [];
+    const depSvg   = _buildDepSvg(depNodes, depEdges);
+
+    // ── Stat cards HTML ──────────────────────────────────────────────────────
+    const stats = [
+        ['Models',       s.models       ?? 0, '#8b5cf6', '#f5f3ff', '#ede9fe'],
+        ['Controllers',  s.controllers  ?? 0, '#3b82f6', '#eff6ff', '#dbeafe'],
+        ['Routes',       s.routes       ?? 0, '#10b981', '#f0fdf4', '#d1fae5'],
+        ['Jobs',         s.jobs         ?? 0, '#f97316', '#fff7ed', '#ffedd5'],
+        ['Modules',      s.modules      ?? 0, '#4f46e5', '#eef2ff', '#e0e7ff'],
+        ['API Routes',   rs.api         ?? 0, '#0891b2', '#ecfeff', '#cffafe'],
+        ['Named Routes', rs.named_count ?? 0, '#7c3aed', '#f5f3ff', '#ede9fe'],
+    ];
+    const statCards = stats.map(([name, count, color, bg, border]) =>
+        `<div style="background:${bg};border:1px solid ${border};border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:24px;font-weight:800;color:${color};font-family:system-ui,sans-serif">${count}</span>
+            <span style="font-size:12px;color:#64748b;font-family:system-ui,sans-serif;font-weight:500">${esc(name)}</span>
+        </div>`
+    ).join('');
+
+    // ── Score checks ─────────────────────────────────────────────────────────
+    const checkRows = (d.score?.checks ?? []).map(c => {
+        const icon  = c.status === 'pass' ? '✔' : c.status === 'warn' ? '⚠' : '✘';
+        const color = c.status === 'pass' ? '#10b981' : c.status === 'warn' ? '#f59e0b' : '#ef4444';
+        return `<tr>
+            <td style="padding:8px 12px;font-size:13px;color:${color};font-weight:700">${icon}</td>
+            <td style="padding:8px 12px;font-size:13px;color:#1e293b;font-weight:500">${esc(c.label)}</td>
+            <td style="padding:8px 12px;font-size:12px;color:#64748b">${esc(c.note ?? '')}</td>
+        </tr>`;
+    }).join('');
+
+    // ── Models table ─────────────────────────────────────────────────────────
+    const modelRows = (d.models ?? []).slice(0, 40).map(m => {
+        const rels = (m.relationships ?? []).map(r => r.type + ':' + (r.related ?? '').split('\\').pop()).join(', ');
+        const fill = (m.fillable ?? []).slice(0, 5).join(', ') + ((m.fillable ?? []).length > 5 ? ' …' : '');
+        return `<tr>
+            <td style="padding:9px 12px;font-weight:700;color:#1e293b;font-family:ui-monospace,monospace;font-size:13px">${esc(m.name)}</td>
+            <td style="padding:9px 12px;color:#64748b;font-family:ui-monospace,monospace;font-size:12px">${esc(m.table ?? '')}</td>
+            <td style="padding:9px 12px;color:#64748b;font-size:12px">${esc(fill)}</td>
+            <td style="padding:9px 12px;color:#8b5cf6;font-size:12px">${esc(rels)}</td>
+        </tr>`;
+    }).join('');
+
+    // ── Controllers table ────────────────────────────────────────────────────
+    const ctrlRows = (d.controllers ?? []).slice(0, 30).map(c => {
+        const barW = Math.min(120, Math.round((c.method_count ?? 0) * 8));
+        const barColor = (c.method_count ?? 0) > 15 ? '#ef4444' : (c.method_count ?? 0) > 10 ? '#f59e0b' : '#10b981';
+        return `<tr>
+            <td style="padding:9px 12px;font-weight:700;color:#1e293b;font-family:ui-monospace,monospace;font-size:13px">${esc(c.name)}</td>
+            <td style="padding:9px 12px">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:${barW}px;height:8px;background:${barColor};border-radius:4px;opacity:0.8"></div>
+                    <span style="font-size:12px;font-weight:700;color:${barColor}">${c.method_count ?? 0}</span>
+                </div>
+            </td>
+            <td style="padding:9px 12px;font-size:12px;color:#64748b;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((c.methods ?? []).slice(0,8).join(', '))}</td>
+        </tr>`;
+    }).join('');
+
+    // ── Routes table ─────────────────────────────────────────────────────────
+    const routeRows = (d.routes ?? []).slice(0, 50).map(r => {
+        const methods = (r.methods ?? []).filter(m => m !== 'HEAD').join('|');
+        const ctrl    = (r.controller?.class ?? '—').split('\\').pop();
+        const action  = r.controller?.method ?? '—';
+        const mwShort = (r.middleware ?? []).map(m => m.split('\\').pop()).slice(0, 2).join(', ');
+        const mCol    = methodColors[methods] ?? '#64748b';
+        return `<tr>
+            <td style="padding:8px 12px"><span style="font-size:11px;font-weight:700;color:${mCol};background:${mCol}18;padding:2px 8px;border-radius:6px;font-family:ui-monospace,monospace">${esc(methods)}</span></td>
+            <td style="padding:8px 12px;font-family:ui-monospace,monospace;font-size:12px;color:#1e293b;font-weight:600">${esc(r.uri)}</td>
+            <td style="padding:8px 12px;font-family:ui-monospace,monospace;font-size:11px;color:#64748b">${esc(ctrl)}@${esc(action)}</td>
+            <td style="padding:8px 12px;font-size:11px;color:#94a3b8">${esc(mwShort)}</td>
+        </tr>`;
+    }).join('');
+
+    // ── Section header helper ─────────────────────────────────────────────────
+    const secHeader = (title, sub, color = '#4f46e5') =>
+        `<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <div style="width:4px;height:32px;border-radius:2px;background:${color};flex-shrink:0"></div>
+            <div>
+                <h2 style="margin:0;font-size:20px;font-weight:800;color:#0f172a;font-family:system-ui,sans-serif">${esc(title)}</h2>
+                ${sub ? `<p style="margin:2px 0 0;font-size:13px;color:#64748b;font-family:system-ui,sans-serif">${esc(sub)}</p>` : ''}
+            </div>
+        </div>`;
+
+    const tableWrap = (headers, rows) =>
+        `<div style="border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;background:#ffffff">
+            <table style="width:100%;border-collapse:collapse;font-family:system-ui,sans-serif">
+                <thead><tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0">
+                    ${headers.map(h => `<th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em">${esc(h)}</th>`).join('')}
+                </tr></thead>
+                <tbody style="divide-y:1px solid #f1f5f9">${rows}</tbody>
+            </table>
+        </div>`;
+
+    // ── Assemble full HTML ────────────────────────────────────────────────────
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Architecture Report — ${esc(proj)}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f8fafc;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;line-height:1.5}
+a{color:inherit;text-decoration:none}
+table tr:nth-child(even){background:#fafbfc}
+table tr:hover{background:#f1f5f9}
+@media print{body{background:#fff}.no-print{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+<div style="background:linear-gradient(135deg,#1e293b 0%,#312e81 100%);color:#fff;padding:40px 48px;display:flex;align-items:center;justify-content:space-between;gap:20px">
+    <div>
+        <p style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:#94a3b8;margin-bottom:6px">Architecture Report</p>
+        <h1 style="font-size:32px;font-weight:800;margin-bottom:8px">${esc(proj)}</h1>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px">
+            <span style="font-size:13px;color:#94a3b8">Laravel ${esc(d.laravel_version ?? '')}</span>
+            <span style="font-size:13px;color:#94a3b8">PHP ${esc(d.php_version ?? '')}</span>
+            <span style="font-size:13px;color:#94a3b8">Generated: ${esc(d.generated_at ?? '')}</span>
+        </div>
+    </div>
+    <div style="text-align:center;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:20px 28px;flex-shrink:0">
+        <div style="font-size:48px;font-weight:900;line-height:1;color:#fff">${score}</div>
+        <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-top:4px">${esc(grade)}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px">Architecture Score</div>
+    </div>
+</div>
+
+<!-- ═══ BODY ═════════════════════════════════════════════════════════════ -->
+<div style="max-width:1200px;margin:0 auto;padding:40px 32px;display:flex;flex-direction:column;gap:48px">
+
+    <!-- Stat Cards -->
+    <section>
+        ${secHeader('Component Overview', `${(d.models??[]).length} models · ${(d.controllers??[]).length} controllers · ${rs.total??0} routes`)}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
+            ${statCards}
+        </div>
+    </section>
+
+    <!-- Score -->
+    <section>
+        ${secHeader('Architecture Score', `${score}/100 — ${esc(grade)}`, '#10b981')}
+        <div style="display:grid;grid-template-columns:160px 1fr;gap:24px;align-items:start;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px">
+            ${gaugeSvg}
+            <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;font-family:system-ui,sans-serif">
+                    <tbody>${checkRows || '<tr><td colspan="3" style="padding:12px;color:#94a3b8;font-size:13px">No score checks available.</td></tr>'}</tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Routes -->
+    <section>
+        ${secHeader('Routes', `${rs.total??0} total · ${rs.web??0} web · ${rs.api??0} API · ${rs.named_count??0} named`, '#10b981')}
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start">
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px">
+                <p style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px">By Method</p>
+                ${routeBarsSvg}
+            </div>
+            <div style="overflow-x:auto">
+                ${tableWrap(['Method','URI','Handler','Middleware'], routeRows || '<tr><td colspan="4" style="padding:12px;color:#94a3b8">No routes.</td></tr>')}
+            </div>
+        </div>
+    </section>
+
+    <!-- Dependency Graph -->
+    ${depSvg ? `<section>
+        ${secHeader('Dependency Graph', `${depNodes.length} nodes · ${depEdges.length} edges`, '#6366f1')}
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
+        </div>
+    </section>` : ''}
+
+    <!-- Models -->
+    <section>
+        ${secHeader('Models', `${(d.models??[]).length} Eloquent models detected`, '#8b5cf6')}
+        ${tableWrap(['Model','Table','Fillable Fields','Relationships'], modelRows || '<tr><td colspan="4" style="padding:12px;color:#94a3b8">No models.</td></tr>')}
+    </section>
+
+    <!-- Controllers -->
+    <section>
+        ${secHeader('Controllers', `${(d.controllers??[]).length} controllers`, '#3b82f6')}
+        ${tableWrap(['Controller','Methods','Method List'], ctrlRows || '<tr><td colspan="3" style="padding:12px;color:#94a3b8">No controllers.</td></tr>')}
+    </section>
+
+</div>
+
+<!-- ═══ FOOTER ═══════════════════════════════════════════════════════════ -->
+<div style="background:#1e293b;color:#64748b;text-align:center;padding:24px;font-size:12px;font-family:system-ui,sans-serif;margin-top:20px">
+    Generated by <strong style="color:#94a3b8">laradar</strong> · ${esc(d.generated_at ?? '')}
+</div>
+
+</body>
+</html>`;
+}
 
 // ── AI Insights ───────────────────────────────────────────────────────────────
 
