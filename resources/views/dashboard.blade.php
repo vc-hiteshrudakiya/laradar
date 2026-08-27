@@ -692,11 +692,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         <div class="nav-group">
             <span class="nav-group__label">Components</span>
-            <button onclick="navigate('packages')" id="nav-packages" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                Packages
-                @if(($summary['packages']??0)>0)<span class="nav-badge">{{ $summary['packages'] }}</span>@endif
-            </button>
         </div>
 
         <div class="nav-group">
@@ -2266,155 +2261,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 </section>
 
-{{-- ══ PACKAGE DETECTION ══ --}}
-<section id="sec-packages" class="p-6" style="display:none">
-
-    @php
-    $packages   = $data['packages'] ?? [];
-    $byCategory = [];
-    foreach ($packages as $pkg) {
-        $byCategory[$pkg['category']][] = $pkg;
-    }
-    ksort($byCategory);
-
-    $devCount = count(array_filter($packages, fn($p) => $p['dev']));
-
-    $categoryMeta = [
-        'Admin Panel'       => ['color'=>'#FBBF24','bg'=>'rgba(251,191,36,.1)','border'=>'#FBBF24','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>'],
-        'API Authentication'=> ['color'=>'#60A5FA','bg'=>'rgba(96,165,250,.1)','border'=>'#60A5FA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>'],
-        'Architecture'      => ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.1)','border'=>'#A78BFA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>'],
-        'Audit'             => ['color'=>'#F87171','bg'=>'rgba(248,113,113,.1)','border'=>'#F87171','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>'],
-        'Auth Scaffolding'  => ['color'=>'#E879F9','bg'=>'rgba(232,121,249,.1)','border'=>'#E879F9','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>'],
-        'Authorization'     => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.1)','border'=>'#34D399','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>'],
-        'Backup'            => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.1)','border'=>'#34D399','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>'],
-        'Debug'             => ['color'=>'#94A3B8','bg'=>'rgba(148,163,184,.1)','border'=>'#94A3B8','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>'],
-        'Import / Export'   => ['color'=>'#34D399','bg'=>'rgba(52,211,153,.1)','border'=>'#34D399','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>'],
-        'Media'             => ['color'=>'#818CF8','bg'=>'rgba(129,140,248,.1)','border'=>'#818CF8','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>'],
-        'Payments'          => ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.1)','border'=>'#A78BFA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>'],
-        'PDF'               => ['color'=>'#F87171','bg'=>'rgba(248,113,113,.1)','border'=>'#F87171','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>'],
-        'Queue Monitoring'  => ['color'=>'#2DD4BF','bg'=>'rgba(45,212,191,.1)','border'=>'#2DD4BF','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>'],
-        'Search'            => ['color'=>'#60A5FA','bg'=>'rgba(96,165,250,.1)','border'=>'#60A5FA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>'],
-        'UI Framework'      => ['color'=>'#A78BFA','bg'=>'rgba(167,139,250,.1)','border'=>'#A78BFA','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>'],
-    ];
-    $defaultCatMeta = ['color'=>'#94A3B8','bg'=>'rgba(148,163,184,.1)','border'=>'#94A3B8','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>'];
-
-    $dotHexColors = [
-        'pink'=>'#F472B6','purple'=>'#C084FC','red'=>'#F87171','blue'=>'#60A5FA',
-        'orange'=>'#FB923C','violet'=>'#A78BFA','amber'=>'#FBBF24',
-        'sky'=>'#38BDF8','emerald'=>'#34D399','green'=>'#4ADE80',
-        'teal'=>'#2DD4BF','slate'=>'#94A3B8','cyan'=>'#818CF8','indigo'=>'#818CF8',
-        'rose'=>'#FB7185',
-    ];
-    @endphp
-
-    @if(empty($packages))
-    <div class="atlas-card" style="text-align:center;padding:64px;">
-        <div style="width:56px;height:56px;background:var(--bg-hover);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-            <svg style="width:28px;height:28px;color:var(--text-faint);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-        </div>
-        <p style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">No known packages detected</p>
-        <p style="font-size:13px;color:var(--text-faint);">None of the tracked packages appear in your <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">composer.json</code>.</p>
-    </div>
-    @else
-
-    {{-- Stats --}}
-    <div class="mds-top-stats">
-        <div class="mds-top-stat">
-            <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($packages) }}</span>
-            <span class="mds-top-stat-lbl">Total Packages</span>
-        </div>
-        <div class="mds-top-stat">
-            <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($byCategory) }}</span>
-            <span class="mds-top-stat-lbl">Categories</span>
-        </div>
-        <div class="mds-top-stat">
-            <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $devCount }}</span>
-            <span class="mds-top-stat-lbl">Dev Only</span>
-        </div>
-    </div>
-    <div class="mds-toolbar">
-        <input id="packages-search" oninput="filterPackages()" type="search" placeholder="Search packages…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
-        <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($packages) }} packages</span>
-    </div>
-
-    {{-- Categories --}}
-    <div id="packages-categories">
-    @php $globalPkgIdx = 0; @endphp
-    @foreach($byCategory as $category => $pkgs)
-    @php $catMeta = $categoryMeta[$category] ?? $defaultCatMeta; @endphp
-    <div style="margin-bottom:32px;">
-
-        {{-- Category Header --}}
-        <div class="pkg-cat-header" style="background:{{ $catMeta['bg'] }};border-left-color:{{ $catMeta['border'] }};">
-            <div style="width:32px;height:32px;border-radius:8px;background:{{ $catMeta['bg'] }};border:1px solid {{ $catMeta['border'] }}40;display:flex;align-items:center;justify-content:center;flex:none;">
-                <svg style="width:16px;height:16px;color:{{ $catMeta['color'] }};" fill="none" stroke="currentColor" viewBox="0 0 24 24">{!! $catMeta['icon'] !!}</svg>
-            </div>
-            <span style="font-weight:700;font-size:13px;color:{{ $catMeta['color'] }};flex:1;">{{ $category }}</span>
-            <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:{{ $catMeta['color'] }}22;color:{{ $catMeta['color'] }};border:1px solid {{ $catMeta['color'] }}44;">{{ count($pkgs) }} pkg{{ count($pkgs) !== 1 ? 's' : '' }}</span>
-        </div>
-
-        {{-- Cards Grid --}}
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
-            @foreach($pkgs as $pkg)
-            @php
-                $dotHex  = $dotHexColors[$pkg['color']] ?? '#94A3B8';
-                $initials = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice(explode(' ', $pkg['name']), 0, 2))));
-                $hasDoc  = !empty($pkg['docs']);
-            @endphp
-            <div class="pkg-card" data-name="{{ strtolower($pkg['name'] . ' ' . $pkg['key']) }}" style="--pkg-i:{{ $globalPkgIdx++ }};background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s,box-shadow .2s;" onmouseenter="this.style.borderColor='{{ $dotHex }}88';this.style.boxShadow='0 8px 28px {{ $dotHex }}22';" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='';">
-                {{-- Colored top bar --}}
-                <div style="height:6px;background:linear-gradient(90deg,{{ $dotHex }},{{ $dotHex }}99);"></div>
-
-                <div style="padding:16px;display:flex;flex-direction:column;gap:12px;flex:1;">
-                    {{-- Header row: avatar + name + badges --}}
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                        {{-- Avatar --}}
-                        <div style="width:42px;height:42px;border-radius:10px;background:{{ $dotHex }}18;border:1px solid {{ $dotHex }}33;display:flex;align-items:center;justify-content:center;flex:none;font-weight:800;font-size:13px;color:{{ $dotHex }};letter-spacing:.02em;">{{ $initials }}</div>
-                        {{-- Name & badges --}}
-                        <div style="min-width:0;flex:1;padding-top:2px;">
-                            <p style="font-weight:700;font-size:14px;color:var(--text);line-height:1.3;margin-bottom:5px;">{{ $pkg['name'] }}</p>
-                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                                @if($pkg['version'])
-                                <span class="pkg-ver-badge" style="font-family:var(--font-mono);font-size:10px;background:{{ $dotHex }}15;color:{{ $dotHex }};padding:2px 8px;border-radius:5px;border:1px solid {{ $dotHex }}33;font-weight:600;">v{{ $pkg['version'] }}</span>
-                                @endif
-                                @if($pkg['dev'])
-                                <span style="font-family:var(--font-mono);font-size:10px;color:var(--amber);background:rgba(251,191,36,.12);padding:2px 8px;border-radius:5px;border:1px solid rgba(251,191,36,.25);font-weight:600;">dev-only</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Description --}}
-                    <p style="font-size:12px;color:var(--text-dim);line-height:1.6;flex:1;">{{ $pkg['description'] }}</p>
-
-                    {{-- Composer key --}}
-                    <div style="background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pkg['key'] }}</span>
-                        <button onclick="copyPkgKey(this,'{{ $pkg['key'] }}')" title="Copy composer require command" style="flex:none;display:flex;align-items:center;gap:4px;background:transparent;border:none;color:var(--text-faint);cursor:pointer;padding:2px 4px;border-radius:4px;font-size:10px;transition:color .15s;" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text-faint)'">
-                            <svg style="width:13px;height:13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                        </button>
-                    </div>
-
-                    {{-- Docs link --}}
-                    @if($hasDoc)
-                    <a href="{{ $pkg['docs'] }}" target="_blank" rel="noopener" class="pkg-docs-btn" style="color:{{ $dotHex }};border-color:{{ $dotHex }}44;background:{{ $dotHex }}10;align-self:flex-start;" onmouseenter="this.style.background='{{ $dotHex }}20'" onmouseleave="this.style.background='{{ $dotHex }}10'">
-                        <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                        View Docs
-                        <svg style="width:11px;height:11px;opacity:.7;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    </a>
-                    @endif
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endforeach
-    </div>{{-- /packages-categories --}}
-
-    @endif
-
-</section>
-
 {{-- Export --}}
 <section id="sec-export" class="p-6" style="display:none">
     <div class="sec-header" style="margin-bottom:30px;">
@@ -3190,7 +3036,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','dependencies','export','ai','chat','aidocs','deadcode'];
+const SECTIONS = ['overview','modules','models','modelmap','controllers','routes','apidocs','dependencies','export','ai','chat','aidocs','deadcode'];
 
 let depRendered     = false;
 let mapTreeRendered = false;
@@ -3683,7 +3529,7 @@ function navigate(s) {
         routes:'Routes', apidocs:'API Docs',
        ,
         dependencies:'Dependencies', export:'Export', ai:'AI Insights', chat:'AI Chat',
-        aidocs:'AI Docs', modules:'Modules', packages:'Packages', deadcode:'Dead Code'
+        aidocs:'AI Docs', modules:'Modules', deadcode:'Dead Code'
     };
     const breadcrumb = document.getElementById('topbar-section');
     if (breadcrumb) breadcrumb.textContent = sectionNames[s] || s;
@@ -3825,17 +3671,6 @@ function filterGrid(type) {
     const lv = document.getElementById('mds-list-view');
     if (lv && type === 'models') lv.querySelectorAll('[data-name]').forEach(el => {
         el.style.display = el.dataset.name.includes(q) ? '' : 'none';
-    });
-}
-
-function filterPackages() {
-    const q = document.getElementById('packages-search').value.toLowerCase();
-    document.querySelectorAll('#packages-categories .pkg-card').forEach(el => {
-        el.style.display = el.dataset.name.includes(q) ? '' : 'none';
-    });
-    document.querySelectorAll('#packages-categories > div').forEach(cat => {
-        const visible = [...cat.querySelectorAll('.pkg-card')].some(c => c.style.display !== 'none');
-        cat.style.display = visible ? '' : 'none';
     });
 }
 
@@ -7547,7 +7382,7 @@ function exportMarkdown() {
         ['Models', s.models], ['Controllers', s.controllers], ['Routes', s.routes],
         ,
         ,
-        ['Modules', s.modules], ['Packages', s.packages],
+        ['Modules', s.modules],
         ['Dep. Edges', (d.dependencies?.edges || []).length],
     ];
     rows.forEach(([label, count]) => { if (count) out.push('| ' + label + ' | ' + count + ' |'); });
