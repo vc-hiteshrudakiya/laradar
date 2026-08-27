@@ -696,6 +696,11 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         <div class="nav-group">
             <span class="nav-group__label">Architecture</span>
+            <button onclick="navigate('dependencies')" id="nav-dependencies" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+                Dependencies
+                @if(!empty($data['dependencies']['edges']))<span class="nav-badge">{{ count($data['dependencies']['edges']) }}</span>@endif
+            </button>
             @php $deadTotal = $data['dead_code']['summary']['total'] ?? 0; @endphp
             <button onclick="navigate('deadcode')" id="nav-deadcode" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -753,6 +758,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Routes'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
         'Jobs'         => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>',
         'Modules'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
+        'Dep. Edges'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/>',
         'Middleware'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>',
     ];
     $kpiColors = [
@@ -761,6 +767,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Routes'       => ['color'=>'var(--emerald)','bg'=>'rgba(52,211,153,0.14)'],
         'Jobs'         => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
         'Modules'      => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
+        'Dep. Edges'   => ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)'],
         'Middleware'   => ['color'=>'var(--emerald)', 'bg'=>'rgba(52,211,153,0.14)'],
     ];
     $stats = [
@@ -768,6 +775,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         ['Controllers',  $summary['controllers']??0],
         ['Routes',       $rs['total']??0],
         ['Modules',      $summary['modules']??0],
+        ['Dep. Edges',   count($data['dependencies']['edges']??[])],
         ['Middleware',   count($rs['middleware_usage']??[])],
     ];
     $kpiNav = [
@@ -775,6 +783,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Controllers'  => 'controllers',
         'Routes'       => 'routes',
         'Modules'      => 'modules',
+        'Dep. Edges'   => 'dependencies',
     ];
     @endphp
 
@@ -1966,6 +1975,161 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 {{-- Jobs --}}
 
+{{-- Dependencies --}}
+<section id="sec-dependencies" class="p-6" style="display:none">
+    <div class="sec-header" style="margin-bottom:24px;">
+        <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
+            <svg viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+        </div>
+        <div>
+            <h1 class="sec-header__title">Dependency Graph</h1>
+            <p class="sec-header__sub">{{ count($data['dependencies']['nodes']??[]) }} nodes · {{ count($data['dependencies']['edges']??[]) }} edges — how your classes connect across layers</p>
+        </div>
+    </div>
+
+    @php
+    $depNodes = $data['dependencies']['nodes'] ?? [];
+    $depEdges = $data['dependencies']['edges'] ?? [];
+
+    // Layer order (top → bottom in the TD diagram)
+    $lOrder  = ['controller','job','event','listener','service','repository','model','database'];
+    $lLabels = [
+        'controller' => 'Controllers',
+        'job'        => 'Jobs',
+        'event'      => 'Events',
+        'listener'   => 'Listeners',
+        'service'    => 'Services',
+        'repository' => 'Repositories',
+        'model'      => 'Models',
+        'database'   => 'Database',
+    ];
+    $byLayer = array_fill_keys($lOrder, []);
+    foreach ($depNodes as $n) {
+        $l = $n['layer'] ?? 'model';
+        if (isset($byLayer[$l])) $byLayer[$l][] = $n['name'];
+    }
+
+    // Edge label mapping
+    $edgeLabel = ['injects' => '', 'uses' => 'uses', 'triggers' => 'triggers', 'persists' => 'persists'];
+
+    // Build flowchart TD
+    $fLines = ['flowchart TD'];
+
+    foreach ($lOrder as $l) {
+        if (empty($byLayer[$l])) continue;
+        if ($l === 'database') {
+            // Database uses cylinder shape — defined inline in edges, not in subgraph
+            continue;
+        }
+        $fLines[] = '    subgraph ' . $lLabels[$l];
+        foreach ($byLayer[$l] as $nm) { $fLines[] = '        ' . $nm; }
+        $fLines[] = '    end';
+    }
+
+    // Database node (cylinder shape) — add outside subgraphs
+    if (!empty($byLayer['database'])) {
+        $fLines[] = '    Database[("Database")]';
+    }
+
+    // Edges with optional labels
+    foreach ($depEdges as $e) {
+        $label = $edgeLabel[$e['type'] ?? ''] ?? '';
+        $arrow = $label ? "-->|\"{$label}\"|" : '-->';
+        $fLines[] = "    {$e['from']} {$arrow} {$e['to']}";
+    }
+
+    // Class styles for each layer
+    foreach ($depNodes as $n) {
+        $fLines[] = "    class {$n['name']} {$n['layer']}";
+    }
+
+    $fLines[] = '    classDef controller fill:#EEF2FF,stroke:#6366F1,color:#172B4D';
+    $fLines[] = '    classDef service    fill:#E3FCEF,stroke:#00875A,color:#172B4D';
+    $fLines[] = '    classDef repository fill:#FFFAE6,stroke:#FF8B00,color:#172B4D';
+    $fLines[] = '    classDef model      fill:#F3F0FF,stroke:#6554C0,color:#172B4D';
+    $fLines[] = '    classDef job        fill:#FFF4E5,stroke:#FF8B00,color:#172B4D';
+    $fLines[] = '    classDef event      fill:#FFF0FB,stroke:#BF40BF,color:#172B4D';
+    $fLines[] = '    classDef listener   fill:#FEE4FA,stroke:#DA62AC,color:#172B4D';
+    $fLines[] = '    classDef database   fill:#F4F5F7,stroke:#6B778C,color:#172B4D';
+
+    $depCode = implode("\n", $fLines);
+
+    // Layer counts for legend
+    $lCounts = [];
+    foreach ($depNodes as $n) { $lCounts[$n['layer']] = ($lCounts[$n['layer']] ?? 0) + 1; }
+
+    $legendItems = [
+        'controller' => ['Controllers', '#6366F1', '#EEF2FF'],
+        'service'    => ['Services',    '#00875A', '#E3FCEF'],
+        'repository' => ['Repositories','#FF8B00', '#FFFAE6'],
+        'model'      => ['Models',      '#6554C0', '#F3F0FF'],
+        'job'        => ['Jobs',        '#FF8B00', '#FFF4E5'],
+        'event'      => ['Events',      '#BF40BF', '#FFF0FB'],
+        'listener'   => ['Listeners',   '#DA62AC', '#FEE4FA'],
+        'database'   => ['Database',    '#6B778C', '#F4F5F7'],
+    ];
+    @endphp
+
+    @if(empty($depEdges))
+    <div class="atlas-card" style="text-align:center;padding:48px;">
+        <p style="color:var(--text-dim);font-weight:500;">No dependency edges found yet.</p>
+        <p style="color:var(--text-faint);font-size:13px;margin-top:8px;">Add classes like <code>ProductService</code>, <code>ProductRepository</code> with constructor injection to see the graph.</p>
+    </div>
+    @else
+    <div class="atlas-card" style="padding:0;overflow:hidden;">
+        {{-- Legend + controls --}}
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover);">
+            @foreach($legendItems as $layer => [$label, $border, $bg])
+            @if(isset($lCounts[$layer]))
+            <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);font-family:var(--font-mono);">
+                <span style="width:10px;height:10px;border-radius:3px;border:1px solid {{ $border }};background:{{ $bg }};display:inline-block;"></span>
+                {{ $label }} <span style="font-weight:700;color:var(--text);">{{ $lCounts[$layer] }}</span>
+            </span>
+            @endif
+            @endforeach
+            <div style="margin-left:auto;display:flex;align-items:center;gap:4px;">
+                <button onclick="depZoom(0.15)" class="atlas-btn" style="width:28px;height:28px;padding:0;justify-content:center;font-size:16px;">+</button>
+                <button onclick="depZoom(-0.15)" class="atlas-btn" style="width:28px;height:28px;padding:0;justify-content:center;font-size:16px;">−</button>
+                <button onclick="depFit()" class="atlas-btn" style="width:28px;height:28px;padding:0;justify-content:center;" title="Fit all">
+                    <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                </button>
+                <button onclick="depClearHighlight()" class="atlas-btn" style="width:28px;height:28px;padding:0;justify-content:center;" title="Clear selection">
+                    <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+
+        {{-- Hint bar --}}
+        <div style="padding:6px 16px;background:var(--bg-hover);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">Scroll to zoom · Drag to pan · Click a node to highlight connections</p>
+            <span id="dep-sel-label" style="font-size:11px;color:var(--cyan);font-family:var(--font-mono);font-weight:600;display:none;"></span>
+        </div>
+
+        {{-- Custom SVG graph --}}
+        <div style="position:relative;height:600px;">
+            <svg id="dep-canvas" width="100%" height="100%" style="cursor:grab;background:var(--bg-sunken)">
+                <defs>
+                    <marker id="dep-arr" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="rgba(148,178,222,0.5)"/>
+                    </marker>
+                    <marker id="dep-arr-hi" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#6366F1"/>
+                    </marker>
+                    <filter id="dep-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(23,43,77,0.10)" flood-opacity="1"/>
+                    </filter>
+                </defs>
+                <g id="dep-vp">
+                    <g id="dep-bands-g"></g>
+                    <g id="dep-edges-g"></g>
+                    <g id="dep-nodes-g"></g>
+                </g>
+            </svg>
+        </div>
+    </div>
+    @endif
+</section>
+
 {{-- ══ MODULE EXPLORER ══ --}}
 <section id="sec-modules" class="p-6" style="display:none">
 
@@ -2872,8 +3036,9 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','models','modelmap','controllers','routes','apidocs','export','ai','chat','aidocs','deadcode'];
+const SECTIONS = ['overview','modules','models','modelmap','controllers','routes','apidocs','dependencies','export','ai','chat','aidocs','deadcode'];
 
+let depRendered     = false;
 let mapTreeRendered = false;
 let erRendered      = false;
 let graphRendered   = false;
@@ -3363,7 +3528,7 @@ function navigate(s) {
         overview:'Overview', models:'Models', modelmap:'Relation Graph', controllers:'Controllers',
         routes:'Routes', apidocs:'API Docs',
        ,
-        export:'Export', ai:'AI Insights', chat:'AI Chat',
+        dependencies:'Dependencies', export:'Export', ai:'AI Insights', chat:'AI Chat',
         aidocs:'AI Docs', modules:'Modules', deadcode:'Dead Code'
     };
     const breadcrumb = document.getElementById('topbar-section');
@@ -3391,6 +3556,8 @@ function navigate(s) {
                 sec.classList.remove('sec-out');
             }
         });
+        if (s === 'dependencies' && !depRendered) {
+            depRendered = true;
             requestAnimationFrame(() => requestAnimationFrame(initDepGraph));
         }
         if (s === 'modelmap' && !graphRendered) {
@@ -7026,6 +7193,7 @@ function _buildAIGraphicReport(d, ai, docs) {
     }).join('');
 
     // ── Dependency graph ─────────────────────────────────────────────────────
+    const depSvg = _buildDepSvg(d.dependencies?.nodes ?? [], d.dependencies?.edges ?? []);
 
     // ── Section helper ───────────────────────────────────────────────────────
     const sec = (title, color, content) =>
@@ -7124,6 +7292,7 @@ ${ai?.summary ? `<div style="background:#f0f9ff;border-bottom:2px solid #bfdbfe;
 
     <!-- Dependency Graph -->
     ${depSvg ? sec('Dependency Graph', '#6366f1',
+        `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden"><div style="overflow-x:auto;padding:20px">${depSvg}</div></div>`
     ) : ''}
 
     <!-- AI Documentation sections -->
@@ -7214,6 +7383,7 @@ function exportMarkdown() {
         ,
         ,
         ['Modules', s.modules],
+        ['Dep. Edges', (d.dependencies?.edges || []).length],
     ];
     rows.forEach(([label, count]) => { if (count) out.push('| ' + label + ' | ' + count + ' |'); });
     out.push('');
@@ -7555,6 +7725,7 @@ table tr:hover{background:#f1f5f9}
     ${depSvg ? `<section>
         ${secHeader('Dependency Graph', `${depNodes.length} nodes · ${depEdges.length} edges`, '#6366f1')}
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
+            <div style="padding:20px">${depSvg}</div>
         </div>
     </section>` : ''}
 
@@ -7579,6 +7750,107 @@ table tr:hover{background:#f1f5f9}
 
 </body>
 </html>`;
+}
+
+function _buildDepSvg(nodes, edges) {
+    if (!nodes.length) return '';
+
+    const layerOrder = ['controller','job','event','listener','service','repository','model'];
+    const layerColors = {
+        controller: { fill:'#EEF2FF', stroke:'#6366F1', text:'#172B4D' },
+        service:    { fill:'#E3FCEF', stroke:'#00875A', text:'#172B4D' },
+        repository: { fill:'#FFFAE6', stroke:'#FF8B00', text:'#172B4D' },
+        model:      { fill:'#F3F0FF', stroke:'#6554C0', text:'#172B4D' },
+        job:        { fill:'#FFF4E5', stroke:'#FF5630', text:'#172B4D' },
+        event:      { fill:'#FFF0FB', stroke:'#BF40BF', text:'#172B4D' },
+        listener:   { fill:'#FEE4FA', stroke:'#DA62AC', text:'#172B4D' },
+    };
+
+    // Wrap each layer into rows so the SVG stays a reasonable width
+    const MAX_PER_ROW = 6;
+    const NW = 140, NH = 52, GAP_X = 16, GAP_Y = 68, ROW_GAP = 10, PAD = 28;
+
+    const byLayer = {};
+    nodes.forEach(n => {
+        const l = n.layer ?? 'model';
+        (byLayer[l] = byLayer[l] || []).push(n);
+    });
+    const lKeys = layerOrder.filter(l => byLayer[l]?.length);
+
+    // Canvas width = widest possible row
+    const maxColsAll = Math.max(...lKeys.map(l => Math.min(byLayer[l].length, MAX_PER_ROW)));
+    const CW = maxColsAll * NW + (maxColsAll - 1) * GAP_X + PAD * 2;
+
+    // Build positions with row-wrapping per layer
+    const nameToPos = {};
+    let curY = PAD;
+    const bands = [];
+
+    lKeys.forEach(l => {
+        const layerNodes = byLayer[l];
+        const rows = [];
+        for (let i = 0; i < layerNodes.length; i += MAX_PER_ROW) {
+            rows.push(layerNodes.slice(i, i + MAX_PER_ROW));
+        }
+        const bandY1 = curY;
+        rows.forEach((row, ri) => {
+            const rowW = row.length * NW + (row.length - 1) * GAP_X;
+            let x = (CW - rowW) / 2;
+            row.forEach(n => {
+                nameToPos[n.name] = { x, y: curY, cx: x + NW / 2 };
+                x += NW + GAP_X;
+            });
+            curY += NH + (ri < rows.length - 1 ? ROW_GAP : 0);
+        });
+        bands.push({ l, y1: bandY1, y2: curY });
+        curY += GAP_Y;
+    });
+    const CH = curY - GAP_Y + PAD;
+
+    // Layer band backgrounds + labels
+    const bandsSvg = bands.map(b => {
+        const c = layerColors[b.l] ?? { fill:'#F4F5F7', stroke:'#6B778C' };
+        const label = b.l.charAt(0).toUpperCase() + b.l.slice(1) + 's';
+        const bh = b.y2 - b.y1 + 16;
+        return `<rect x="${PAD / 2}" y="${b.y1 - 8}" width="${CW - PAD}" height="${bh}" rx="8" fill="${c.stroke}" opacity="0.06"/>
+                <text x="${PAD}" y="${b.y1 - 8 + bh / 2 + 4}" font-size="9" font-weight="700" fill="${c.stroke}" opacity="0.55" font-family="ui-monospace,monospace" letter-spacing="0.08em">${label.toUpperCase()}</text>`;
+    }).join('');
+
+    // Edges (skip back-edges for readability in a static render)
+    const edgesSvg = edges.slice(0, 200).map(e => {
+        const f = nameToPos[e.from], t = nameToPos[e.to];
+        if (!f || !t) return '';
+        const x1 = f.cx, y1 = f.y + NH, x2 = t.cx, y2 = t.y;
+        if (y2 <= y1 + 4) return '';
+        const cp = (y2 - y1) * 0.45;
+        return `<path d="M${x1},${y1} C${x1},${y1+cp} ${x2},${y2-cp} ${x2},${y2}" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="1.4" marker-end="url(#dep-arr)"/>`;
+    }).join('');
+
+    // Nodes
+    const nodesSvg = nodes.map(n => {
+        const p = nameToPos[n.name]; if (!p) return '';
+        const c  = layerColors[n.layer ?? ''] ?? { fill:'#F4F5F7', stroke:'#6B778C', text:'#172B4D' };
+        const nm = n.name.length > 17 ? n.name.slice(0, 16) + '…' : n.name;
+        const lb = (n.layer ?? '').toUpperCase();
+        return `<g>
+            <rect x="${p.x}" y="${p.y}" width="${NW}" height="${NH}" rx="8" fill="${c.fill}" stroke="${c.stroke}" stroke-width="1.5"/>
+            <text x="${p.cx}" y="${p.y + 18}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${c.stroke}" font-family="ui-monospace,monospace" letter-spacing="0.07em">${lb}</text>
+            <text x="${p.cx}" y="${p.y + 36}" text-anchor="middle" font-size="11" font-weight="600" fill="${c.text}" font-family="ui-monospace,monospace">${nm}</text>
+        </g>`;
+    }).join('');
+
+    // viewBox + max-width:100% + height:auto ensures the SVG scales to any container
+    return `<svg viewBox="0 0 ${CW} ${CH}" width="${CW}" height="${CH}" style="display:block;max-width:100%;height:auto">
+        <defs>
+            <marker id="dep-arr" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+                <polygon points="0 0,7 3,0 6" fill="#94a3b8"/>
+            </marker>
+        </defs>
+        <rect width="${CW}" height="${CH}" fill="#F7F8F9" rx="12"/>
+        ${bandsSvg}
+        ${edgesSvg}
+        ${nodesSvg}
+    </svg>`;
 }
 
 // ── AI Insights ───────────────────────────────────────────────────────────────
