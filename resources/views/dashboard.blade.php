@@ -19,7 +19,7 @@
   --red:#6366F1; --red-dim:rgba(99,102,241,0.08); --red-border:rgba(99,102,241,0.25);
   --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
   --shadow-hover:0 4px 24px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.08);
-  --font-sans:'Figtree',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --laravel-red:#FF2D20; --font-sans:'Instrument Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
   --ease:cubic-bezier(.22,.61,.36,1);
 }
 
@@ -51,9 +51,8 @@ body{
 .sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
 .sidebar__brand{display:flex;align-items:center;gap:10px;padding:6px 8px 22px;}
 .sidebar__brand .mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(155deg,#6366F1,#818CF8);border:1px solid rgba(99,102,241,0.25);display:flex;align-items:center;justify-content:center;flex:none;}
-.sidebar__brand div{line-height:1.25;}
-.sidebar__brand strong{font-size:17px;letter-spacing:0.02em;color:var(--text);}
-.sidebar__brand span{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.1em;color:var(--text-faint);text-transform:uppercase;}
+.sidebar__brand div{line-height:1;}
+.sidebar__brand strong{font-size:16px;font-weight:800;letter-spacing:0.04em;color:var(--text);text-transform:uppercase;}
 .sidebar nav{flex:1;overflow-y:auto;}
 .nav-group{margin-bottom:20px;}
 .nav-group__label{font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);padding:0 10px;margin-bottom:9px;display:block;}
@@ -332,8 +331,8 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .mds-trait-row{display:flex;flex-wrap:wrap;gap:5px;}
 .mds-trait-pip{font-size:10px;padding:2px 8px;border-radius:5px;background:rgba(101,84,192,.08);color:var(--violet);border:1px solid rgba(101,84,192,.2);font-family:var(--font-mono);}
 /* List view */
-.mds-list-head{display:grid;grid-template-columns:40px 1fr 140px 60px 80px 60px;gap:10px;padding:8px 16px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:var(--font-mono);margin-bottom:4px;}
-.mds-list-row{display:grid;grid-template-columns:40px 1fr 140px 60px 80px 60px;align-items:center;gap:10px;padding:11px 16px;border-radius:11px;background:var(--bg-elevated);border:1px solid var(--border);margin-bottom:6px;cursor:pointer;transition:border-color .22s,transform .18s,box-shadow .18s;box-shadow:var(--shadow);}
+.mds-list-head{display:grid;grid-template-columns:40px 1fr 140px 60px 80px 60px;gap:10px;padding:10px 16px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:var(--font-mono);margin-bottom:0;background:var(--bg-sunken);border-bottom:1px solid var(--border);}
+.mds-list-row{display:grid;grid-template-columns:40px 1fr 140px 60px 80px 60px;align-items:center;gap:10px;padding:11px 16px;background:var(--bg-elevated);border-bottom:1px solid var(--border);cursor:pointer;transition:background .18s;}.mds-list-row:last-child{border-bottom:none;}.mds-list-row:hover{background:var(--bg-hover);}
 .mds-list-row:hover{transform:translateX(4px);box-shadow:var(--shadow-hover);border-color:var(--border-strong);}
 .mds-list-av{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none;border:1px solid;}
 /* Detail layout */
@@ -555,35 +554,6 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .doc-r td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-dim);}
 .doc-r tr:last-child td{border-bottom:none;}
 .doc-r tr:hover td{background:rgba(99,102,241,.02);}
-/* ── Hero Section ── */
-@keyframes heroBadgeDot{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.8);opacity:.4;}}
-@keyframes heroCardIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
-.hero-dot-grid{position:absolute;inset:0;background-image:radial-gradient(rgba(99,102,241,0.05) 1.2px,transparent 1.2px);background-size:28px 28px;pointer-events:none;z-index:0;}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.22);border-radius:20px;padding:5px 16px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#6366F1;text-transform:uppercase;box-shadow:0 2px 12px rgba(99,102,241,0.08);}
-.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:#6366F1;display:inline-block;animation:heroBadgeDot 2.2s ease-in-out infinite;}
-.hero-title{font-size:42px;font-weight:900;margin:0;line-height:1.1;letter-spacing:-0.025em;color:#1D1D1F;}
-.hero-sub{font-size:12px;color:#6B7280;margin:8px 0 0;font-family:ui-monospace,monospace;letter-spacing:.04em;line-height:1.7;}
-.hero-stat-card{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:22px 20px;border:1px solid rgba(255,255,255,0.85);position:relative;transition:box-shadow .25s ease;cursor:default;}
-.hero-stat-card:hover{box-shadow:0 10px 36px rgba(0,0,0,0.12);}
-.hero-stat-card::before{display:none;}
-/* C — glowing border on hover */
-@keyframes heroRotBorder{to{--hero-ba:360deg;}}
-.hero-stat-card{transition:box-shadow .3s ease,border-color .3s ease,transform .3s ease;}
-.hero-stat-card:hover{border-color:rgba(99,102,241,0.35)!important;box-shadow:0 0 0 2px rgba(99,102,241,0.10),0 12px 36px rgba(99,102,241,0.10)!important;}
-.hero-stat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;}
-.hero-stat-icon svg{width:17px;height:17px;flex:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.hero-stat-num{font-size:32px;font-weight:900;line-height:1;display:block;color:#6366F1;min-width:48px;}
-.hero-stat-lbl{font-size:13px;font-weight:600;color:#1D1D1F;display:block;margin-top:1px;}
-.hero-stat-sub{font-size:11px;color:#9CA3AF;display:block;margin-top:1px;}
-/* Scrollytelling — opacity/transform driven by JS rAF, no CSS transitions on elements */
-.arch-scene{will-change:opacity;}
-.ast{opacity:0;will-change:opacity,transform;}
-@keyframes archEdgeDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
-.hero-title-letter{display:inline-block;animation:heroLetterDrop .55s cubic-bezier(.34,1.56,.64,1) both;}
-@keyframes heroLetterDrop{from{opacity:0;transform:translateY(-16px) scale(.78);}to{opacity:1;transform:none;}}
-@keyframes heroStreakAnim{0%{left:-70px;opacity:0}20%{opacity:1}80%{opacity:.6}100%{left:100%;opacity:0}}
-#hero-streak{position:absolute;top:0;bottom:0;left:0;width:70px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.52),transparent);pointer-events:none;z-index:3;animation:heroStreakAnim .9s cubic-bezier(.25,.46,.45,.94) .45s both;}
-
 /* ── Responsive Hamburger ── */
 #menu-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--bg-hover);cursor:pointer;flex:none;transition:background .15s;}
 #menu-toggle:hover{background:var(--border);}
@@ -615,9 +585,6 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
     .topbar{padding:12px 16px;gap:10px;}
     .resp-grid-4{grid-template-columns:repeat(2,1fr)!important;}
     .resp-grid-3{grid-template-columns:repeat(2,1fr)!important;}
-    /* Collapse arch-story to fixed height — no scroll-story on mobile */
-    #arch-story-wrap{height:auto!important;margin:-24px -16px 20px!important;}
-    #arch-story-sticky{position:relative!important;height:440px!important;}
 }
 @media(max-width:560px){
     .kpi-grid{grid-template-columns:1fr 1fr;}
@@ -628,7 +595,6 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
     .resp-grid-3{grid-template-columns:1fr!important;}
     .resp-grid-2{grid-template-columns:1fr!important;}
     .topbar{padding:10px 14px;}
-    #arch-story-sticky{height:360px!important;}
 }
 </style>
 </head>
@@ -651,7 +617,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         <div class="mark">
             <span class="radar"><span class="radar__ring"></span><span class="radar__ring radar__ring--delay"></span><span class="radar__sweep"></span><span class="radar__dot"></span></span>
         </div>
-        <div><strong>{{ $data['project']['name'] }}</strong><span>Laradar</span></div>
+        <div><strong>Laradar</strong></div>
     </div>
 
     @if(!empty($score))
@@ -820,220 +786,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Overview --}}
 <section id="sec-overview" class="p-6">
 
-    {{-- ── Scrollytelling Hero ─────────────────────────────────────────────── --}}
-    @php
-        $stModels      = array_slice($data['models']??[], 0, 5);
-        $stControllers = array_slice($data['controllers']??[], 0, 4);
-        $bgCount       = ($summary['jobs']??0)+($summary['events']??0)+($summary['services']??0);
-    @endphp
-    <div id="arch-story-wrap" style="position:relative;height:400vh;margin:-24px -24px 28px -24px;">
-        <div id="arch-story-sticky" style="position:sticky;top:0;height:100vh;overflow:hidden;background:linear-gradient(145deg,#ECEEFF 0%,#F7F8FF 50%,#EDFFF8 100%);display:flex;flex-direction:column;transition:background 0.7s ease;">
-
-            {{-- Dot grid background --}}
-            <div class="hero-dot-grid"></div>
-            {{-- Particle mesh canvas --}}
-            <canvas id="hero-particles" style="position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0.65;"></canvas>
-            {{-- Light streak --}}
-            <div id="hero-streak"></div>
-            {{-- Orb top-right --}}
-            <div id="arch-orb" style="position:absolute;top:-120px;right:-100px;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.22) 0%,transparent 70%);pointer-events:none;transition:background 0.8s ease;z-index:0;"></div>
-            {{-- Orb bottom-left --}}
-            <div id="arch-orb2" style="position:absolute;bottom:-100px;left:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.14) 0%,transparent 70%);pointer-events:none;transition:background 0.8s ease;z-index:0;"></div>
-            {{-- Faint large scene number --}}
-            <div id="arch-bg-num" style="position:absolute;right:4%;bottom:24px;font-size:180px;font-weight:900;color:rgba(79,70,229,0.07);line-height:1;pointer-events:none;user-select:none;font-family:ui-monospace,monospace;transition:color 0.7s ease,transform 0.5s ease;z-index:0;">01</div>
-
-            {{-- Single centered content area --}}
-            <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px 60px;overflow:hidden;position:relative;z-index:1;">
-                <div style="width:100%;max-width:760px;position:relative;">
-
-                    {{-- Scene 0: Overview --}}
-                    <div id="arch-scene-0" class="arch-scene" style="position:relative;">
-                        <div class="ast ast-l" style="transition-delay:0ms">
-                            <span class="hero-badge"><span class="hero-badge-dot"></span>Architecture Overview</span>
-                        </div>
-                        <div class="ast ast-u" style="transition-delay:100ms;margin-top:14px;">
-                            <h2 class="hero-title">{{ $data['project']['name'] }}</h2>
-                            <p class="hero-sub">Laravel {{ $data['laravel_version'] }} &nbsp;·&nbsp; PHP {{ $data['php_version'] }} &nbsp;·&nbsp; Scroll to explore each layer</p>
-                        </div>
-                        <div style="margin-top:22px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
-                            <div class="ast ast-l hero-stat-card" style="transition-delay:200ms;box-shadow:0 6px 24px rgba(99,102,241,0.18);">
-                                <div class="hero-stat-icon" style="background:rgba(99,102,241,0.10);">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="#6366F1"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
-                                </div>
-                                <div>
-                                    <span class="hero-stat-num" data-target="{{ $summary['models']??0 }}">{{ $summary['models']??0 }}</span>
-                                    <span class="hero-stat-lbl">Models</span>
-                                    <span class="hero-stat-sub">Eloquent classes</span>
-                                </div>
-                            </div>
-                            <div class="ast ast-l hero-stat-card" style="transition-delay:260ms;box-shadow:0 4px 20px rgba(124,58,237,0.14);">
-                                <div class="hero-stat-icon" style="background:rgba(124,58,237,0.10);">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
-                                </div>
-                                <div>
-                                    <span class="hero-stat-num" data-target="{{ $summary['controllers']??0 }}">{{ $summary['controllers']??0 }}</span>
-                                    <span class="hero-stat-lbl">Controllers</span>
-                                    <span class="hero-stat-sub">Request handlers</span>
-                                </div>
-                            </div>
-                            <div class="ast ast-r hero-stat-card" style="transition-delay:320ms;box-shadow:0 4px 20px rgba(5,150,105,0.12);">
-                                <div class="hero-stat-icon" style="background:rgba(16,185,129,0.10);">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="#059669"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                </div>
-                                <div>
-                                    <span class="hero-stat-num" data-target="{{ $rs['total']??0 }}">{{ $rs['total']??0 }}</span>
-                                    <span class="hero-stat-lbl">Routes</span>
-                                    <span class="hero-stat-sub">Web &amp; API</span>
-                                </div>
-                            </div>
-                            <div class="ast ast-r hero-stat-card" style="transition-delay:380ms;box-shadow:0 4px 20px rgba(219,39,119,0.12);">
-                                <div class="hero-stat-icon" style="background:rgba(219,39,119,0.10);">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="#DB2777"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                                </div>
-                                <div>
-                                    <span class="hero-stat-num" data-target="{{ $bgCount }}">{{ $bgCount }}</span>
-                                    <span class="hero-stat-lbl">Background</span>
-                                    <span class="hero-stat-sub">Jobs · Events · Services</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ast ast-u" style="transition-delay:440ms;margin-top:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                            @foreach(array_slice($rs['by_group']??[], 0, 3) as $group => $cnt)
-                            <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:20px;padding:6px 14px;font-size:11px;color:#374151;font-family:ui-monospace,monospace;">
-                                <span style="font-weight:700;color:#6366F1;">{{ $cnt }}</span><span>{{ ucfirst($group) }}</span>
-                            </span>
-                            @endforeach
-                            @if($summary['packages']??0)
-                            <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:20px;padding:6px 14px;font-size:11px;color:#374151;font-family:ui-monospace,monospace;">
-                                <span style="font-weight:700;color:#7C3AED;">{{ $summary['packages'] }}</span><span>Packages</span>
-                            </span>
-                            @endif
-                        </div>
-                    </div>
-
-                    {{-- Scene 1: Data Layer --}}
-                    <div id="arch-scene-1" class="arch-scene" style="position:absolute;inset:0;opacity:0;pointer-events:none;">
-                        <div class="ast ast-l" style="transition-delay:0ms">
-                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(124,58,237,0.10);border:1px solid rgba(124,58,237,0.25);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#7C3AED;text-transform:uppercase;">
-                                <span style="width:6px;height:6px;border-radius:50%;background:#7C3AED;display:inline-block;"></span>
-                                Data Layer
-                            </span>
-                        </div>
-                        <div class="ast ast-u" style="transition-delay:80ms;margin-top:16px;">
-                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Eloquent Models</h2>
-                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;">Your data layer — <strong style="color:#7C3AED">{{ $summary['models']??0 }} models</strong> mapped to database tables with relationships.</p>
-                        </div>
-                        <div style="margin-top:20px;display:flex;flex-direction:column;gap:8px;">
-                            @foreach($stModels as $i => $m)
-                            @php $fromDir = $i % 2 === 0 ? 'l' : 'r'; @endphp
-                            <div class="ast ast-{{ $fromDir }}" style="transition-delay:{{ 160 + $i*70 }}ms;display:flex;align-items:center;gap:10px;background:#FFFFFF;border-radius:12px;padding:10px 14px;border:1px solid rgba(124,58,237,0.12);border-left:3px solid #7C3AED;box-shadow:0 1px 6px rgba(124,58,237,0.06);">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" style="width:14px;height:14px;flex:none;"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
-                                <span style="font-size:12px;font-weight:700;color:#1E1B4B;font-family:ui-monospace,monospace;">{{ $m['name'] }}</span>
-                                @if(!empty($m['table']))<span style="font-size:10px;color:#9CA3AF;margin-left:auto;">{{ $m['table'] }}</span>@endif
-                            </div>
-                            @endforeach
-                            @if(count($data['models']??[]) > 5)
-                            <div class="ast ast-u" style="transition-delay:{{ 160 + 5*70 }}ms;display:flex;align-items:center;justify-content:center;background:rgba(124,58,237,0.05);border-radius:12px;padding:10px;border:1px dashed rgba(124,58,237,0.2);">
-                                <span style="font-size:11px;color:#7C3AED;font-weight:600;">+{{ count($data['models']??[]) - 5 }} more models</span>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    {{-- Scene 2: HTTP Layer --}}
-                    <div id="arch-scene-2" class="arch-scene" style="position:absolute;inset:0;opacity:0;pointer-events:none;">
-                        <div class="ast ast-r" style="transition-delay:0ms">
-                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(14,165,233,0.10);border:1px solid rgba(14,165,233,0.25);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#0EA5E9;text-transform:uppercase;">
-                                <span style="width:6px;height:6px;border-radius:50%;background:#0EA5E9;display:inline-block;"></span>
-                                HTTP Layer
-                            </span>
-                        </div>
-                        <div class="ast ast-u" style="transition-delay:80ms;margin-top:16px;">
-                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Request Handlers</h2>
-                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;"><strong style="color:#0EA5E9">{{ $summary['controllers']??0 }} controllers</strong> handling <strong style="color:#0369A1">{{ $rs['total']??0 }} routes</strong> across your application.</p>
-                        </div>
-                        <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:8px;">
-                            @foreach($stControllers as $i => $c)
-                            <div class="ast ast-{{ $i % 2 === 0 ? 'l' : 'r' }}" style="transition-delay:{{ 300 + $i*50 }}ms;display:inline-flex;align-items:center;gap:6px;background:#FFFFFF;border:1px solid rgba(14,165,233,0.2);border-radius:20px;padding:5px 12px;box-shadow:0 1px 4px rgba(14,165,233,0.08);">
-                                <span style="width:5px;height:5px;border-radius:50%;background:#0EA5E9;flex:none;"></span>
-                                <span style="font-size:11px;font-weight:600;color:#0369A1;font-family:ui-monospace,monospace;">{{ $c['name'] }}</span>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    {{-- Scene 3: Background Layer --}}
-                    <div id="arch-scene-3" class="arch-scene" style="position:absolute;inset:0;opacity:0;pointer-events:none;">
-                        <div class="ast ast-l" style="transition-delay:0ms">
-                            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:4px 14px;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.14em;color:#D97706;text-transform:uppercase;">
-                                <span style="width:6px;height:6px;border-radius:50%;background:#D97706;display:inline-block;"></span>
-                                Background Layer
-                            </span>
-                        </div>
-                        <div class="ast ast-u" style="transition-delay:80ms;margin-top:16px;">
-                            <h2 style="font-size:38px;font-weight:900;color:#1E1B4B;margin:0;line-height:1.1;letter-spacing:-0.02em;">Async Architecture</h2>
-                            <p style="font-size:13.5px;color:#6B7280;margin:8px 0 0;line-height:1.7;">Keeping your app fast and scalable with background processing.</p>
-                        </div>
-                        <div class="resp-grid-3" style="margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
-                            <div class="ast ast-l" style="transition-delay:200ms;background:#FFFFFF;border-radius:18px;padding:24px 20px;border:1px solid rgba(245,158,11,0.2);border-top:4px solid #F59E0B;box-shadow:0 4px 16px rgba(245,158,11,0.08);text-align:center;">
-                                <span style="font-size:48px;font-weight:900;color:#F59E0B;display:block;line-height:1;">{{ $summary['jobs']??0 }}</span>
-                                <span style="font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:.12em;display:block;margin-top:8px;font-weight:600;">Jobs</span>
-                                <span style="font-size:10px;color:#9CA3AF;display:block;margin-top:4px;">Queued workers</span>
-                            </div>
-                            <div class="ast ast-u" style="transition-delay:300ms;background:#FFFFFF;border-radius:18px;padding:24px 20px;border:1px solid rgba(239,68,68,0.2);border-top:4px solid #EF4444;box-shadow:0 4px 16px rgba(239,68,68,0.08);text-align:center;">
-                                <span style="font-size:48px;font-weight:900;color:#EF4444;display:block;line-height:1;">{{ $summary['events']??0 }}</span>
-                                <span style="font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:.12em;display:block;margin-top:8px;font-weight:600;">Events</span>
-                                <span style="font-size:10px;color:#9CA3AF;display:block;margin-top:4px;">With listeners</span>
-                            </div>
-                            <div class="ast ast-r" style="transition-delay:400ms;background:#FFFFFF;border-radius:18px;padding:24px 20px;border:1px solid rgba(16,185,129,0.2);border-top:4px solid #10B981;box-shadow:0 4px 16px rgba(16,185,129,0.08);text-align:center;">
-                                <span style="font-size:48px;font-weight:900;color:#10B981;display:block;line-height:1;">{{ $summary['services']??0 }}</span>
-                                <span style="font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:.12em;display:block;margin-top:8px;font-weight:600;">Services</span>
-                                <span style="font-size:10px;color:#9CA3AF;display:block;margin-top:4px;">Service classes</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            {{-- Bottom tab navigation --}}
-            <div style="background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,0.06);height:52px;display:flex;align-items:stretch;flex-shrink:0;z-index:2;position:relative;">
-                <div style="display:flex;align-items:stretch;gap:0;padding:0 20px;">
-                    @php
-                        $stTabs = [
-                            ['Overview',   '#4F46E5'],
-                            ['Data Layer', '#7C3AED'],
-                            ['HTTP Layer', '#0EA5E9'],
-                            ['Background', '#D97706'],
-                        ];
-                    @endphp
-                    @foreach($stTabs as $ti => [$tl, $tc])
-                    <button id="arch-tab-{{ $ti }}" onclick="archJumpTo({{ $ti }})" style="padding:0 20px;font-size:12px;font-weight:600;color:{{ $ti===0 ? $tc : '#9CA3AF' }};background:none;border:none;border-bottom:2.5px solid {{ $ti===0 ? $tc : 'transparent' }};cursor:pointer;transition:color .25s,border-color .25s;font-family:inherit;letter-spacing:.02em;white-space:nowrap;">{{ $tl }}</button>
-                    @endforeach
-                </div>
-                <div style="margin-left:auto;display:flex;align-items:center;gap:14px;padding:0 20px;">
-                    <div style="width:120px;height:3px;background:#E5E7EB;border-radius:2px;overflow:hidden;">
-                        <div id="arch-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#4F46E5,#0EA5E9);border-radius:2px;transition:width .08s linear;"></div>
-                    </div>
-                    <button onclick="archSkip()" style="font-size:11px;font-weight:600;color:#4F46E5;background:rgba(79,70,229,0.08);border:1px solid rgba(79,70,229,0.2);border-radius:16px;padding:5px 14px;cursor:pointer;font-family:inherit;">Skip →</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="sec-header" style="margin-bottom:20px;">
-        <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
-            <svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-        </div>
-        <div>
-            <h1 class="sec-header__title">Overview</h1>
-            <p class="sec-header__sub">{{ $data['project']['name'] }} · Laravel {{ $data['laravel_version'] }}</p>
-        </div>
-    </div>
-
-    <div style="position:relative;border-radius:16px;margin-bottom:28px;padding:20px 20px 4px;background:#FFFFFF;border:1px solid var(--border);box-shadow:var(--shadow);">
-
     @php
     $kpiIcons = [
         'Models'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>',
@@ -1047,6 +799,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Policies'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
         'Modules'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
         'Dep. Edges'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/>',
+        'Middleware'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>',
     ];
     $kpiColors = [
         'Models'       => ['color'=>'var(--violet)', 'bg'=>'rgba(167,139,250,0.14)'],
@@ -1060,6 +813,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Policies'     => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
         'Modules'      => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
         'Dep. Edges'   => ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)'],
+        'Middleware'   => ['color'=>'var(--emerald)', 'bg'=>'rgba(52,211,153,0.14)'],
     ];
     $stats = [
         ['Models',       $summary['models']??0],
@@ -1073,13 +827,27 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         ['Policies',     $summary['policies']??0],
         ['Modules',      $summary['modules']??0],
         ['Dep. Edges',   count($data['dependencies']['edges']??[])],
+        ['Middleware',   count($rs['middleware_usage']??[])],
+    ];
+    $kpiNav = [
+        'Models'       => 'models',
+        'Controllers'  => 'controllers',
+        'Routes'       => 'routes',
+        'Jobs'         => 'jobs',
+        'Events'       => 'events',
+        'Services'     => 'services',
+        'Repositories' => 'repositories',
+        'Observers'    => 'observers',
+        'Policies'     => 'policies',
+        'Modules'      => 'modules',
+        'Dep. Edges'   => 'dependencies',
     ];
     @endphp
 
-    <div class="kpi-grid" style="margin-bottom:0;position:relative;z-index:1;">
+    <div class="kpi-grid" style="margin-bottom:28px;grid-template-columns:repeat(4,1fr);">
         @foreach($stats as [$label,$count])
-        @php $kc = $kpiColors[$label] ?? ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)']; $ki = $kpiIcons[$label] ?? ''; @endphp
-        <div class="kpi-card ov-reveal" data-ov-reveal style="transition-delay:{{ $loop->index * 45 }}ms;">
+        @php $kc = $kpiColors[$label] ?? ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)']; $ki = $kpiIcons[$label] ?? ''; $kn = $kpiNav[$label] ?? ''; @endphp
+        <div class="kpi-card ov-reveal" data-ov-reveal style="transition-delay:{{ $loop->index * 45 }}ms;{{ $kn ? 'cursor:pointer;' : '' }}" @if($kn) onclick="navigate('{{ $kn }}')" @endif>
             <div class="kpi-card__icon" style="background:{{ $kc['bg'] }};color:{{ $kc['color'] }};">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">{!! $ki !!}</svg>
             </div>
@@ -1088,7 +856,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
         @endforeach
     </div>
-    </div>{{-- /orb-wrapper --}}
 
     {{-- Architecture Explorer --}}
     <div class="ov-panel ov-reveal" data-ov-reveal style="margin-bottom:24px;">
@@ -1222,20 +989,12 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         {{-- Toolbar --}}
         <div class="mds-toolbar">
-            <div class="mds-view-grp">
-                <button id="mds-vbtn-grid" class="mds-view-btn active" onclick="mdsView('grid')" title="Grid">
-                    <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                </button>
-                <button id="mds-vbtn-list" class="mds-view-btn" onclick="mdsView('list')" title="List">
-                    <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                </button>
-            </div>
             <input id="models-search" oninput="filterGrid('models')" type="search" placeholder="Search models…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;flex:1;max-width:240px;font-family:var(--font-mono);">
             <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($data['models']) }} models</span>
         </div>
 
         {{-- Grid view --}}
-        <div id="mds-grid-view">
+        <div id="mds-grid-view" style="display:none;">
             <div class="mds-grid" id="models-grid">
                 @foreach($data['models'] as $i => $model)
                 @php
@@ -1309,13 +1068,13 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
 
         {{-- List view --}}
-        <div id="mds-list-view" style="display:none;">
+        <div id="mds-list-view" style="background:var(--bg-elevated);border-radius:12px;border:1px solid var(--border);overflow:hidden;">
             <div class="mds-list-head">
                 <span></span><span>Model</span><span>Table</span><span>Rels</span><span>Fillable</span><span>Traits</span>
             </div>
             @foreach($data['models'] as $i => $model)
             @php $mp = $mPalette[$i % count($mPalette)]; @endphp
-            <div class="mds-list-row" onclick="showDetail('models',{{ $i }})" data-name="{{ strtolower($model['name']) }}" style="border-color:var(--border);" onmouseenter="this.style.borderColor='{{ $mp['border'] }}'" onmouseleave="this.style.borderColor='var(--border)'">
+            <div class="mds-list-row" onclick="showDetail('models',{{ $i }})" data-name="{{ strtolower($model['name']) }}">
                 <div class="mds-list-av" style="background:{{ $mp['bg'] }};color:{{ $mp['color'] }};border-color:{{ $mp['border'] }};">{{ substr($model['name'],0,1) }}</div>
                 <div>
                     <span style="font-weight:700;font-size:13.5px;color:var(--text);">{{ $model['name'] }}</span>
@@ -1340,21 +1099,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 <section id="sec-controllers" class="p-6" style="display:none">
     <div id="controllers-list">
 
-        {{-- Header --}}
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-            <div class="sec-header" style="margin-bottom:0;">
-                <div class="sec-header__icon" style="background:rgba(255,139,0,.10);border:1px solid rgba(255,139,0,.20);color:var(--amber);">
-                    <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
-                </div>
-                <div>
-                    <h1 class="sec-header__title">Controllers</h1>
-                    <p class="sec-header__sub">HTTP request handlers in your application</p>
-                </div>
-            </div>
-            <input id="controllers-search" oninput="filterGrid('controllers')" type="search" placeholder="Search controllers…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
-        </div>
-
-        {{-- Stats banner --}}
         @php
             $ctrlTotal      = count($data['controllers']);
             $ctrlTotalMeth  = array_sum(array_column($data['controllers'], 'method_count'));
@@ -1362,78 +1106,54 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
             $ctrlResource   = count(array_filter($data['controllers'], fn($c) => !empty($c['is_resource'])));
             $ctrlMaxMethods = max(array_column($data['controllers'], 'method_count') ?: [1]);
         @endphp
-        <div class="sec-stats-banner" style="margin-bottom:24px;">
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(255,139,0,.12);color:var(--amber);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $ctrlTotal }}</div><div class="sec-stat-lbl">Controllers</div></div>
+        <div class="mds-top-stats">
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:var(--amber);">{{ $ctrlTotal }}</span>
+                <span class="mds-top-stat-lbl">Controllers</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(255,139,0,.12);color:var(--amber);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $ctrlTotalMeth }}</div><div class="sec-stat-lbl">Total Methods</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:var(--cyan);">{{ $ctrlTotalMeth }}</span>
+                <span class="mds-top-stat-lbl">Total Methods</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(255,139,0,.12);color:var(--amber);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $ctrlResource }}</div><div class="sec-stat-lbl">Resource</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:var(--emerald);">{{ $ctrlResource }}</span>
+                <span class="mds-top-stat-lbl">Resource</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(255,139,0,.12);color:var(--amber);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $ctrlWithMw }}</div><div class="sec-stat-lbl">With Middleware</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:var(--rose);">{{ $ctrlWithMw }}</span>
+                <span class="mds-top-stat-lbl">With Middleware</span>
             </div>
         </div>
 
-        <div id="controllers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;">
+        <div class="mds-toolbar">
+            <input id="controllers-search" oninput="filterGrid('controllers')" type="search" placeholder="Search controllers…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;flex:1;max-width:240px;font-family:var(--font-mono);">
+            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ $ctrlTotal }} controllers</span>
+        </div>
+
+        <div id="controllers-grid" style="background:var(--bg-elevated);border-radius:12px;border:1px solid var(--border);overflow:hidden;">
+            <div class="mds-list-head" style="grid-template-columns:36px 1fr 80px 70px 70px 90px;">
+                <span></span><span>Controller</span><span>Methods</span><span>Routes</span><span>Deps</span><span>Complexity</span>
+            </div>
             @foreach($data['controllers'] as $i => $ctrl)
             @php
-                $ctrlRouteCount  = count(array_filter($data['routes'] ?? [], fn($r) => class_basename($r['controller']['class'] ?? '') === $ctrl['name']));
-                $ctrlComplexity  = $ctrlMaxMethods > 0 ? round(($ctrl['method_count']??0) / $ctrlMaxMethods * 100) : 0;
+                $ctrlRouteCount = count(array_filter($data['routes'] ?? [], fn($r) => class_basename($r['controller']['class'] ?? '') === $ctrl['name']));
+                $ctrlComplexity = $ctrlMaxMethods > 0 ? round(($ctrl['method_count']??0) / $ctrlMaxMethods * 100) : 0;
             @endphp
-            <div class="ctrl-card" style="--ci:{{$i}};" onclick="showDetail('controllers',{{$i}})" data-name="{{ strtolower($ctrl['name']) }}">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:10px;">
-                    <div style="display:flex;align-items:center;gap:12px;min-width:0;">
-                        <div class="ctrl-card__icon" style="flex:none;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
-                        </div>
-                        <div style="min-width:0;">
-                            <p class="ctrl-card__name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $ctrl['name'] }}</p>
-                            <p class="ctrl-card__ns" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $ctrl['namespace'] }}</p>
-                        </div>
+            <div class="mds-list-row" style="grid-template-columns:36px 1fr 80px 70px 70px 90px;" onclick="showDetail('controllers',{{$i}})" data-name="{{ strtolower($ctrl['name']) }}">
+                <div class="mds-list-av" style="background:rgba(255,139,0,0.10);color:var(--amber);border-color:rgba(255,139,0,0.25);">{{ substr($ctrl['name'],0,1) }}</div>
+                <div style="min-width:0;">
+                    <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        {{ $ctrl['name'] }}
+                        @if(!empty($ctrl['is_resource']))<span style="font-family:var(--font-mono);font-size:9px;padding:2px 6px;border-radius:10px;background:rgba(52,211,153,0.12);color:var(--emerald);border:1px solid rgba(52,211,153,0.25);margin-left:6px;">Resource</span>@endif
                     </div>
-                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none;">
-                        @if(!empty($ctrl['is_resource']))<span style="font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:12px;background:rgba(52,211,153,0.12);color:var(--emerald);border:1px solid rgba(52,211,153,0.25);">Resource</span>@endif
-                    </div>
+                    <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $ctrl['namespace'] }}</div>
                 </div>
-                <div class="resp-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
-                    <div class="ctrl-stat"><b>{{ $ctrl['method_count']??0 }}</b><span>Methods</span></div>
-                    <div class="ctrl-stat"><b>{{ $ctrlRouteCount }}</b><span>Routes</span></div>
-                    <div class="ctrl-stat"><b>{{ count($ctrl['dependencies']??[]) }}</b><span>Deps</span></div>
-                </div>
-                @if(!empty($ctrl['dependencies']))
-                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
-                    @foreach(array_slice($ctrl['dependencies'],0,3) as $dep)
-                    <span class="ctrl-chip">{{ $dep['type'] }}</span>
-                    @endforeach
-                    @if(count($ctrl['dependencies'])>3)<span style="font-size:10px;color:var(--text-faint);">+{{ count($ctrl['dependencies'])-3 }}</span>@endif
-                </div>
-                @endif
-                @if(!empty($ctrl['methods']))
-                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
-                    @foreach(array_slice($ctrl['methods']??[],0,4) as $m)<span class="ctrl-chip">{{ $m }}</span>@endforeach
-                    @if(count($ctrl['methods']??[])>4)<span style="font-size:10px;color:var(--text-faint);">+{{ count($ctrl['methods'])-4 }} more</span>@endif
-                </div>
-                @endif
-                {{-- Complexity bar --}}
-                <div style="border-top:1px solid var(--border);padding-top:10px;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
-                        <span style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);">complexity</span>
-                        <span style="font-size:10px;color:var(--amber);font-family:var(--font-mono);font-weight:700;">{{ $ctrlComplexity }}%</span>
+                <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);text-align:center;">{{ $ctrl['method_count']??0 }}</div>
+                <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--sky);text-align:center;">{{ $ctrlRouteCount }}</div>
+                <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--violet);text-align:center;">{{ count($ctrl['dependencies']??[]) }}</div>
+                <div style="padding-right:8px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                        <span style="font-family:var(--font-mono);font-size:10px;color:var(--amber);font-weight:700;">{{ $ctrlComplexity }}%</span>
                     </div>
                     <div class="ctrl-complexity-track">
                         <div class="ctrl-complexity-fill" style="width:0;" data-target="{{ $ctrlComplexity }}"></div>
@@ -1779,98 +1499,33 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     {{-- List view --}}
     <div id="routes-list">
 
-        {{-- Header --}}
-        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;">
-            <div class="sec-header" style="margin-bottom:0;">
-                <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
-                    <svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <div>
-                    <h1 class="sec-header__title">Route Explorer</h1>
-                    <p class="sec-header__sub">Click any row to explore its full pipeline</p>
-                </div>
+        {{-- Stats (models style) --}}
+        <div class="mds-top-stats">
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:var(--cyan);">{{ $routeTotal }}</span>
+                <span class="mds-top-stat-lbl">Total Routes</span>
             </div>
-            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
-                <div style="position:relative;">
-                    <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text-faint);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input id="routes-search" oninput="filterRoutes()" type="search" placeholder="Search URI or handler…"
-                        style="border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 32px;font-size:12px;width:220px;font-family:var(--font-mono);">
-                </div>
-                <select id="routes-method-filter" onchange="filterRoutes()"
-                    style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-family:var(--font-mono);">
-                    <option value="">All Methods</option>
-                    @foreach(array_keys($rs['by_method']??[]) as $m)<option value="{{ strtoupper($m) }}">{{ strtoupper($m) }}</option>@endforeach
-                </select>
-                <select id="routes-mw-filter" onchange="filterRoutes()"
-                    style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-family:var(--font-mono);max-width:180px;">
-                    <option value="">All Middleware</option>
-                    @foreach(array_keys($rs['middleware_usage']??[]) as $mw)
-                    <option value="{{ $mw }}">{{ class_basename($mw) }}</option>
-                    @endforeach
-                </select>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:var(--emerald);">{{ $routeAuthCount }}</span>
+                <span class="mds-top-stat-lbl">Auth Protected</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:var(--amber);">{{ $routeApiCount }}</span>
+                <span class="mds-top-stat-lbl">API Endpoints</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:var(--rose);">{{ $routePublic }}</span>
+                <span class="mds-top-stat-lbl">Public</span>
             </div>
         </div>
-
-        {{-- Stats banner --}}
-        <div class="sec-stats-banner" style="margin-bottom:20px;">
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(99,102,241,.10);color:var(--cyan);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $routeTotal }}</div><div class="sec-stat-lbl">Total Routes</div></div>
+        <div class="mds-toolbar">
+            <div style="position:relative;">
+                <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text-faint);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input id="routes-search" oninput="filterRoutes()" type="search" placeholder="Search URI or handler…"
+                    style="border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 32px;font-size:12px;width:220px;font-family:var(--font-mono);background:var(--bg-elevated);color:var(--text);">
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(52,211,153,.12);color:var(--emerald);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $routeAuthCount }}</div><div class="sec-stat-lbl">Auth Protected</div></div>
-            </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $routeApiCount }}</div><div class="sec-stat-lbl">API Endpoints</div></div>
-            </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(248,113,113,.12);color:var(--rose);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $routePublic }}</div><div class="sec-stat-lbl">Public</div></div>
-            </div>
+            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ $routeTotal }} routes</span>
         </div>
-
-        {{-- Method distribution stacked bar --}}
-        @if(!empty($routeMethodCounts))
-        <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:20px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                <span style="font-size:12px;font-weight:700;color:var(--text);">Method Distribution</span>
-                <span style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">{{ $routeTotal }} routes total</span>
-            </div>
-            {{-- Stacked bar --}}
-            <div class="method-dist-bar" style="height:12px;margin-bottom:14px;">
-                @foreach($routeMethodCounts as $method => $cnt)
-                @php $mc = $routeMethodColors[$method] ?? ['hex'=>'#94A3B8','bg'=>'rgba(148,163,184,.12)','border'=>'rgba(148,163,184,.3)']; @endphp
-                <div class="method-dist-seg" style="width:{{ round($cnt/$routeDistTotal*100,1) }}%;background:{{ $mc['hex'] }};"
-                     onclick="document.getElementById('routes-method-filter').value='{{ $method }}'; filterRoutes();"
-                     title="{{ $method }}: {{ $cnt }} routes ({{ round($cnt/$routeDistTotal*100,1) }}%)"></div>
-                @endforeach
-            </div>
-            {{-- Legend --}}
-            <div style="display:flex;flex-wrap:wrap;gap:10px;">
-                @foreach($routeMethodCounts as $method => $cnt)
-                @php $mc = $routeMethodColors[$method] ?? ['hex'=>'#94A3B8','bg'=>'rgba(148,163,184,.12)','border'=>'rgba(148,163,184,.3)']; @endphp
-                <button onclick="document.getElementById('routes-method-filter').value='{{ $method }}'; filterRoutes();"
-                    style="display:flex;align-items:center;gap:7px;background:{{ $mc['bg'] }};border:1px solid {{ $mc['border'] }};border-radius:8px;padding:5px 12px;cursor:pointer;transition:opacity .15s;"
-                    onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
-                    <span style="width:8px;height:8px;border-radius:50%;background:{{ $mc['hex'] }};flex:none;"></span>
-                    <span style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:{{ $mc['hex'] }};">{{ $method }}</span>
-                    <span style="font-family:var(--font-mono);font-size:13px;font-weight:800;color:var(--text);">{{ $cnt }}</span>
-                    <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);">{{ round($cnt/$routeDistTotal*100) }}%</span>
-                </button>
-                @endforeach
-            </div>
-        </div>
-        @endif
 
         {{-- Table --}}
         <div style="background:var(--bg-elevated);border-radius:12px;border:1px solid var(--border);overflow:hidden;">
@@ -2378,52 +2033,36 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Jobs --}}
 <section id="sec-jobs" class="p-6" style="display:none">
     <div id="jobs-list">
-        {{-- Header --}}
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-            <div class="sec-header" style="margin-bottom:0;">
-                <div class="sec-header__icon" style="background:rgba(255,139,0,.10);border:1px solid rgba(255,139,0,.20);color:var(--amber);">
-                    <svg viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                </div>
-                <div>
-                    <h1 class="sec-header__title">Jobs</h1>
-                    <p class="sec-header__sub">Background queue jobs in your application</p>
-                </div>
-            </div>
-            <input id="jobs-search" oninput="filterGrid('jobs')" type="search" placeholder="Search jobs…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
-        </div>
-        {{-- Stats --}}
         @php
             $jobsQueued  = count(array_filter($data['jobs'], fn($j) => $j['should_queue']??false));
             $jobsTimeout = count(array_filter($data['jobs'], fn($j) => !empty($j['timeout'])));
         @endphp
-        <div class="sec-stats-banner">
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ count($data['jobs']) }}</div><div class="sec-stat-lbl">Total Jobs</div></div>
+        <div class="mds-top-stats">
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($data['jobs']) }}</span>
+                <span class="mds-top-stat-lbl">Total Jobs</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $jobsQueued }}</div><div class="sec-stat-lbl">ShouldQueue</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $jobsQueued }}</span>
+                <span class="mds-top-stat-lbl">ShouldQueue</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $jobsTimeout }}</div><div class="sec-stat-lbl">With Timeout</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $jobsTimeout }}</span>
+                <span class="mds-top-stat-lbl">With Timeout</span>
             </div>
+        </div>
+        <div class="mds-toolbar">
+            <input id="jobs-search" oninput="filterGrid('jobs')" type="search" placeholder="Search jobs…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
+            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($data['jobs']) }} jobs</span>
         </div>
         @if(empty($data['jobs']))
         <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No jobs found in <code>app/Jobs</code></p></div>
         @else
         <div id="jobs-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['jobs'] as $i => $job)
-            <div class="sec2-card" style="--ci:{{$i}};border-left-color:var(--amber);" onclick="showDetail('jobs',{{$i}})" data-name="{{ strtolower($job['name']) }}">
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#FF2D20;" onclick="showDetail('jobs',{{$i}})" data-name="{{ strtolower($job['name']) }}">
                 <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-                    <div class="sec2-icon" style="background:rgba(251,191,36,.12);color:var(--amber);">
+                    <div class="sec2-icon" style="background:rgba(255,45,32,.10);color:#FF2D20;">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     </div>
                     <div style="min-width:0;flex:1;">
@@ -2431,7 +2070,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         <p class="sec2-sub">queue: {{ $job['queue']??'default' }}</p>
                     </div>
                     @if($job['should_queue']??false)
-                    <span class="sec2-chip" style="background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.25);flex:none;">queued</span>
+                    <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);flex:none;">queued</span>
                     @endif
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -2449,41 +2088,29 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Events --}}
 <section id="sec-events" class="p-6" style="display:none">
     <div id="events-list">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-            <div class="sec-header" style="margin-bottom:0;">
-                <div class="sec-header__icon" style="background:rgba(101,84,192,.10);border:1px solid rgba(101,84,192,.20);color:var(--violet);">
-                    <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                </div>
-                <div>
-                    <h1 class="sec-header__title">Events</h1>
-                    <p class="sec-header__sub">Application events and broadcast listeners</p>
-                </div>
-            </div>
-            <input id="events-search" oninput="filterGrid('events')" type="search" placeholder="Search events…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
-        </div>
         @php $evtBroadcast = count(array_filter($data['events'], fn($e) => $e['should_broadcast']??false)); @endphp
-        <div class="sec-stats-banner">
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(167,139,250,.12);color:var(--violet);">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ count($data['events']) }}</div><div class="sec-stat-lbl">Total Events</div></div>
+        <div class="mds-top-stats">
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($data['events']) }}</span>
+                <span class="mds-top-stat-lbl">Total Events</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(167,139,250,.12);color:var(--violet);">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $evtBroadcast }}</div><div class="sec-stat-lbl">Broadcast</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $evtBroadcast }}</span>
+                <span class="mds-top-stat-lbl">Broadcast</span>
             </div>
+        </div>
+        <div class="mds-toolbar">
+            <input id="events-search" oninput="filterGrid('events')" type="search" placeholder="Search events…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
+            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($data['events']) }} events</span>
         </div>
         @if(empty($data['events']))
         <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No events found in <code>app/Events</code></p></div>
         @else
         <div id="events-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['events'] as $i => $evt)
-            <div class="sec2-card" style="--ci:{{$i}};border-left-color:var(--violet);" onclick="showDetail('events',{{$i}})" data-name="{{ strtolower($evt['name']) }}">
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#FF2D20;" onclick="showDetail('events',{{$i}})" data-name="{{ strtolower($evt['name']) }}">
                 <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;">
-                    <div class="sec2-icon" style="background:rgba(167,139,250,.12);color:var(--violet);">
+                    <div class="sec2-icon" style="background:rgba(255,45,32,.10);color:#FF2D20;">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                     </div>
                     <div style="min-width:0;flex:1;">
@@ -2491,7 +2118,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         <p class="sec2-sub">{{ $evt['namespace'] }}</p>
                     </div>
                     @if($evt['should_broadcast']??false)
-                    <span class="sec2-chip" style="background:rgba(167,139,250,.1);color:var(--violet);border-color:rgba(167,139,250,.3);flex:none;">broadcast</span>
+                    <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);flex:none;">broadcast</span>
                     @endif
                 </div>
                 @if(!empty($evt['properties']))
@@ -2508,44 +2135,32 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Services --}}
 <section id="sec-services" class="p-6" style="display:none">
     <div id="services-list">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-            <div class="sec-header" style="margin-bottom:0;">
-                <div class="sec-header__icon" style="background:rgba(0,135,90,.10);border:1px solid rgba(0,135,90,.20);color:var(--emerald);">
-                    <svg viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </div>
-                <div>
-                    <h1 class="sec-header__title">Services</h1>
-                    <p class="sec-header__sub">Business logic service classes</p>
-                </div>
-            </div>
-            <input id="services-search" oninput="filterGrid('services')" type="search" placeholder="Search services…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
-        </div>
         @php
             $svcTotal   = count($data['services']);
             $svcMethods = $svcTotal > 0 ? round(array_sum(array_map(fn($s) => count($s['methods']??[]), $data['services'])) / $svcTotal) : 0;
         @endphp
-        <div class="sec-stats-banner">
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(45,212,191,.12);color:#2DD4BF;">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $svcTotal }}</div><div class="sec-stat-lbl">Total Services</div></div>
+        <div class="mds-top-stats">
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $svcTotal }}</span>
+                <span class="mds-top-stat-lbl">Total Services</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(45,212,191,.12);color:#2DD4BF;">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $svcMethods }}</div><div class="sec-stat-lbl">Avg Methods</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $svcMethods }}</span>
+                <span class="mds-top-stat-lbl">Avg Methods</span>
             </div>
+        </div>
+        <div class="mds-toolbar">
+            <input id="services-search" oninput="filterGrid('services')" type="search" placeholder="Search services…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
+            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ $svcTotal }} services</span>
         </div>
         @if(empty($data['services']))
         <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No services found in <code>app/Services</code></p></div>
         @else
         <div id="services-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['services'] as $i => $svc)
-            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#2DD4BF;" onclick="showDetail('services',{{$i}})" data-name="{{ strtolower($svc['name']) }}">
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#FF2D20;" onclick="showDetail('services',{{$i}})" data-name="{{ strtolower($svc['name']) }}">
                 <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-                    <div class="sec2-icon" style="background:rgba(45,212,191,.12);color:#2DD4BF;">
+                    <div class="sec2-icon" style="background:rgba(255,45,32,.10);color:#FF2D20;">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     </div>
                     <div style="min-width:0;flex:1;">
@@ -2554,7 +2169,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                     </div>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <span class="sec2-chip" style="background:rgba(45,212,191,.1);color:#2DD4BF;border-color:rgba(45,212,191,.25);">{{ count($svc['methods']??[]) }} methods</span>
+                    <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);">{{ count($svc['methods']??[]) }} methods</span>
                     @if(!empty($svc['dependencies']))<span class="sec2-chip" style="background:var(--bg-hover);color:var(--text-dim);border-color:var(--border);">{{ count($svc['dependencies']) }} deps</span>@endif
                 </div>
             </div>
@@ -2568,42 +2183,28 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Repositories --}}
 <section id="sec-repositories" class="p-6" style="display:none">
     <div id="repositories-list">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-            <div class="sec-header" style="margin-bottom:0;">
-                <div class="sec-header__icon" style="background:rgba(0,101,255,.10);border:1px solid rgba(0,101,255,.20);color:var(--sky);">
-                    <svg viewBox="0 0 24 24"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                </div>
-                <div>
-                    <h1 class="sec-header__title">Repositories</h1>
-                    <p class="sec-header__sub">Data access layer repository classes</p>
-                </div>
-            </div>
-            <input id="repositories-search" oninput="filterGrid('repositories')" type="search" placeholder="Search repositories…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
-        </div>
         @php
             $repoTotal    = count($data['repositories']);
             $repoMethods  = $repoTotal > 0 ? round(array_sum(array_map(fn($r) => count($r['methods']??[]), $data['repositories'])) / $repoTotal) : 0;
             $repoDeps     = array_sum(array_map(fn($r) => count($r['dependencies']??[]), $data['repositories']));
         @endphp
-        <div class="sec-stats-banner">
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(99,102,241,.10);color:var(--cyan);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $repoTotal }}</div><div class="sec-stat-lbl">Repositories</div></div>
+        <div class="mds-top-stats">
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $repoTotal }}</span>
+                <span class="mds-top-stat-lbl">Repositories</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(99,102,241,.10);color:var(--cyan);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $repoMethods }}</div><div class="sec-stat-lbl">Avg Methods</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $repoMethods }}</span>
+                <span class="mds-top-stat-lbl">Avg Methods</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(99,102,241,.10);color:var(--cyan);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $repoDeps }}</div><div class="sec-stat-lbl">Total Deps</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $repoDeps }}</span>
+                <span class="mds-top-stat-lbl">Total Deps</span>
             </div>
+        </div>
+        <div class="mds-toolbar">
+            <input id="repositories-search" oninput="filterGrid('repositories')" type="search" placeholder="Search repositories…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
+            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ $repoTotal }} repositories</span>
         </div>
         @if(empty($data['repositories']))
         <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No repositories found in <code>app/Repositories</code></p></div>
@@ -2619,7 +2220,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 <div style="height:5px;background:linear-gradient(90deg,var(--cyan),var(--cyan-bright));"></div>
                 <div style="padding:18px;">
                     <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
-                        <div style="width:38px;height:38px;border-radius:10px;background:rgba(99,102,241,.10);color:var(--cyan);display:flex;align-items:center;justify-content:center;flex:none;border:1px solid rgba(99,102,241,.2);">
+                        <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,45,32,.10);color:#FF2D20;display:flex;align-items:center;justify-content:center;flex:none;border:1px solid rgba(99,102,241,.2);">
                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                         </div>
                         <div style="min-width:0;flex:1;">
@@ -2628,7 +2229,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <span class="sec2-chip" style="background:rgba(99,102,241,.08);color:var(--cyan);border-color:rgba(99,102,241,.20);">{{ count($repo['methods']??[]) }} methods</span>
+                        <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);">{{ count($repo['methods']??[]) }} methods</span>
                         {{-- Dependency dots --}}
                         @if($repoDotCount > 0)
                         <div style="display:flex;align-items:center;gap:3px;" title="{{ count($repo['dependencies']??[]) }} dependencies">
@@ -2655,43 +2256,31 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Observers --}}
 <section id="sec-observers" class="p-6" style="display:none">
     <div id="observers-list">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-            <div class="sec-header" style="margin-bottom:0;">
-                <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
-                    <svg viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                </div>
-                <div>
-                    <h1 class="sec-header__title">Observers</h1>
-                    <p class="sec-header__sub">Model lifecycle event observers</p>
-                </div>
-            </div>
-            <input id="observers-search" oninput="filterGrid('observers')" type="search" placeholder="Search observers…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
-        </div>
         @php
             $obsModels = count(array_unique(array_filter(array_column($data['observers'], 'model'))));
         @endphp
-        <div class="sec-stats-banner">
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(248,113,113,.12);color:var(--rose);">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ count($data['observers']) }}</div><div class="sec-stat-lbl">Total Observers</div></div>
+        <div class="mds-top-stats">
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($data['observers']) }}</span>
+                <span class="mds-top-stat-lbl">Total Observers</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(248,113,113,.12);color:var(--rose);">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $obsModels }}</div><div class="sec-stat-lbl">Models Covered</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $obsModels }}</span>
+                <span class="mds-top-stat-lbl">Models Covered</span>
             </div>
+        </div>
+        <div class="mds-toolbar">
+            <input id="observers-search" oninput="filterGrid('observers')" type="search" placeholder="Search observers…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
+            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($data['observers']) }} observers</span>
         </div>
         @if(empty($data['observers']))
         <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No observers found in <code>app/Observers</code></p></div>
         @else
         <div id="observers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['observers'] as $i => $obs)
-            <div class="sec2-card" style="--ci:{{$i}};border-left-color:var(--rose);" onclick="showDetail('observers',{{$i}})" data-name="{{ strtolower($obs['name']) }}">
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#FF2D20;" onclick="showDetail('observers',{{$i}})" data-name="{{ strtolower($obs['name']) }}">
                 <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-                    <div class="sec2-icon" style="background:rgba(248,113,113,.12);color:var(--rose);">
+                    <div class="sec2-icon" style="background:rgba(255,45,32,.10);color:#FF2D20;">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                     </div>
                     <div style="min-width:0;flex:1;">
@@ -2702,7 +2291,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 @if(!empty($obs['events']))
                 <div style="display:flex;flex-wrap:wrap;gap:5px;">
                     @foreach($obs['events'] as $e)
-                    <span class="sec2-chip" style="background:rgba(248,113,113,.1);color:var(--rose);border-color:rgba(248,113,113,.25);">{{ $e }}</span>
+                    <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);">{{ $e }}</span>
                     @endforeach
                 </div>
                 @endif
@@ -2717,43 +2306,31 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 {{-- Policies --}}
 <section id="sec-policies" class="p-6" style="display:none">
     <div id="policies-list">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-            <div class="sec-header" style="margin-bottom:0;">
-                <div class="sec-header__icon" style="background:rgba(222,53,11,.10);border:1px solid rgba(222,53,11,.20);color:var(--rose);">
-                    <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                </div>
-                <div>
-                    <h1 class="sec-header__title">Policies</h1>
-                    <p class="sec-header__sub">Authorization policies for your models</p>
-                </div>
-            </div>
-            <input id="policies-search" oninput="filterGrid('policies')" type="search" placeholder="Search policies…" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;width:180px;font-family:var(--font-mono);">
-        </div>
         @php
             $polActions = array_sum(array_map(fn($p) => count($p['actions']??[]), $data['policies']));
         @endphp
-        <div class="sec-stats-banner">
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(52,211,153,.12);color:var(--emerald);">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ count($data['policies']) }}</div><div class="sec-stat-lbl">Total Policies</div></div>
+        <div class="mds-top-stats">
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($data['policies']) }}</span>
+                <span class="mds-top-stat-lbl">Total Policies</span>
             </div>
-            <div class="sec-stat-card">
-                <div class="sec-stat-icon" style="background:rgba(52,211,153,.12);color:var(--emerald);">
-                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                </div>
-                <div><div class="sec-stat-num">{{ $polActions }}</div><div class="sec-stat-lbl">Total Actions</div></div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $polActions }}</span>
+                <span class="mds-top-stat-lbl">Total Actions</span>
             </div>
+        </div>
+        <div class="mds-toolbar">
+            <input id="policies-search" oninput="filterGrid('policies')" type="search" placeholder="Search policies…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
+            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($data['policies']) }} policies</span>
         </div>
         @if(empty($data['policies']))
         <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No policies found in <code>app/Policies</code></p></div>
         @else
         <div id="policies-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
             @foreach($data['policies'] as $i => $pol)
-            <div class="sec2-card" style="--ci:{{$i}};border-left-color:var(--emerald);" onclick="showDetail('policies',{{$i}})" data-name="{{ strtolower($pol['name']) }}">
+            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#FF2D20;" onclick="showDetail('policies',{{$i}})" data-name="{{ strtolower($pol['name']) }}">
                 <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-                    <div class="sec2-icon" style="background:rgba(52,211,153,.12);color:var(--emerald);">
+                    <div class="sec2-icon" style="background:rgba(255,45,32,.10);color:#FF2D20;">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                     </div>
                     <div style="min-width:0;flex:1;">
@@ -2764,7 +2341,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 @if(!empty($pol['actions']))
                 <div style="display:flex;flex-wrap:wrap;gap:5px;">
                     @foreach($pol['actions'] as $a)
-                    <span class="sec2-chip" style="background:rgba(52,211,153,.1);color:var(--emerald);border-color:rgba(52,211,153,.25);">{{ $a }}</span>
+                    <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);">{{ $a }}</span>
                     @endforeach
                 </div>
                 @endif
@@ -3103,17 +2680,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     ];
     @endphp
 
-    {{-- Page Header --}}
-    <div class="sec-header" style="margin-bottom:24px;">
-        <div class="sec-header__icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--cyan);">
-            <svg viewBox="0 0 24 24"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-        </div>
-        <div>
-            <h1 class="sec-header__title">Packages</h1>
-            <p class="sec-header__sub">Composer dependencies detected in your application</p>
-        </div>
-    </div>
-
     @if(empty($packages))
     <div class="atlas-card" style="text-align:center;padding:64px;">
         <div style="width:56px;height:56px;background:var(--bg-hover);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
@@ -3124,38 +2690,28 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
     </div>
     @else
 
-    {{-- Stats Banner --}}
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:28px;">
-        <div class="pkg-stat-card">
-            <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,.10);border:1px solid rgba(99,102,241,.25);display:flex;align-items:center;justify-content:center;flex:none;">
-                <svg style="width:20px;height:20px;color:#6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            </div>
-            <div>
-                <p style="font-size:22px;font-weight:800;color:var(--text);line-height:1;">{{ count($packages) }}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin-top:2px;">Total Packages</p>
-            </div>
+    {{-- Stats --}}
+    <div class="mds-top-stats">
+        <div class="mds-top-stat">
+            <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($packages) }}</span>
+            <span class="mds-top-stat-lbl">Total Packages</span>
         </div>
-        <div class="pkg-stat-card">
-            <div style="width:40px;height:40px;border-radius:10px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);display:flex;align-items:center;justify-content:center;flex:none;">
-                <svg style="width:20px;height:20px;color:#34D399;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
-            </div>
-            <div>
-                <p style="font-size:22px;font-weight:800;color:var(--text);line-height:1;">{{ count($byCategory) }}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin-top:2px;">Categories</p>
-            </div>
+        <div class="mds-top-stat">
+            <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($byCategory) }}</span>
+            <span class="mds-top-stat-lbl">Categories</span>
         </div>
-        <div class="pkg-stat-card">
-            <div style="width:40px;height:40px;border-radius:10px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);display:flex;align-items:center;justify-content:center;flex:none;">
-                <svg style="width:20px;height:20px;color:#FBBF24;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-            </div>
-            <div>
-                <p style="font-size:22px;font-weight:800;color:var(--text);line-height:1;">{{ $devCount }}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin-top:2px;">Dev Only</p>
-            </div>
+        <div class="mds-top-stat">
+            <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $devCount }}</span>
+            <span class="mds-top-stat-lbl">Dev Only</span>
         </div>
+    </div>
+    <div class="mds-toolbar">
+        <input id="packages-search" oninput="filterPackages()" type="search" placeholder="Search packages…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
+        <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($packages) }} packages</span>
     </div>
 
     {{-- Categories --}}
+    <div id="packages-categories">
     @php $globalPkgIdx = 0; @endphp
     @foreach($byCategory as $category => $pkgs)
     @php $catMeta = $categoryMeta[$category] ?? $defaultCatMeta; @endphp
@@ -3178,7 +2734,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
                 $initials = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice(explode(' ', $pkg['name']), 0, 2))));
                 $hasDoc  = !empty($pkg['docs']);
             @endphp
-            <div class="pkg-card" style="--pkg-i:{{ $globalPkgIdx++ }};background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s,box-shadow .2s;" onmouseenter="this.style.borderColor='{{ $dotHex }}88';this.style.boxShadow='0 8px 28px {{ $dotHex }}22';" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='';">
+            <div class="pkg-card" data-name="{{ strtolower($pkg['name'] . ' ' . $pkg['key']) }}" style="--pkg-i:{{ $globalPkgIdx++ }};background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s,box-shadow .2s;" onmouseenter="this.style.borderColor='{{ $dotHex }}88';this.style.boxShadow='0 8px 28px {{ $dotHex }}22';" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='';">
                 {{-- Colored top bar --}}
                 <div style="height:6px;background:linear-gradient(90deg,{{ $dotHex }},{{ $dotHex }}99);"></div>
 
@@ -3226,6 +2782,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         </div>
     </div>
     @endforeach
+    </div>{{-- /packages-categories --}}
 
     @endif
 
@@ -4555,14 +4112,19 @@ function navigate(s) {
             }, 200);
         }
 
-        // Re-trigger health check stagger every time overview is shown.
-        // The IntersectionObserver only fires once, so rows never re-animate
-        // on subsequent navigates — reset each row's animation to replay it.
         if (s === 'overview') {
             setTimeout(() => {
+                // Ensure ov-reveal cards are visible when returning to overview
+                document.querySelectorAll('#sec-overview [data-ov-reveal]').forEach(el => {
+                    el.classList.add('ov-in');
+                    el.querySelectorAll('.kpi-card__num[data-count]').forEach(n => {
+                        _countUp(n, +n.dataset.count, 900);
+                    });
+                });
+                // Re-trigger hc-row stagger animation
                 document.querySelectorAll('#sec-overview .hc-row').forEach(el => {
                     el.style.animation = 'none';
-                    void el.offsetWidth;    // force reflow so browser registers the reset
+                    void el.offsetWidth;
                     el.style.animation = '';
                 });
             }, 80);
@@ -4637,6 +4199,17 @@ function filterGrid(type) {
     const lv = document.getElementById('mds-list-view');
     if (lv && type === 'models') lv.querySelectorAll('[data-name]').forEach(el => {
         el.style.display = el.dataset.name.includes(q) ? '' : 'none';
+    });
+}
+
+function filterPackages() {
+    const q = document.getElementById('packages-search').value.toLowerCase();
+    document.querySelectorAll('#packages-categories .pkg-card').forEach(el => {
+        el.style.display = el.dataset.name.includes(q) ? '' : 'none';
+    });
+    document.querySelectorAll('#packages-categories > div').forEach(cat => {
+        const visible = [...cat.querySelectorAll('.pkg-card')].some(c => c.style.display !== 'none');
+        cat.style.display = visible ? '' : 'none';
     });
 }
 
@@ -7356,6 +6929,19 @@ function _countUp(el, target, duration) {
             });
         }, { threshold: 0.1 });
         document.querySelectorAll('[data-ov-reveal]').forEach(el => io.observe(el));
+
+        // Without the hero section above them, overview cards are immediately in
+        // viewport on load. IO fires async and can miss them — force-reveal once.
+        requestAnimationFrame(() => {
+            document.querySelectorAll('#sec-overview [data-ov-reveal]').forEach(el => {
+                if (el.classList.contains('ov-in')) return;
+                el.classList.add('ov-in');
+                el.querySelectorAll('.kpi-card__num[data-count]').forEach(n => {
+                    _countUp(n, +n.dataset.count, 900);
+                });
+                _animateBars(el);
+            });
+        });
     }
 
     // Sidebar score bar — always visible, animate shortly after load
@@ -9294,243 +8880,6 @@ function _downloadBlob(content, filename, mime, isBlob = false) {
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
-
-// ── Scrollytelling Architecture Story ────────────────────────────────────────
-(function () {
-    const clamp    = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
-    const map01    = (p, s, e)   => clamp((p - s) / (e - s), 0, 1);
-    const easeOut  = t => 1 - Math.pow(1 - t, 3);
-
-    const ST_THEME = [
-        { bg:'linear-gradient(145deg,#ECEEFF 0%,#F7F8FF 50%,#EDFFF8 100%)', orb:'rgba(79,70,229,0.22)',  orb2:'rgba(79,70,229,0.14)',  num:'rgba(79,70,229,0.10)',  tab:'#4F46E5' },
-        { bg:'linear-gradient(145deg,#F2EEFF 0%,#F7F8FF 55%,#EEF0FF 100%)', orb:'rgba(124,58,237,0.22)', orb2:'rgba(124,58,237,0.13)', num:'rgba(124,58,237,0.10)', tab:'#7C3AED' },
-        { bg:'linear-gradient(145deg,#E8F4FF 0%,#F7F8FF 55%,#EEF6FF 100%)', orb:'rgba(14,165,233,0.22)',  orb2:'rgba(14,165,233,0.13)',  num:'rgba(14,165,233,0.10)',  tab:'#0EA5E9' },
-        { bg:'linear-gradient(145deg,#F5F5FF 0%,#F8F8FF 55%,#FFF5F0 100%)', orb:'rgba(249,115,22,0.18)',  orb2:'rgba(249,115,22,0.11)',  num:'rgba(249,115,22,0.09)',  tab:'#D97706' },
-    ];
-    const SCENES = [
-        { enter:-0.10, peak:0.00, hold:0.18, fade:0.25, exit:0.33 },
-        { enter:0.23,  peak:0.29, hold:0.43, fade:0.50, exit:0.58 },
-        { enter:0.48,  peak:0.54, hold:0.68, fade:0.75, exit:0.83 },
-        { enter:0.73,  peak:0.79, hold:1.00, fade:1.20, exit:1.30 },
-    ];
-    let _elData = [], _scenes = [];
-
-    function buildElData() {
-        _scenes = [...document.querySelectorAll('.arch-scene')];
-        _elData = [];
-        _scenes.forEach((scene, si) => {
-            const S = SCENES[si];
-            [...scene.querySelectorAll('.ast')].forEach((el, ei) => {
-                const dir = el.classList.contains('ast-l') ? 'l' : el.classList.contains('ast-r') ? 'r' : 'u';
-                const staggerBase = si === 0 ? S.peak - 0.18 : S.peak;
-                const elEnter = staggerBase + ei * 0.014;
-                const elFull  = elEnter + 0.055;
-                _elData.push({ el, dir, si, elEnter, elFull, elFade:S.fade, elExit:S.exit });
-                el.style.transition = 'none';
-                el.style.willChange = 'opacity, transform';
-            });
-        });
-    }
-
-    let _heroCountDone = false;
-    function heroCountUp() {
-        if (_heroCountDone) return;
-        _heroCountDone = true;
-        document.querySelectorAll('#arch-scene-0 .hero-stat-num[data-target]').forEach(el => {
-            const target = parseInt(el.dataset.target) || 0;
-            if (target === 0) return;
-            let pos = 0, vel = 0, last = null;
-            const k = 180, d = 14;
-            function step(ts) {
-                if (!last) last = ts;
-                const dt = Math.min((ts - last) / 1000, 0.05); last = ts;
-                vel += (-k * (pos - target) - d * vel) * dt; pos += vel * dt;
-                el.textContent = Math.round(pos);
-                if (Math.abs(pos - target) < 0.5 && Math.abs(vel) < 0.5) { el.textContent = target; } else { requestAnimationFrame(step); }
-            }
-            requestAnimationFrame(step);
-        });
-    }
-
-    let _lastTheme = -1;
-    function applyTheme(si) {
-        if (si === _lastTheme) return;
-        _lastTheme = si;
-        if (si === 0) heroCountUp();
-        const T = ST_THEME[si];
-        const sticky = document.getElementById('arch-story-sticky');
-        const orb    = document.getElementById('arch-orb');
-        const orb2   = document.getElementById('arch-orb2');
-        const bgNum  = document.getElementById('arch-bg-num');
-        if (sticky) sticky.style.background = T.bg;
-        if (orb)   orb.style.background   = `radial-gradient(circle,${T.orb} 0%,transparent 70%)`;
-        if (orb2)  orb2.style.background  = `radial-gradient(circle,${T.orb2} 0%,transparent 70%)`;
-        if (bgNum) { bgNum.textContent = String(si + 1).padStart(2, '0'); bgNum.style.color = T.num; }
-        for (let i = 0; i < 4; i++) {
-            const tab = document.getElementById('arch-tab-' + i);
-            if (!tab) continue;
-            tab.style.color       = i === si ? ST_THEME[i].tab : '#9CA3AF';
-            tab.style.borderColor = i === si ? ST_THEME[i].tab : 'transparent';
-        }
-    }
-
-    function frame(p) {
-        const bar = document.getElementById('arch-progress-bar');
-        if (bar) bar.style.width = (p * 100).toFixed(2) + '%';
-        let maxVis = 0, dominant = 0;
-        _scenes.forEach((el, i) => {
-            const S = SCENES[i];
-            const vis = easeOut(map01(p, S.enter, S.peak)) * (1 - easeOut(map01(p, S.fade, S.exit)));
-            el.style.opacity = vis;
-            el.style.pointerEvents = vis > 0.05 ? '' : 'none';
-            if (vis > maxVis) { maxVis = vis; dominant = i; }
-        });
-        applyTheme(dominant);
-        _elData.forEach(({ el, dir, elEnter, elFull, elFade, elExit }) => {
-            const inP  = easeOut(map01(p, elEnter, elFull));
-            const outP = 1 - easeOut(map01(p, elFade, elExit));
-            const vis  = inP * outP;
-            const slide = (1 - inP) * 56;
-            el.style.opacity   = vis;
-            el.style.transform = dir === 'l' ? `translateX(${-slide}px)` : dir === 'r' ? `translateX(${slide}px)` : `translateY(${(1 - inP) * 36}px)`;
-        });
-    }
-
-    function archJumpTo(scene) {
-        const content = document.querySelector('.content');
-        const wrap    = document.getElementById('arch-story-wrap');
-        if (!content || !wrap) return;
-        content.scrollTo({ top: wrap.offsetTop + (SCENES[scene].peak * Math.max(1, wrap.offsetHeight - content.clientHeight)), behavior: 'smooth' });
-    }
-    function archSkip() {
-        const content = document.querySelector('.content');
-        const wrap    = document.getElementById('arch-story-wrap');
-        if (!content || !wrap) return;
-        content.scrollTo({ top: wrap.offsetTop + wrap.offsetHeight, behavior: 'smooth' });
-    }
-    window.archJumpTo = archJumpTo;
-    window.archSkip   = archSkip;
-
-    function initArchStory() {
-        const content = document.querySelector('.content');
-        const wrap    = document.getElementById('arch-story-wrap');
-        if (!content || !wrap) return;
-        buildElData();
-        let _ticking = false;
-        function onScroll() {
-            const scrollable = Math.max(1, wrap.offsetHeight - content.clientHeight);
-            const _p = Math.max(0, Math.min(1, (content.scrollTop - wrap.offsetTop) / scrollable));
-            if (!_ticking) { _ticking = true; requestAnimationFrame(() => { frame(_p); _ticking = false; }); }
-        }
-        content.addEventListener('scroll', onScroll, { passive: true });
-        frame(0);
-    }
-    document.addEventListener('DOMContentLoaded', initArchStory);
-})();
-
-// ── Hero: Parallax · Letter Stagger · Particles · Magnetic Pull ──────────────
-(function() {
-    (function() {
-        const sticky = document.getElementById('arch-story-sticky');
-        if (!sticky) return;
-        const orb   = document.getElementById('arch-orb');
-        const orb2  = document.getElementById('arch-orb2');
-        const bgNum = document.getElementById('arch-bg-num');
-        let mx = 0, my = 0, tx = 0, ty = 0;
-        sticky.addEventListener('mousemove', e => {
-            const r = sticky.getBoundingClientRect();
-            mx = (e.clientX - r.left) / r.width  - 0.5;
-            my = (e.clientY - r.top)  / r.height - 0.5;
-        }, { passive: true });
-        (function loop() {
-            tx += (mx - tx) * 0.06; ty += (my - ty) * 0.06;
-            if (orb)   orb.style.transform   = `translate(${(tx*28).toFixed(2)}px,${(ty*20).toFixed(2)}px)`;
-            if (orb2)  orb2.style.transform  = `translate(${(tx*-18).toFixed(2)}px,${(ty*-14).toFixed(2)}px)`;
-            if (bgNum) bgNum.style.transform = `translate(${(tx*10).toFixed(2)}px,${(ty*8).toFixed(2)}px)`;
-            requestAnimationFrame(loop);
-        })();
-    })();
-
-    function splitHeroTitle() {
-        document.querySelectorAll('.hero-title').forEach(el => {
-            if (el.dataset.split) return;
-            el.dataset.split = '1';
-            if (getComputedStyle(el).webkitTextFillColor === 'rgba(0, 0, 0, 0)') {
-                el.style.animation = 'heroLetterDrop 0.65s cubic-bezier(.34,1.56,.64,1) both';
-                return;
-            }
-            const text = el.textContent;
-            el.textContent = '';
-            text.split('').forEach((ch, i) => {
-                if (ch === ' ') { el.appendChild(document.createTextNode(' ')); return; }
-                const s = document.createElement('span');
-                s.className = 'hero-title-letter';
-                s.textContent = ch;
-                s.style.animationDelay = (i * 36) + 'ms';
-                el.appendChild(s);
-            });
-        });
-    }
-
-    function initParticles() {
-        const canvas = document.getElementById('hero-particles');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        const N = 48, LINK = 120;
-        let W = 0, H = 0, dots = [];
-        function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-        function spawn() { dots = []; for (let i = 0; i < N; i++) dots.push({ x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.38, vy:(Math.random()-.5)*.38 }); }
-        resize(); spawn();
-        window.addEventListener('resize', () => { resize(); spawn(); });
-        function loop() {
-            if (!dots.length || W < 2 || H < 2) { requestAnimationFrame(loop); return; }
-            ctx.clearRect(0, 0, W, H);
-            for (let i = 0; i < N; i++) {
-                const d = dots[i];
-                d.x += d.vx; d.y += d.vy;
-                if (d.x < 0) d.x = W; else if (d.x > W) d.x = 0;
-                if (d.y < 0) d.y = H; else if (d.y > H) d.y = 0;
-                ctx.beginPath(); ctx.arc(d.x, d.y, 2, 0, Math.PI*2);
-                ctx.fillStyle = 'rgba(99,102,241,0.52)'; ctx.fill();
-            }
-            for (let i = 0; i < N; i++) {
-                for (let j = i+1; j < N; j++) {
-                    const dist = Math.hypot(dots[i].x-dots[j].x, dots[i].y-dots[j].y);
-                    if (dist < LINK) {
-                        ctx.beginPath(); ctx.moveTo(dots[i].x,dots[i].y); ctx.lineTo(dots[j].x,dots[j].y);
-                        ctx.strokeStyle = `rgba(99,102,241,${(0.16*(1-dist/LINK)).toFixed(3)})`; ctx.lineWidth = 1; ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(loop);
-        }
-        requestAnimationFrame(loop);
-    }
-
-    function initMagnetic() {
-        document.querySelectorAll('#arch-scene-0 .hero-stat-card').forEach(card => {
-            let raf = null;
-            card.addEventListener('mousemove', e => {
-                if (raf) cancelAnimationFrame(raf);
-                raf = requestAnimationFrame(() => {
-                    const r  = card.getBoundingClientRect();
-                    const dx = (e.clientX - (r.left + r.width/2))  / (r.width/2);
-                    const dy = (e.clientY - (r.top  + r.height/2)) / (r.height/2);
-                    card.style.transition = 'box-shadow .2s';
-                    card.style.transform  = `perspective(800px) rotateX(${(-dy*5).toFixed(2)}deg) rotateY(${(dx*5).toFixed(2)}deg) translate(${(dx*5).toFixed(2)}px,${(dy*5).toFixed(2)}px) translateZ(6px)`;
-                    raf = null;
-                });
-            }, { passive: true });
-            card.addEventListener('mouseleave', () => {
-                if (raf) { cancelAnimationFrame(raf); raf = null; }
-                card.style.transition = 'transform 0.5s cubic-bezier(.34,1.56,.64,1), box-shadow .25s';
-                card.style.transform  = '';
-            });
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => { splitHeroTitle(); initParticles(); initMagnetic(); });
-})();
 
 // ── Card 3D tilt on hover ────────────────────────────────────────────────────
 (function() {
