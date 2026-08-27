@@ -692,11 +692,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         <div class="nav-group">
             <span class="nav-group__label">Components</span>
-            <button onclick="navigate('repositories')" id="nav-repositories" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                Repositories
-                @if(($summary['repositories']??0)>0)<span class="nav-badge">{{ $summary['repositories'] }}</span>@endif
-            </button>
             <button onclick="navigate('observers')" id="nav-observers" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 Observers
@@ -777,7 +772,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Controllers'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>',
         'Routes'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
         'Jobs'         => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>',
-        'Repositories' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>',
         'Observers'    => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>',
         'Policies'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
         'Modules'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
@@ -789,7 +783,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Controllers'  => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
         'Routes'       => ['color'=>'var(--emerald)','bg'=>'rgba(52,211,153,0.14)'],
         'Jobs'         => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
-        'Repositories' => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
         'Observers'    => ['color'=>'var(--amber)',  'bg'=>'rgba(251,191,36,0.14)'],
         'Policies'     => ['color'=>'var(--sky)',    'bg'=>'rgba(96,165,250,0.14)'],
         'Modules'      => ['color'=>'var(--cyan)',   'bg'=>'rgba(99,102,241,0.10)'],
@@ -800,7 +793,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         ['Models',       $summary['models']??0],
         ['Controllers',  $summary['controllers']??0],
         ['Routes',       $rs['total']??0],
-        ['Repositories', $summary['repositories']??0],
         ['Observers',    $summary['observers']??0],
         ['Policies',     $summary['policies']??0],
         ['Modules',      $summary['modules']??0],
@@ -811,7 +803,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Models'       => 'models',
         'Controllers'  => 'controllers',
         'Routes'       => 'routes',
-        'Repositories' => 'repositories',
         'Observers'    => 'observers',
         'Policies'     => 'policies',
         'Modules'      => 'modules',
@@ -2006,79 +1997,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 </section>
 
 {{-- Jobs --}}
-
-{{-- Repositories --}}
-<section id="sec-repositories" class="p-6" style="display:none">
-    <div id="repositories-list">
-        @php
-            $repoTotal    = count($data['repositories']);
-            $repoMethods  = $repoTotal > 0 ? round(array_sum(array_map(fn($r) => count($r['methods']??[]), $data['repositories'])) / $repoTotal) : 0;
-            $repoDeps     = array_sum(array_map(fn($r) => count($r['dependencies']??[]), $data['repositories']));
-        @endphp
-        <div class="mds-top-stats">
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $repoTotal }}</span>
-                <span class="mds-top-stat-lbl">Repositories</span>
-            </div>
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $repoMethods }}</span>
-                <span class="mds-top-stat-lbl">Avg Methods</span>
-            </div>
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $repoDeps }}</span>
-                <span class="mds-top-stat-lbl">Total Deps</span>
-            </div>
-        </div>
-        <div class="mds-toolbar">
-            <input id="repositories-search" oninput="filterGrid('repositories')" type="search" placeholder="Search repositories…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
-            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ $repoTotal }} repositories</span>
-        </div>
-        @if(empty($data['repositories']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No repositories found in <code>app/Repositories</code></p></div>
-        @else
-        <div id="repositories-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
-            @foreach($data['repositories'] as $i => $repo)
-            @php $repoDotCount = min(count($repo['dependencies']??[]), 8); @endphp
-            <div class="repo-card" style="--ci:{{$i}};background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s,border-color .2s;"
-                 onclick="showDetail('repositories',{{$i}})" data-name="{{ strtolower($repo['name']) }}"
-                 onmouseenter="this.style.borderColor='rgba(99,102,241,0.4)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(99,102,241,0.10)'"
-                 onmouseleave="this.style.borderColor='var(--border)';this.style.transform='';this.style.boxShadow='var(--shadow)'">
-                {{-- Top bar --}}
-                <div style="height:5px;background:linear-gradient(90deg,var(--cyan),var(--cyan-bright));"></div>
-                <div style="padding:18px;">
-                    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
-                        <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,45,32,.10);color:#FF2D20;display:flex;align-items:center;justify-content:center;flex:none;border:1px solid rgba(99,102,241,.2);">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                        </div>
-                        <div style="min-width:0;flex:1;">
-                            <p style="font-weight:700;font-size:14px;color:var(--text);margin:0 0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $repo['name'] }}</p>
-                            <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $repo['namespace'] }}</p>
-                        </div>
-                    </div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);">{{ count($repo['methods']??[]) }} methods</span>
-                        {{-- Dependency dots --}}
-                        @if($repoDotCount > 0)
-                        <div style="display:flex;align-items:center;gap:3px;" title="{{ count($repo['dependencies']??[]) }} dependencies">
-                            @for($d=0;$d<$repoDotCount;$d++)
-                            <div class="repo-dep-dot" style="opacity:{{ round(1 - ($d / max($repoDotCount,1)) * 0.5, 2) }};"></div>
-                            @endfor
-                            @if(count($repo['dependencies']??[]) > 8)
-                            <span style="font-size:9px;color:var(--text-faint);font-family:var(--font-mono);">+{{ count($repo['dependencies'])-8 }}</span>
-                            @endif
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-        @endif
-    </div>
-    <div id="repositories-detail" style="display:none">
-        <div id="repositories-detail-content"></div>
-    </div>
-</section>
 
 {{-- Observers --}}
 <section id="sec-observers" class="p-6" style="display:none">
@@ -3390,7 +3308,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','repositories','observers','policies','dependencies','export','ai','chat','aidocs','deadcode'];
+const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','observers','policies','dependencies','export','ai','chat','aidocs','deadcode'];
 
 let depRendered     = false;
 let mapTreeRendered = false;
@@ -3881,7 +3799,7 @@ function navigate(s) {
     const sectionNames = {
         overview:'Overview', models:'Models', modelmap:'Relation Graph', controllers:'Controllers',
         routes:'Routes', apidocs:'API Docs',
-        repositories:'Repositories', observers:'Observers', policies:'Policies',
+        observers:'Observers', policies:'Policies',
         dependencies:'Dependencies', export:'Export', ai:'AI Insights', chat:'AI Chat',
         aidocs:'AI Docs', modules:'Modules', packages:'Packages', deadcode:'Dead Code'
     };
@@ -3972,7 +3890,7 @@ function _atlasTheme(el) {
 
 const _SECTION_LABELS = {
     models:'Models', controllers:'Controllers', routes:'Route Explorer',
-    repositories:'Repositories', observers:'Observers', policies:'Policies',
+    observers:'Observers', policies:'Policies',
 };
 let _activeDetailType = null;
 
@@ -4573,7 +4491,6 @@ function rfRefreshPanel() {
 function renderDetail(type, item) {
     const map = {
         models: renderModel, controllers: renderController,
-        repositories: x => renderService(x, 'Repository'),
         observers: renderObserver, policies: renderPolicy,
     };
     return (map[type] || (() => ''))(item);
@@ -7591,7 +7508,6 @@ function _buildAIGraphicReport(d, ai, docs) {
         ['Models',       s.models??0,        '#8b5cf6','#f5f3ff','#ede9fe'],
         ['Controllers',  s.controllers??0,   '#3b82f6','#eff6ff','#dbeafe'],
         ['Routes',       s.routes??0,        '#10b981','#f0fdf4','#d1fae5'],
-        ['Repositories', s.repositories??0,  '#f59e0b','#fffbeb','#fef3c7'],
         ['Jobs',         s.jobs??0,          '#f97316','#fff7ed','#ffedd5'],
         ['Policies',     s.policies??0,      '#64748b','#f8fafc','#f1f5f9'],
         ['API Routes',   rs.api??0,          '#0891b2','#ecfeff','#cffafe'],
@@ -7864,7 +7780,7 @@ function exportMarkdown() {
     const rows = [
         ['Models', s.models], ['Controllers', s.controllers], ['Routes', s.routes],
         ,
-        ['Repositories', s.repositories], ['Observers', s.observers],
+        ['Observers', s.observers],
         ['Policies', s.policies], ['Modules', s.modules], ['Packages', s.packages],
         ['Dep. Edges', (d.dependencies?.edges || []).length],
     ];
@@ -8044,7 +7960,6 @@ function _buildGraphicReport(d) {
         ['Models',       s.models       ?? 0, '#8b5cf6', '#f5f3ff', '#ede9fe'],
         ['Controllers',  s.controllers  ?? 0, '#3b82f6', '#eff6ff', '#dbeafe'],
         ['Routes',       s.routes       ?? 0, '#10b981', '#f0fdf4', '#d1fae5'],
-        ['Repositories', s.repositories ?? 0, '#f59e0b', '#fffbeb', '#fef3c7'],
         ['Jobs',         s.jobs         ?? 0, '#f97316', '#fff7ed', '#ffedd5'],
         ['Observers',    s.observers    ?? 0, '#ec4899', '#fdf2f8', '#fce7f3'],
         ['Policies',     s.policies     ?? 0, '#64748b', '#f8fafc', '#f1f5f9'],
