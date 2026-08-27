@@ -692,11 +692,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
         <div class="nav-group">
             <span class="nav-group__label">Components</span>
-            <button onclick="navigate('jobs')" id="nav-jobs" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                Jobs
-                @if(($summary['jobs']??0)>0)<span class="nav-badge">{{ $summary['jobs'] }}</span>@endif
-            </button>
             <button onclick="navigate('events')" id="nav-events" class="nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 Events
@@ -819,7 +814,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         ['Models',       $summary['models']??0],
         ['Controllers',  $summary['controllers']??0],
         ['Routes',       $rs['total']??0],
-        ['Jobs',         $summary['jobs']??0],
         ['Events',       $summary['events']??0],
         ['Services',     $summary['services']??0],
         ['Repositories', $summary['repositories']??0],
@@ -833,8 +827,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
         'Models'       => 'models',
         'Controllers'  => 'controllers',
         'Routes'       => 'routes',
-        'Jobs'         => 'jobs',
-        'Events'       => 'events',
+            'Events'       => 'events',
         'Services'     => 'services',
         'Repositories' => 'repositories',
         'Observers'    => 'observers',
@@ -2031,59 +2024,6 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 </section>
 
 {{-- Jobs --}}
-<section id="sec-jobs" class="p-6" style="display:none">
-    <div id="jobs-list">
-        @php
-            $jobsQueued  = count(array_filter($data['jobs'], fn($j) => $j['should_queue']??false));
-            $jobsTimeout = count(array_filter($data['jobs'], fn($j) => !empty($j['timeout'])));
-        @endphp
-        <div class="mds-top-stats">
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($data['jobs']) }}</span>
-                <span class="mds-top-stat-lbl">Total Jobs</span>
-            </div>
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $jobsQueued }}</span>
-                <span class="mds-top-stat-lbl">ShouldQueue</span>
-            </div>
-            <div class="mds-top-stat">
-                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $jobsTimeout }}</span>
-                <span class="mds-top-stat-lbl">With Timeout</span>
-            </div>
-        </div>
-        <div class="mds-toolbar">
-            <input id="jobs-search" oninput="filterGrid('jobs')" type="search" placeholder="Search jobs…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
-            <span style="margin-left:auto;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ count($data['jobs']) }} jobs</span>
-        </div>
-        @if(empty($data['jobs']))
-        <div class="atlas-card" style="text-align:center;padding:48px;"><p style="color:var(--text-faint);">No jobs found in <code>app/Jobs</code></p></div>
-        @else
-        <div id="jobs-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
-            @foreach($data['jobs'] as $i => $job)
-            <div class="sec2-card" style="--ci:{{$i}};border-left-color:#FF2D20;" onclick="showDetail('jobs',{{$i}})" data-name="{{ strtolower($job['name']) }}">
-                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-                    <div class="sec2-icon" style="background:rgba(255,45,32,.10);color:#FF2D20;">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </div>
-                    <div style="min-width:0;flex:1;">
-                        <p class="sec2-name">{{ $job['name'] }}</p>
-                        <p class="sec2-sub">queue: {{ $job['queue']??'default' }}</p>
-                    </div>
-                    @if($job['should_queue']??false)
-                    <span class="sec2-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.20);flex:none;">queued</span>
-                    @endif
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    @if($job['tries']??null)<span class="sec2-chip" style="background:var(--bg-hover);color:var(--text-dim);border-color:var(--border);">{{ $job['tries'] }} tries</span>@endif
-                    @if($job['timeout']??null)<span class="sec2-chip" style="background:var(--bg-hover);color:var(--text-dim);border-color:var(--border);">{{ $job['timeout'] }}s timeout</span>@endif
-                </div>
-            </div>
-            @endforeach
-        </div>
-        @endif
-    </div>
-    <div id="jobs-detail" style="display:none"><div id="jobs-detail-content"></div></div>
-</section>
 
 {{-- Events --}}
 <section id="sec-events" class="p-6" style="display:none">
@@ -3563,7 +3503,7 @@ $gradeClass = match(strtoupper($grade[0] ?? 'F')) {
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','jobs','events','services','repositories','observers','policies','dependencies','export','ai','chat','aidocs','deadcode'];
+const SECTIONS = ['overview','modules','packages','models','modelmap','controllers','routes','apidocs','events','services','repositories','observers','policies','dependencies','export','ai','chat','aidocs','deadcode'];
 
 let depRendered     = false;
 let mapTreeRendered = false;
@@ -4053,7 +3993,7 @@ function navigate(s) {
     _moveNavIndicator(s);
     const sectionNames = {
         overview:'Overview', models:'Models', modelmap:'Relation Graph', controllers:'Controllers',
-        routes:'Routes', apidocs:'API Docs', jobs:'Jobs', events:'Events', services:'Services',
+        routes:'Routes', apidocs:'API Docs', events:'Events', services:'Services',
         repositories:'Repositories', observers:'Observers', policies:'Policies',
         dependencies:'Dependencies', export:'Export', ai:'AI Insights', chat:'AI Chat',
         aidocs:'AI Docs', modules:'Modules', packages:'Packages', deadcode:'Dead Code'
@@ -4145,7 +4085,7 @@ function _atlasTheme(el) {
 
 const _SECTION_LABELS = {
     models:'Models', controllers:'Controllers', routes:'Route Explorer',
-    jobs:'Jobs', events:'Events', services:'Services',
+    events:'Events', services:'Services',
     repositories:'Repositories', observers:'Observers', policies:'Policies',
 };
 let _activeDetailType = null;
@@ -4747,7 +4687,7 @@ function rfRefreshPanel() {
 function renderDetail(type, item) {
     const map = {
         models: renderModel, controllers: renderController,
-        jobs: renderJob, events: renderEvent,
+        events: renderEvent,
         services: x => renderService(x, 'Service'),
         repositories: x => renderService(x, 'Repository'),
         observers: renderObserver, policies: renderPolicy,
@@ -5345,61 +5285,6 @@ function renderController(c) {
         </div>`;
     }
 
-    return h;
-}
-
-function renderJob(j) {
-    const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    const clr = '#FBBF24', rgb = '251,191,36';
-    let h = `
-    <div style="background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border);padding:24px;margin-bottom:24px;">
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-            <div style="width:56px;height:56px;border-radius:14px;background:rgba(${rgb},.13);border:1px solid rgba(${rgb},.3);display:flex;align-items:center;justify-content:center;flex:none;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${clr}" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div style="flex:1;min-width:0;">
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
-                    <h2 style="font-size:22px;font-weight:700;color:var(--text);margin:0;">${esc(j.name)}</h2>
-                    ${j.should_queue ? `<span style="font-size:11px;background:rgba(${rgb},.12);color:${clr};border:1px solid rgba(${rgb},.3);padding:2px 10px;border-radius:20px;font-weight:600;">Queued</span>` : ''}
-                </div>
-                <p style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin:0 0 2px;">${esc(j.namespace)}</p>
-                <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin:0;">${esc(j.path || '')}</p>
-            </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-            <div style="background:rgba(${rgb},.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(${rgb},.18);">
-                <p style="font-size:13px;font-weight:700;color:${clr};margin:0 0 2px;font-family:var(--font-mono);">${esc(j.queue || 'default')}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin:0;">Queue</p>
-            </div>
-            <div style="background:rgba(96,165,250,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(96,165,250,.18);">
-                <p style="font-size:22px;font-weight:700;color:#60A5FA;margin:0 0 2px;">${j.tries || '—'}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin:0;">Max Tries</p>
-            </div>
-            <div style="background:rgba(167,139,250,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(167,139,250,.18);">
-                <p style="font-size:22px;font-weight:700;color:#A78BFA;margin:0 0 2px;">${j.timeout ? esc(j.timeout)+'s' : '—'}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin:0;">Timeout</p>
-            </div>
-            <div style="background:rgba(52,211,153,.08);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(52,211,153,.18);">
-                <p style="font-size:22px;font-weight:700;color:#34D399;margin:0 0 2px;">${j.delay ? esc(j.delay)+'s' : '—'}</p>
-                <p style="font-size:11px;color:var(--text-faint);margin:0;">Delay</p>
-            </div>
-        </div>
-    </div>`;
-    const flags = [
-        j.should_queue  && `<span style="font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;background:rgba(${rgb},.1);color:${clr};">ShouldQueue</span>`,
-        j.unique        && `<span style="font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;background:rgba(99,102,241,.08);color:#6366F1;">ShouldBeUnique</span>`,
-        j.encrypted     && `<span style="font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;background:rgba(167,139,250,.1);color:#A78BFA;">ShouldBeEncrypted</span>`,
-    ].filter(Boolean);
-    if (flags.length) h += detailCard('Queue Interfaces', `<div style="display:flex;flex-wrap:wrap;gap:8px;">${flags.join('')}</div>`);
-    if (j.dependencies?.length) {
-        const depItems = j.dependencies.map(d =>
-            `<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(167,139,250,.07);border-radius:9px;border:1px solid rgba(167,139,250,.18);">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.5" style="flex:none;"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-                <div><span style="font-size:11px;font-family:var(--font-mono);color:#6D28D9;font-weight:600;">${esc(d.type||d)}</span>${d.name?`<span style="font-size:10px;color:#9CA3AF;margin-left:5px;">$${esc(d.name)}</span>`:''}</div>
-            </div>`
-        ).join('');
-        h += detailCard('Dependencies', `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;">${depItems}</div>`);
-    }
     return h;
 }
 
@@ -8146,7 +8031,7 @@ function exportMarkdown() {
     out.push('|-----------|------:|');
     const rows = [
         ['Models', s.models], ['Controllers', s.controllers], ['Routes', s.routes],
-        ['Jobs', s.jobs], ['Events', s.events], ['Services', s.services],
+        ['Events', s.events], ['Services', s.services],
         ['Repositories', s.repositories], ['Observers', s.observers],
         ['Policies', s.policies], ['Modules', s.modules], ['Packages', s.packages],
         ['Dep. Edges', (d.dependencies?.edges || []).length],
