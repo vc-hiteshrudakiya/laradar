@@ -1,6 +1,6 @@
 {
     "name": "vcian/laradar",
-    "description": "Automatically discover, visualize, and document Laravel application architecture with an interactive dashboard, HTML/JSON/Markdown reports, dependency graphs, and AI-powered insights.",
+    "description": "Automatically discover, visualize, and document Laravel application architecture with an interactive dashboard, HTML/JSON/Markdown reports, and AI-powered insights.",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -10,17 +10,13 @@
         "visualization",
         "dashboard",
         "documentation",
-        "dependency-graph",
         "ai",
         "code-analysis",
         "laradar"
     ],
     "authors": [
         {
-            "name": "Hitesh Rudakiya",
-            "email": "hitesh.rudakiya@viitor.cloud",
-            "homepage": "https://viitorcloud.com",
-            "role": "Developer"
+            "name": "Vcian - ViitorCloud"
         }
     ],
     "homepage": "https://github.com/vcian/laradar",

@@ -82,10 +82,13 @@ class ControllerAnalyzer
         if (!preg_match('/public\s+function\s+__construct\s*\(([^)]+)\)/s', $content, $m)) {
             return [];
         }
-        preg_match_all('/\b([A-Z][\w\\\\]+)\s+\$(\w+)/', $m[1], $hits);
+        // Handle union types (Foo|Bar $var), nullable (?Foo $var), intersection (Foo&Bar $var)
+        preg_match_all('/\??([A-Z][\w\\\\]+(?:[|&]\??[A-Z][\w\\\\]+)*)\s+\$(\w+)/', $m[1], $hits);
         $deps = [];
-        foreach ($hits[1] as $i => $type) {
-            $short = class_basename(str_replace('\\', '/', $type));
+        foreach ($hits[1] as $i => $typeExpr) {
+            // For union/intersection types, use the first concrete type
+            $primary = preg_split('/[|&]/', $typeExpr)[0];
+            $short   = class_basename(str_replace('\\', '/', $primary));
             if (in_array($short, ['Request', 'Response', 'Application', 'Container'])) continue;
             $deps[] = ['type' => $short, 'var' => $hits[2][$i]];
         }
@@ -135,8 +138,10 @@ class ControllerAnalyzer
             if ($sig !== '') {
                 foreach (preg_split('/,(?![^<>]*>)/', $sig) as $param) {
                     $param = trim($param);
-                    if (preg_match('/\b([A-Z][\w\\\\]+)\s+\$(\w+)/', $param, $p)) {
-                        $params[] = ['type' => class_basename(str_replace('\\', '/', $p[1])), 'var' => $p[2]];
+                    // Handle union/intersection types and nullable prefix
+                    if (preg_match('/\??([A-Z][\w\\\\]+(?:[|&]\??[A-Z][\w\\\\]+)*)\s+\$(\w+)/', $param, $p)) {
+                        $primary  = preg_split('/[|&]/', $p[1])[0];
+                        $params[] = ['type' => class_basename(str_replace('\\', '/', $primary)), 'var' => $p[2]];
                     } elseif (preg_match('/\$(\w+)/', $param, $p)) {
                         $params[] = ['type' => null, 'var' => $p[1]];
                     }

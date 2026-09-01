@@ -99,15 +99,9 @@ PROMPT;
             'model'       => $model,
             'messages'    => [['role' => 'user', 'content' => $prompt]],
             'temperature' => (float) ($this->config['temperature'] ?? 0.2),
-            'max_tokens'  => 8192,
         ];
 
-        if ($jsonMode) {
-            $body['response_format'] = ['type' => 'json_object'];
-        }
-
-        $response = Http::timeout(60)
-            ->withHeaders([
+        $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type'  => 'application/json',
             ])

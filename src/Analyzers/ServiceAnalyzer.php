@@ -62,10 +62,15 @@ class ServiceAnalyzer
         return [
             'name'         => $name,
             'namespace'    => $namespace,
-            'path'         => $file->getRelativePathname(),
+            'path'         => $this->relativePath($file->getRealPath()),
             'dependencies' => $dependencies,
             'methods'      => $methods,
             'method_count' => count($methods),
         ];
+    }
+
+    private function relativePath(string $absolutePath): string
+    {
+        return ltrim(str_replace(base_path(), '', $absolutePath), DIRECTORY_SEPARATOR);
     }
 }

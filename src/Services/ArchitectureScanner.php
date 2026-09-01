@@ -42,20 +42,13 @@ class ArchitectureScanner
             'policies'     => fn($item) => $report->addPolicy($item),
             'modules'      => fn($item) => $report->addModule($item),
             'packages'     => fn($item) => $report->addPackage($item),
-            'api_docs'     => fn($item) => $report->addApiDoc($item),
+            'migrations'   => fn($item) => $report->addMigration($item),
         ];
 
         foreach ($extendedMap as $type => $addFn) {
             if (!isset($this->analyzers[$type])) continue;
             $result = $this->analyzers[$type]->analyze();
             foreach ($result['items']  as $item)  { $addFn($item); }
-            foreach ($result['errors'] as $error) { $report->addError($error); }
-        }
-
-        // Dependency graph
-        if (isset($this->analyzers['dependencies'])) {
-            $result = $this->analyzers['dependencies']->analyze();
-            $report->setDependencies($result);
             foreach ($result['errors'] as $error) { $report->addError($error); }
         }
 

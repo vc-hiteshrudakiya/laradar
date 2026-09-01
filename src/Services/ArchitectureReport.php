@@ -11,7 +11,6 @@ class ArchitectureReport
     private array $routes       = [];
     private array $errors       = [];
     private array $performance  = [];
-    private array $dependencies = ['nodes' => [], 'edges' => []];
     private array $score        = [];
     private array $jobs         = [];
     private array $events       = [];
@@ -21,7 +20,7 @@ class ArchitectureReport
     private array $policies     = [];
     private array $modules      = [];
     private array $packages     = [];
-    private array $apiDocs      = [];
+    private array $migrations   = [];
 
     public function __construct(
         private string $projectName,
@@ -41,14 +40,6 @@ class ArchitectureReport
     public function addRoute(array $route): void       { $this->routes[]      = $route; }
     public function addError(array $error): void       { $this->errors[]      = $error; }
 
-    public function setDependencies(array $graph): void
-    {
-        $this->dependencies = [
-            'nodes' => $graph['nodes'] ?? [],
-            'edges' => $graph['edges'] ?? [],
-        ];
-    }
-
     public function setScore(array $score): void
     {
         $this->score = $score;
@@ -62,7 +53,7 @@ class ArchitectureReport
     public function addPolicy(array $p): void        { $this->policies[]     = $p; }
     public function addModule(array $m): void        { $this->modules[]      = $m; }
     public function addPackage(array $p): void       { $this->packages[]     = $p; }
-    public function addApiDoc(array $e): void        { $this->apiDocs[]      = $e; }
+    public function addMigration(array $m): void    { $this->migrations[]   = $m; }
 
     public function getReport(): array
     {
@@ -89,10 +80,10 @@ class ArchitectureReport
                 'policies'             => count($this->policies),
                 'modules'              => count($this->modules),
                 'packages'             => count($this->packages),
+                'migrations'           => count($this->migrations),
                 'relationship_summary' => $this->buildRelationshipSummary(),
             ],
             'route_summary' => $this->buildRouteSummary(),
-            'dependencies'  => $this->dependencies,
             'models'        => $this->models,
             'controllers'   => $this->controllers,
             'routes'        => $this->routes,
@@ -104,7 +95,7 @@ class ArchitectureReport
             'policies'      => $this->policies,
             'modules'       => $this->modules,
             'packages'      => $this->packages,
-            'api_docs'      => $this->apiDocs,
+            'migrations'    => $this->migrations,
             'errors'        => $this->errors,
         ];
     }

@@ -5,12 +5,11 @@ namespace Vcian\Laradar;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Vcian\Laradar\Analyzers\ControllerAnalyzer;
-use Vcian\Laradar\Analyzers\DependencyAnalyzer;
 use Vcian\Laradar\Analyzers\EventAnalyzer;
 use Vcian\Laradar\Analyzers\JobAnalyzer;
+use Vcian\Laradar\Analyzers\MigrationAnalyzer;
 use Vcian\Laradar\Analyzers\ModelAnalyzer;
 use Vcian\Laradar\Analyzers\ObserverAnalyzer;
-use Vcian\Laradar\Analyzers\ApiDocAnalyzer;
 use Vcian\Laradar\Analyzers\ModuleAnalyzer;
 use Vcian\Laradar\Analyzers\PackageDetector;
 use Vcian\Laradar\Analyzers\PolicyAnalyzer;
@@ -19,7 +18,6 @@ use Vcian\Laradar\Analyzers\ServiceAnalyzer;
 use Vcian\Laradar\AI\AIManager;
 use Vcian\Laradar\Http\Controllers\AIController;
 use Vcian\Laradar\Http\Controllers\DashboardController;
-use Vcian\Laradar\Http\Controllers\ExportController;
 use Vcian\Laradar\Services\ArchitectureScanner;
 use Vcian\Laradar\Services\ReportExporter;
 
@@ -55,10 +53,6 @@ class LaradarServiceProvider extends ServiceProvider
 
             if ($scan['routes'] ?? true) {
                 $analyzers['routes'] = new RouteAnalyzer($appNamespace);
-            }
-
-            if ($scan['dependencies'] ?? true) {
-                $analyzers['dependencies'] = new DependencyAnalyzer(app_path());
             }
 
             if ($scan['jobs'] ?? true) {
@@ -109,10 +103,9 @@ class LaradarServiceProvider extends ServiceProvider
                 $analyzers['packages'] = new PackageDetector(base_path());
             }
 
-            if ($scan['api_docs'] ?? true) {
-                $analyzers['api_docs'] = new ApiDocAnalyzer(
-                    $appNamespace,
-                    app_path()
+            if ($scan['migrations'] ?? true) {
+                $analyzers['migrations'] = new MigrationAnalyzer(
+                    $paths['migrations'] ?? database_path('migrations')
                 );
             }
 
@@ -165,23 +158,62 @@ class LaradarServiceProvider extends ServiceProvider
             return;
         }
 
-        $path       = $config['path']       ?? 'architecture';
+        $path       = $config['path']       ?? 'laradar';
         $middleware = $config['middleware']  ?? ['web'];
 
+        // Overview (root)
         Route::middleware($middleware)
-            ->get($path, DashboardController::class)
+            ->get($path, [DashboardController::class, 'overview'])
             ->name('laradar.dashboard');
 
+        // Per-section pages
+        foreach (['models','controllers','routes','migrations','jobs','events','services',
+                  'repositories','observers','policies','modules','middleware',
+                  'packages','ai','chat','aidocs'] as $section) {
+            $method = $section === 'middleware' ? 'middlewarePage' : $section;
+            Route::middleware($middleware)
+                ->get($path . '/' . $section, [DashboardController::class, $method])
+                ->name('laradar.' . $section);
+        }
+
+        // Model detail page
         Route::middleware($middleware)
-            ->get($path . '/export/{format}', ExportController::class)
-            ->name('laradar.export')
-            ->where('format', 'html|svg');
+            ->get($path . '/models/{model}', [DashboardController::class, 'modelDetail'])
+            ->name('laradar.model.detail')
+            ->where('model', '[a-zA-Z0-9_]+');
+
+        // Serve the last generated HTML scan report
+        Route::middleware($middleware)
+            ->get($path . '/report', function () {
+                $file = storage_path('architecture/report.html');
+                if (!file_exists($file)) {
+                    abort(404, 'No report found. Run php artisan laradar:scan first.');
+                }
+                return response(file_get_contents($file), 200, ['Content-Type' => 'text/html']);
+            })
+            ->name('laradar.report');
 
         Route::middleware($middleware)->group(function () use ($path) {
             Route::post($path . '/ai/analyze',       [AIController::class, 'analyze'])->name('laradar.ai.analyze');
             Route::post($path . '/ai/chat',          [AIController::class, 'chat'])->name('laradar.ai.chat');
             Route::post($path . '/ai/documentation', [AIController::class, 'documentation'])->name('laradar.ai.documentation');
         });
+
+        // Serve package static assets (icon, favicons) without requiring vendor:publish
+        Route::get($path . '/assets/{filename}', function (string $filename) {
+            $file = realpath(__DIR__ . '/../public/' . $filename);
+            $base = realpath(__DIR__ . '/../public');
+            if (!$file || !str_starts_with($file, $base) || !file_exists($file)) {
+                abort(404);
+            }
+            $mime = match(pathinfo($filename, PATHINFO_EXTENSION)) {
+                'svg'  => 'image/svg+xml',
+                'ico'  => 'image/x-icon',
+                'png'  => 'image/png',
+                default => 'application/octet-stream',
+            };
+            return response()->file($file, ['Content-Type' => $mime, 'Cache-Control' => 'public, max-age=86400']);
+        })->name('laradar.asset')->where('filename', '[a-zA-Z0-9_\-\.]+');
     }
 
     private function detectModulesPath(): string

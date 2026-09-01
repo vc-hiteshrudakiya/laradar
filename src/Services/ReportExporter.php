@@ -71,11 +71,9 @@ class ReportExporter
         // header bar
         $svg .= '<rect x="0" y="0" width="' . $W . '" height="66" fill="#1e293b"/>' . "\n";
         $svg .= '<text x="20" y="28" font-size="18" font-weight="bold" fill="white">'
-              . htmlspecialchars($project, ENT_XML1) . ' — Architecture Overview</text>' . "\n";
+              . htmlspecialchars($project, ENT_XML1) . ' — Laradar Report</text>' . "\n";
         $svg .= '<text x="20" y="50" font-size="12" fill="#94a3b8">'
-              . 'Laravel ' . htmlspecialchars($data['laravel_version'], ENT_XML1)
-              . ' · PHP ' . htmlspecialchars($data['php_version'], ENT_XML1)
-              . ' · laradar v' . htmlspecialchars($data['package_version'], ENT_XML1)
+              . htmlspecialchars($data['generated_at'], ENT_XML1)
               . '</text>' . "\n";
 
         // score badge in header
@@ -118,13 +116,9 @@ class ReportExporter
                   . $color . '">' . htmlspecialchars($name, ENT_XML1) . '</text>' . "\n";
         }
 
-        // dep-edge count badge
-        $edgeCount = count($data['dependencies']['edges'] ?? []);
-        $nodeCount = count($data['dependencies']['nodes'] ?? []);
-        $svg .= '<rect x="' . ($W - 220) . '" y="' . ($H - 55) . '" width="210" height="40" rx="8" fill="#1e293b" opacity="0.85"/>' . "\n";
-        $svg .= '<text x="' . ($W - 115) . '" y="' . ($H - 35) . '" text-anchor="middle" font-size="11" fill="#94a3b8">'
-              . $nodeCount . ' dependency nodes · ' . $edgeCount . ' edges</text>' . "\n";
-        $svg .= '<text x="' . ($W - 115) . '" y="' . ($H - 20) . '" text-anchor="middle" font-size="10" fill="#64748b">'
+        // generated-at badge
+        $svg .= '<rect x="' . ($W - 220) . '" y="' . ($H - 40) . '" width="210" height="26" rx="6" fill="#1e293b" opacity="0.75"/>' . "\n";
+        $svg .= '<text x="' . ($W - 115) . '" y="' . ($H - 22) . '" text-anchor="middle" font-size="10" fill="#64748b">'
               . htmlspecialchars($data['generated_at'], ENT_XML1) . '</text>' . "\n";
 
         $svg .= '</svg>';
@@ -138,7 +132,7 @@ class ReportExporter
         $out  = [];
 
         // ── Header ────────────────────────────────────────────────
-        $out[] = "# Architecture Report — {$data['project']['name']}";
+        $out[] = "# Laradar Report — {$data['project']['name']}";
         $out[] = '';
         $out[] = "> Generated: {$data['generated_at']}  ";
         $out[] = "> Laravel {$data['laravel_version']} · PHP {$data['php_version']} · laradar v{$data['package_version']}";
@@ -171,76 +165,37 @@ class ReportExporter
         $out[] = "| Models | {$data['summary']['models']} |";
         $out[] = "| Controllers | {$data['summary']['controllers']} |";
         $out[] = "| Routes | {$data['summary']['routes']} |";
-        $out[] = "| Dependency edges | " . count($data['dependencies']['edges']) . " |";
+        $out[] = "| Jobs | {$data['summary']['jobs']} |";
+        $out[] = "| Events | {$data['summary']['events']} |";
+        $out[] = "| Services | {$data['summary']['services']} |";
+        $out[] = "| Repositories | {$data['summary']['repositories']} |";
+        $out[] = "| Observers | {$data['summary']['observers']} |";
+        $out[] = "| Policies | {$data['summary']['policies']} |";
+        $out[] = "| Modules | {$data['summary']['modules']} |";
+        $out[] = "| Packages | {$data['summary']['packages']} |";
 
-        // Route analysis
         $rs = $data['route_summary'];
-        if (!empty($rs['api_versions'])) {
-            $out[] = "| API Versions | " . implode(', ', array_keys($rs['api_versions'])) . " |";
-        }
+        $mwCount = count($rs['middleware_usage'] ?? []);
         $out[] = "| Named Routes | {$rs['named_count']} / {$rs['total']} |";
+        $out[] = "| Unique Middleware | {$mwCount} |";
         $out[] = '';
 
-        // ── Dependency Graph (Mermaid — renders on GitHub) ────────
-        $deps = $data['dependencies'];
-        if (!empty($deps['edges'])) {
+        // ── Migrations ────────────────────────────────────────────
+        if (!empty($data['migrations'])) {
             $out[] = '---';
             $out[] = '';
-            $out[] = '## Dependency Graph';
+            $out[] = '## Migrations';
             $out[] = '';
-            $out[] = '```mermaid';
-            $out[] = 'flowchart TD';
-
-            $layerStyle = [
-                'controller' => ':::controller',
-                'service'    => ':::service',
-                'repository' => ':::repository',
-                'model'      => ':::model',
-                'job'        => ':::job',
-                'event'      => ':::event',
-                'listener'   => ':::listener',
-                'database'   => ':::database',
-            ];
-            $edgeLabel = ['injects' => '', 'uses' => 'uses', 'triggers' => 'triggers', 'persists' => 'persists'];
-
-            // Group by layer for subgraphs
-            $layerOrder  = ['controller', 'job', 'event', 'listener', 'service', 'repository', 'model'];
-            $layerLabels = ['controller' => 'Controllers', 'job' => 'Jobs', 'event' => 'Events',
-                'listener' => 'Listeners', 'service' => 'Services', 'repository' => 'Repositories', 'model' => 'Models'];
-            $byLayer = [];
-            foreach ($deps['nodes'] as $node) {
-                $l = $node['layer'] ?? 'model';
-                if ($l !== 'database') $byLayer[$l][] = $node['name'];
+            $out[] = '| Date | Operation | Table | Columns | Foreign Keys |';
+            $out[] = '|------|-----------|-------|--------:|-------------:|';
+            foreach ($data['migrations'] as $mg) {
+                $op   = strtoupper($mg['operation'] ?? 'unknown');
+                $tbl  = $mg['table'] ?? '—';
+                $cols = count($mg['columns'] ?? []);
+                $fks  = count($mg['foreign_keys'] ?? []);
+                $date = $mg['date'] ?? '—';
+                $out[] = "| {$date} | {$op} | `{$tbl}` | {$cols} | {$fks} |";
             }
-            foreach ($layerOrder as $layer) {
-                if (empty($byLayer[$layer])) continue;
-                $out[] = "    subgraph {$layerLabels[$layer]}";
-                foreach ($byLayer[$layer] as $nm) { $out[] = "        {$nm}"; }
-                $out[] = '    end';
-            }
-
-            // Database cylinder node
-            $hasDb = !empty(array_filter($deps['nodes'], fn($n) => ($n['layer'] ?? '') === 'database'));
-            if ($hasDb) $out[] = '    Database[("Database")]';
-
-            foreach ($deps['edges'] as $edge) {
-                $lbl   = $edgeLabel[$edge['type'] ?? ''] ?? '';
-                $arrow = $lbl ? "-->|\"{$lbl}\"|" : '-->';
-                $fromStyle = $layerStyle[$deps['nodes'][array_search($edge['from'], array_column($deps['nodes'], 'name'))]['layer'] ?? ''] ?? '';
-                $toStyle   = $layerStyle[$deps['nodes'][array_search($edge['to'],   array_column($deps['nodes'], 'name'))]['layer'] ?? ''] ?? '';
-                $out[] = "    {$edge['from']}{$fromStyle} {$arrow} {$edge['to']}{$toStyle}";
-            }
-
-            $out[] = '';
-            $out[] = '    classDef controller fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a';
-            $out[] = '    classDef service    fill:#d1fae5,stroke:#10b981,color:#064e3b';
-            $out[] = '    classDef repository fill:#fef3c7,stroke:#f59e0b,color:#78350f';
-            $out[] = '    classDef model      fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95';
-            $out[] = '    classDef job        fill:#fef9c3,stroke:#ca8a04,color:#713f12';
-            $out[] = '    classDef event      fill:#fdf4ff,stroke:#a855f7,color:#581c87';
-            $out[] = '    classDef listener   fill:#fce7f3,stroke:#ec4899,color:#831843';
-            $out[] = '    classDef database   fill:#f1f5f9,stroke:#64748b,color:#1e293b';
-            $out[] = '```';
             $out[] = '';
         }
 
@@ -302,6 +257,143 @@ class ReportExporter
             $out[] = "| {$methods} | `{$route['uri']}` | {$ctrl} | {$action} | {$name} | {$mw} |";
         }
         $out[] = '';
+
+        // ── Middleware ────────────────────────────────────────────
+        if (!empty($rs['middleware_usage'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Middleware Usage';
+            $out[] = '';
+            $out[] = '| Middleware | Count |';
+            $out[] = '|------------|------:|';
+            foreach ($rs['middleware_usage'] as $mw => $cnt) {
+                $out[] = "| `{$mw}` | {$cnt} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Jobs ─────────────────────────────────────────────────
+        if (!empty($data['jobs'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Jobs';
+            $out[] = '';
+            $out[] = '| Job | Namespace | Queue | Tries | Timeout |';
+            $out[] = '|-----|-----------|-------|------:|--------:|';
+            foreach ($data['jobs'] as $item) {
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$item['queue']} | {$item['tries']} | {$item['timeout']} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Events ───────────────────────────────────────────────
+        if (!empty($data['events'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Events';
+            $out[] = '';
+            $out[] = '| Event | Namespace | Listeners | Properties |';
+            $out[] = '|-------|-----------|----------:|-----------:|';
+            foreach ($data['events'] as $item) {
+                $listeners = count($item['listeners'] ?? []);
+                $props     = count($item['properties'] ?? []);
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$listeners} | {$props} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Services ─────────────────────────────────────────────
+        if (!empty($data['services'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Services';
+            $out[] = '';
+            $out[] = '| Service | Namespace | Methods |';
+            $out[] = '|---------|-----------|--------:|';
+            foreach ($data['services'] as $item) {
+                $mc = count($item['methods'] ?? []);
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$mc} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Repositories ─────────────────────────────────────────
+        if (!empty($data['repositories'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Repositories';
+            $out[] = '';
+            $out[] = '| Repository | Namespace | Methods |';
+            $out[] = '|------------|-----------|--------:|';
+            foreach ($data['repositories'] as $item) {
+                $mc = count($item['methods'] ?? []);
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$mc} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Observers ────────────────────────────────────────────
+        if (!empty($data['observers'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Observers';
+            $out[] = '';
+            $out[] = '| Observer | Namespace | Observed Model | Events |';
+            $out[] = '|----------|-----------|----------------|--------|';
+            foreach ($data['observers'] as $item) {
+                $model  = class_basename($item['model'] ?? '—');
+                $events = implode(', ', $item['events'] ?? []) ?: '—';
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$model} | {$events} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Policies ─────────────────────────────────────────────
+        if (!empty($data['policies'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Policies';
+            $out[] = '';
+            $out[] = '| Policy | Namespace | Model | Actions |';
+            $out[] = '|--------|-----------|-------|---------|';
+            foreach ($data['policies'] as $item) {
+                $model   = class_basename($item['model'] ?? '—');
+                $actions = implode(', ', $item['actions'] ?? []) ?: '—';
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$model} | {$actions} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Modules ──────────────────────────────────────────────
+        if (!empty($data['modules'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Modules';
+            $out[] = '';
+            $out[] = '| Module | Path | Routes |';
+            $out[] = '|--------|------|-------:|';
+            foreach ($data['modules'] as $item) {
+                $out[] = "| {$item['name']} | `{$item['path']}` | {$item['routes']} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Packages ─────────────────────────────────────────────
+        if (!empty($data['packages'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Packages';
+            $out[] = '';
+            $out[] = '| Package | Version | Type | Description |';
+            $out[] = '|---------|---------|------|-------------|';
+            foreach ($data['packages'] as $pkg) {
+                $desc    = str_replace('|', '\\|', $pkg['description'] ?? '—');
+                $version = $pkg['version'] ?? '—';
+                $type    = $pkg['type'] ?? 'library';
+                $out[] = "| {$pkg['name']} | {$version} | {$type} | {$desc} |";
+            }
+            $out[] = '';
+        }
 
         return implode("\n", $out);
     }

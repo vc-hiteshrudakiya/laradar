@@ -29,28 +29,64 @@ class AIManager
 
     public function analyze(array $architectureData): AIAnalysisResponse
     {
-        return $this->provider()->analyze($architectureData);
+        try {
+            return $this->provider()->analyze($architectureData);
+        } catch (\Throwable $e) {
+            return $this->withFallback(fn($p) => $p->analyze($architectureData), $e);
+        }
     }
 
     public function reviewArchitecture(array $architectureData): AIAnalysisResponse
     {
-        return $this->provider()->reviewArchitecture($architectureData);
+        try {
+            return $this->provider()->reviewArchitecture($architectureData);
+        } catch (\Throwable $e) {
+            return $this->withFallback(fn($p) => $p->reviewArchitecture($architectureData), $e);
+        }
     }
 
     public function chat(string $message, array $context = []): string
     {
-        return $this->provider()->chat($message, $context);
+        try {
+            return $this->provider()->chat($message, $context);
+        } catch (\Throwable $e) {
+            return $this->withFallback(fn($p) => $p->chat($message, $context), $e);
+        }
     }
 
     public function generateDocumentation(array $architectureData, string $type = 'architecture'): string
     {
-        return $this->provider()->generateDocumentation($architectureData, $type);
+        try {
+            return $this->provider()->generateDocumentation($architectureData, $type);
+        } catch (\Throwable $e) {
+            return $this->withFallback(fn($p) => $p->generateDocumentation($architectureData, $type), $e);
+        }
+    }
+
+    private function withFallback(\Closure $call, \Throwable $original): mixed
+    {
+        $fallbackName = $this->config['fallback_provider'] ?? null;
+        $primaryName  = $this->config['provider'] ?? null;
+
+        if ($fallbackName && $fallbackName !== $primaryName) {
+            return $call($this->makeProvider($fallbackName));
+        }
+
+        throw $original;
     }
 
     public function provider(): AIProvider
     {
         if ($this->resolvedProvider === null) {
-            $this->resolvedProvider = $this->makeProvider($this->config['provider'] ?? 'gemini');
+            $provider = $this->config['provider'] ?? null;
+
+            if (!$provider) {
+                throw new RuntimeException(
+                    'No AI provider could be detected. Add an API key to your .env (e.g. ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY) and set AI_ENABLED=true.'
+                );
+            }
+
+            $this->resolvedProvider = $this->makeProvider($provider);
         }
 
         return $this->resolvedProvider;
@@ -66,7 +102,7 @@ class AIManager
         $this->customProviders[$name] = $provider;
 
         // If this name is the active provider, apply it right away.
-        if (($this->config['provider'] ?? 'gemini') === $name) {
+        if (($this->config['provider'] ?? null) === $name) {
             $this->resolvedProvider = $provider;
         }
     }

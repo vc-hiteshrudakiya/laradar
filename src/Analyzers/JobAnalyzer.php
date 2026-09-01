@@ -73,7 +73,7 @@ class JobAnalyzer
         return [
             'name'          => $name,
             'namespace'     => $namespace,
-            'path'          => $file->getRelativePathname(),
+            'path'          => $this->relativePath($file->getRealPath()),
             'should_queue'  => str_contains($content, 'ShouldQueue'),
             'unique'        => str_contains($content, 'ShouldBeUnique'),
             'encrypted'     => str_contains($content, 'ShouldBeEncrypted'),
@@ -83,5 +83,10 @@ class JobAnalyzer
             'delay'         => $delay,
             'dependencies'  => $dependencies,
         ];
+    }
+
+    private function relativePath(string $absolutePath): string
+    {
+        return ltrim(str_replace(base_path(), '', $absolutePath), DIRECTORY_SEPARATOR);
     }
 }

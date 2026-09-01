@@ -12,6 +12,14 @@ class AIController extends Controller
 {
     private const DOC_TYPES = ['architecture', 'models', 'controllers', 'routes', 'services', 'modules'];
 
+    public function __construct()
+    {
+        $perMinute = config('laradar.ai.rate_limit', 30);
+        if ($perMinute > 0) {
+            $this->middleware("throttle:{$perMinute},1")->only(['chat', 'analyze']);
+        }
+    }
+
     public function analyze(Laradar $discovery, AIManager $ai): JsonResponse
     {
         if (!$ai->isEnabled()) {
@@ -39,8 +47,9 @@ class AIController extends Controller
         if (empty($message)) {
             return response()->json(['error' => 'Message is required.'], 422);
         }
-        if (strlen($message) > 5000) {
-            return response()->json(['error' => 'Message too long. Maximum 5000 characters allowed.'], 422);
+        $maxLen = config('laradar.ai.max_message_length', 5000);
+        if (strlen($message) > $maxLen) {
+            return response()->json(['error' => "Message too long. Maximum {$maxLen} characters allowed."], 422);
         }
 
         try {
