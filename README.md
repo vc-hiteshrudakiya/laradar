@@ -1,88 +1,100 @@
-# Laradar
+<div align="center">
+    <h1>Laradar</h1>
+</div>
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/vcian/laradar.svg?style=flat-square&label=Packagist)](https://packagist.org/packages/vcian/laradar)
-[![Total Downloads](https://img.shields.io/packagist/dt/vcian/laradar.svg?style=flat-square&label=Downloads)](https://packagist.org/packages/vcian/laradar)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-[![PHP](https://img.shields.io/badge/PHP-%5E8.1-blue.svg?style=flat-square)](https://www.php.net)
-[![Laravel](https://img.shields.io/badge/Laravel-10%20|%2011%20|%2012%20|%2013-red.svg?style=flat-square)](https://laravel.com)
+<p align="center">
+    <a href="https://packagist.org/packages/vcian/laradar"><img src="https://img.shields.io/packagist/v/vcian/laradar.svg?style=flat-square" alt="Latest Version on Packagist"></a>
+    <a href="https://packagist.org/packages/vcian/laradar"><img src="https://img.shields.io/packagist/dt/vcian/laradar.svg?style=flat-square" alt="Total Downloads"></a>
+    <a href="https://www.php.net"><img src="https://img.shields.io/badge/PHP-%5E8.1-blue.svg?style=flat-square" alt="PHP Version"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="License"></a>
+    <a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-10%20|%2011%20|%2012%20|%2013-red.svg?style=flat-square" alt="Laravel"></a>
+</p>
 
-Automatically **discover, visualize, and document** your Laravel application architecture — without writing a single line of configuration.
+Laradar automatically **discovers, visualizes, and documents** your Laravel application architecture - without writing a single line of configuration.
 
-## Screenshots
-
-![Dashboard Overview](art/dashboard.png)
-
-![Models Explorer](art/models.png)
-
-![Routes Explorer](art/routes.png)
-
-- Interactive dashboard with architecture overview, flowchart, and route explorer
-- Scans models, controllers, routes, jobs, events, services, repositories, observers, policies, middleware, modules, and packages
-- Optional **AI-powered architecture review** (OpenAI, Anthropic, Gemini, Groq, Mistral, Ollama, OpenRouter)
+Drop it into any Laravel project and instantly get an interactive dashboard that maps your models, controllers, routes, migrations, jobs, events, services, and more. Optionally enhance it with AI-powered architecture insights from any of 7 supported providers.
 
 ---
 
-## Requirements
+## Why Laradar?
 
-| Dependency | Version |
-|---|---|
-| PHP | ^8.1 |
-| Laravel | 10, 11, 12, or 13 |
+As a Laravel application grows, understanding its full structure becomes harder. New team members spend days reading code to understand what exists. Developers duplicate logic because they didn't know a service already existed. Architecture decisions get made without a clear picture of the whole.
+
+Laradar gives everyone on the team - from the developer who wrote it to the one who just joined - an instant, accurate map of the application. No documentation to maintain. No diagrams to keep updated. Just install and the dashboard reflects the real state of the project at all times.
 
 ---
 
-## Installation
+## Quick Start
+
+**1. Install the package:**
 
 ```bash
 composer require vcian/laradar
 ```
 
-Publish the config file:
+**2. Publish the config:**
 
 ```bash
 php artisan vendor:publish --tag=laradar-config
 ```
 
----
-
-## Interactive Dashboard
-
-Visit `/laradar` in your browser (only available when `APP_ENV=local` or `APP_ENV=development` by default):
+**3. Visit the dashboard:**
 
 ```
 http://your-app.test/laradar
 ```
 
-The dashboard provides:
-- **Overview** — component counts, architecture score, health checks, and architecture flowchart
-- **Models** — relationships, fillable fields, table mappings
-- **Controllers** — methods, route bindings, dependencies
-- **Routes** — full route list with methods, middleware, and controllers
-- **Migrations** — all migration files with table name, operation (create/modify/drop), columns, types, and foreign keys
-- **Jobs / Events / Services / Repositories / Observers / Policies / Middleware / Modules / Packages** — per-component explorer
-- **AI Insights** — AI-powered review of your architecture (requires AI config)
+> The dashboard is only accessible when `APP_ENV=local` or `APP_ENV=development`. It is automatically disabled in production.
 
 ---
 
-## Artisan Command
+## Dashboard
 
-Generate reports from the command line:
+<div align="center">
+
+![Laradar Dashboard](art/dashboard.png)
+
+</div>
+
+Laradar scans your application once on page load and presents all data instantly.
+
+| Section | What you see |
+|---|---|
+| **Overview** | Architecture score, component counts, and an interactive architecture flowchart |
+| **Models** | Table mappings, fillable fields, hidden fields, casts, and relationships |
+| **Controllers** | Methods, route bindings, and class dependencies |
+| **Routes** | Full route list with HTTP method, URI, middleware, name, and controller |
+| **Migrations** | Every migration file with its table operation, column types, and foreign keys |
+| **Jobs** | Queue connections and class hierarchy |
+| **Events** | Listeners and broadcast channels |
+| **Services** | All classes discovered in `App\Services` |
+| **Repositories** | All classes discovered in `App\Repositories` |
+| **Observers** | Observed models and registered event hooks |
+| **Policies** | Guarded models and defined abilities |
+| **Middleware** | All registered middleware and their aliases |
+| **Modules** | Modular structure detection from `Modules/` directory |
+| **Packages** | Installed Composer packages with version information |
+| **AI Insights** | AI-powered review of your architecture (requires AI configuration) |
+
+---
+
+## Artisan Reports
+
+Generate a full architecture report without opening the browser:
 
 ```bash
-# Generate all formats (json, html, markdown)
 php artisan laradar:scan
+```
 
-# Generate specific formats
+Export in a specific format:
+
+```bash
 php artisan laradar:scan --format=html
 php artisan laradar:scan --format=json
 php artisan laradar:scan --format=markdown
 ```
 
-Reports are saved to `storage/architecture/`. After scanning, the HTML report is also accessible in the browser at:
-
-```
-http://your-app.test/laradar/report
-```
+Reports are saved to `storage/architecture/`. The HTML report is also viewable in the browser at `http://your-app.test/laradar/report`.
 
 ---
 
@@ -94,7 +106,7 @@ http://your-app.test/laradar/report
 return [
     'dashboard' => [
         'enabled'    => true,
-        'path'       => 'laradar',         // URL path
+        'path'       => 'laradar',       // dashboard URL: /laradar
         'middleware' => ['web'],
     ],
 
@@ -113,7 +125,6 @@ return [
         'packages'     => true,
     ],
 
-    // AI analysis (optional)
     'ai' => [
         'enabled'  => env('AI_ENABLED', false),
         'provider' => env('AI_PROVIDER', 'gemini'),
@@ -125,71 +136,51 @@ return [
 
 ## AI Analysis
 
-Add to your `.env`:
+Laradar can send your architecture summary to an AI provider and return an architectural review directly inside the dashboard.
+
+Enable it in your `.env`:
 
 ```env
 AI_ENABLED=true
-
-# Choose one provider:
-
-# Google Gemini
 AI_PROVIDER=gemini
 GEMINI_API_KEY=your-key
-GEMINI_MODEL=gemini-2.0-flash
-
-# OpenAI
-AI_PROVIDER=openai
-OPENAI_API_KEY=your-key
-OPENAI_MODEL=gpt-4o-mini
-
-# Anthropic Claude
-AI_PROVIDER=anthropic
-ANTHROPIC_API_KEY=your-key
-ANTHROPIC_MODEL=claude-3-5-haiku-20241022
-
-# Groq (fast & free tier)
-AI_PROVIDER=groq
-GROQ_API_KEY=your-key
-GROQ_MODEL=llama-3.3-70b-versatile
-
-# Mistral
-AI_PROVIDER=mistral
-MISTRAL_API_KEY=your-key
-MISTRAL_MODEL=mistral-small-latest
-
-# Ollama (local)
-AI_PROVIDER=ollama
-OLLAMA_MODEL=llama3
-OLLAMA_BASE_URL=http://localhost:11434/v1
-
-# OpenRouter (200+ models, free tier available)
-AI_PROVIDER=openrouter
-OPENROUTER_API_KEY=your-key
-OPENROUTER_MODEL=openrouter/auto       # auto-selects best available model
+GEMINI_MODEL=gemini-2.0-flash   # the model used for the architecture review
 ```
+
+**Supported providers:**
+
+| Provider | `AI_PROVIDER` | API Key | Model |
+|---|---|---|---|
+| Google Gemini | `gemini` | `GEMINI_API_KEY` | `GEMINI_MODEL` |
+| OpenAI | `openai` | `OPENAI_API_KEY` | `OPENAI_MODEL` |
+| Anthropic Claude | `anthropic` | `ANTHROPIC_API_KEY` | `ANTHROPIC_MODEL` |
+| Groq | `groq` | `GROQ_API_KEY` | `GROQ_MODEL` |
+| Mistral | `mistral` | `MISTRAL_API_KEY` | `MISTRAL_MODEL` |
+| Ollama *(local, no key needed)* | `ollama` | — | `OLLAMA_MODEL` |
+| OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `OPENROUTER_MODEL` |
 
 ---
 
 ## What Gets Scanned
 
-| Component | What is detected |
+| Component | Detected Information |
 |---|---|
 | **Models** | Table, fillable, hidden, casts, relationships, observers |
 | **Controllers** | Methods, route bindings, dependencies |
-| **Routes** | URI, method, middleware, name, controller |
+| **Routes** | URI, HTTP method, middleware, name, controller |
+| **Migrations** | Table operations, column types, foreign keys |
 | **Jobs** | Queue connection, class hierarchy |
 | **Events** | Listeners, broadcast channels |
-| **Services** | Service classes in `App\Services` |
-| **Repositories** | Repository classes in `App\Repositories` |
+| **Services** | Classes in `App\Services` |
+| **Repositories** | Classes in `App\Repositories` |
 | **Observers** | Observed models, event hooks |
 | **Policies** | Guarded models, defined abilities |
-| **Migrations** | Migration files, table operations, column types, foreign keys |
 | **Middleware** | Registered middleware and aliases |
-| **Modules** | Module detection from `Modules/` directory |
-| **Packages** | Installed Composer packages with version info |
+| **Modules** | Detection from `Modules/` directory |
+| **Packages** | Composer packages with version info |
 
 ---
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+Laradar is open-sourced software licensed under the [MIT license](LICENSE).

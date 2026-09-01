@@ -30,7 +30,7 @@
                 <span></span><span>Policy</span><span>Model</span><span>Actions</span>
             </div>
             @foreach($data['policies'] as $i => $pol)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 120px 1fr;cursor:pointer;" onclick="showDetail('policies',{{$i}})" data-name="{{ strtolower($pol['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 120px 1fr;" data-name="{{ strtolower($pol['name']) }}">
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($pol['name'],0,1)) }}</div>
                 <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pol['name'] }}</div>
                 <div style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pol['model']??'Unknown' }}</div>
@@ -44,6 +44,5 @@
         </div>
         @endif
     </div>
-    <div id="policies-detail" style="display:none"><div id="policies-detail-content"></div></div>
 
 

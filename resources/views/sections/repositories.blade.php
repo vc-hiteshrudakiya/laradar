@@ -36,7 +36,7 @@
                 <span></span><span>Repository</span><span>Methods</span><span>Deps</span>
             </div>
             @foreach($data['repositories'] as $i => $repo)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 90px 80px;cursor:pointer;" onclick="showDetail('repositories',{{$i}})" data-name="{{ strtolower($repo['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 90px 80px;" data-name="{{ strtolower($repo['name']) }}">
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($repo['name'],0,1)) }}</div>
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $repo['name'] }}</div>
@@ -48,9 +48,6 @@
             @endforeach
         </div>
         @endif
-    </div>
-    <div id="repositories-detail" style="display:none">
-        <div id="repositories-detail-content"></div>
     </div>
 
 

@@ -30,7 +30,7 @@
                 <span></span><span>Observer</span><span>Observes</span><span>Events</span>
             </div>
             @foreach($data['observers'] as $i => $obs)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 160px 1fr;cursor:pointer;" onclick="showDetail('observers',{{$i}})" data-name="{{ strtolower($obs['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 160px 1fr;" data-name="{{ strtolower($obs['name']) }}">
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($obs['name'],0,1)) }}</div>
                 <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $obs['name'] }}</div>
                 <div style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $obs['model']??'Unknown' }}</div>
@@ -44,6 +44,5 @@
         </div>
         @endif
     </div>
-    <div id="observers-detail" style="display:none"><div id="observers-detail-content"></div></div>
 
 
