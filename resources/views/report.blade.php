@@ -7,7 +7,7 @@
 <link rel="icon" type="image/x-icon" href="{{ route('laradar.asset', ['filename' => 'favicon.ico']) }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#FFFFFF;--bg-elevated:#FFFFFF;--bg-sunken:#F9F6EF;--bg-hover:#F9FAFB;
@@ -16,7 +16,7 @@
   --brand:#FF2D20;--brand-bg:rgba(255,45,32,0.08);--brand-border:rgba(255,45,32,0.20);
   --emerald:#16A34A;--amber:#D97706;--rose:#DC2626;
   --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
-  --font-sans:'Figtree',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --font-sans:'Instrument Sans',sans-serif;--font-mono:'JetBrains Mono',monospace;
   --ease:cubic-bezier(.22,.61,.36,1);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -128,6 +128,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
 
 /* Footer */
 .rp-footer{text-align:center;font-size:11px;color:var(--text-faint);border-top:1px solid var(--border);padding:16px 28px;}
+
+/* KPI grid */
+.ov-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.ov-kpi-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:20px;transition:transform .22s,box-shadow .22s,border-color .22s;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);}
+.ov-kpi-card:hover{transform:translateY(-2px);box-shadow:0 4px 18px rgba(0,0,0,.10);border-color:var(--border-strong);}
+.ov-kpi-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.ov-kpi-icon svg{width:17px;height:17px;stroke:currentColor;fill:none;}
+.ov-kpi-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text-faint);display:block;}
+.ov-kpi-num{font-family:var(--font-mono);font-size:28px;letter-spacing:-.01em;margin-top:4px;display:block;color:var(--brand);}
+
+/* Atlas cards */
+.ov-cards-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:6px;}
+.ov-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);}
+.ov-card-hd{font-size:14px;font-weight:700;color:var(--text);margin-bottom:18px;}
+.ov-score-bar{height:4px;border-radius:2px;background:var(--bg-sunken);overflow:hidden;margin-top:6px;}
+.ov-score-fill{height:100%;border-radius:2px;}
+
+/* Score ring */
+.ov-score-wrap{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;margin-bottom:24px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);}
+.ov-ring-box{position:relative;width:88px;height:88px;flex:none;}
+.ov-ring-box svg{transform:rotate(-90deg);}
+.ov-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 </style>
 </head>
 <body>
@@ -279,6 +301,27 @@ if (!empty($sc)) {
         </button>
         @endif
 
+        @if(($data['summary']['migrations']??0) > 0)
+        <button class="rp-nav-btn" data-sec="migrations" onclick="showSec('migrations')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/><path d="M4 12c0 2.21 3.582 4 8 4s8-1.79 8-4"/></svg>
+                Migrations
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['migrations'] }}</span>
+        </button>
+        @endif
+
+        @php $mwNavCount = count(collect($data['routes'] ?? [])->flatMap(fn($r) => $r['middleware'] ?? [])->unique()->values()->all()); @endphp
+        @if($mwNavCount > 0)
+        <button class="rp-nav-btn" data-sec="middleware" onclick="showSec('middleware')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                Middleware
+            </span>
+            <span class="rp-nav-badge">{{ $mwNavCount }}</span>
+        </button>
+        @endif
+
         @if(!empty($data['errors']))
         <button class="rp-nav-btn" data-sec="errors" onclick="showSec('errors')">
             <span class="left">
@@ -314,130 +357,165 @@ if (!empty($sc)) {
 
         {{-- ── OVERVIEW ── --}}
         <div id="sec-overview" class="rp-section active">
+        @php
+        $ovIcons = [
+            'Models'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>',
+            'Controllers'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>',
+            'Routes'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
+            'Jobs'         => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>',
+            'Events'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>',
+            'Services'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>',
+            'Repositories' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>',
+            'Observers'    => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>',
+            'Policies'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
+            'Modules'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
+            'Middleware'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>',
+            'Migrations'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12c0 2.21 3.582 4 8 4s8-1.79 8-4"/>',
+            'Packages'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11l0 .01"/>',
+        ];
+        $ovStats = [
+            ['Models',       $data['summary']['models']??0,       'models'],
+            ['Controllers',  $data['summary']['controllers']??0,   'controllers'],
+            ['Routes',       $rs['total']??0,                      'routes'],
+            ['Migrations',   $data['summary']['migrations']??0,   'migrations'],
+            ['Jobs',         $data['summary']['jobs']??0,          'jobs'],
+            ['Events',       $data['summary']['events']??0,        'events'],
+            ['Services',     $data['summary']['services']??0,      'services'],
+            ['Repositories', $data['summary']['repositories']??0,  'repositories'],
+            ['Observers',    $data['summary']['observers']??0,     'observers'],
+            ['Policies',     $data['summary']['policies']??0,      'policies'],
+            ['Modules',      $data['summary']['modules']??0,       'modules'],
+            ['Middleware',   count($rs['middleware_usage']??[]),   'middleware'],
+            ['Packages',     $data['summary']['packages']??0,      'packages'],
+        ];
+        $perf = $data['performance'] ?? [];
+        @endphp
 
-            {{-- Score card --}}
-            @if(!empty($sc))
-            <div class="rp-card" style="margin-bottom:20px;">
-                <div class="rp-card-body" style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;">
-                    <div style="display:flex;align-items:center;gap:16px;flex:none;">
-                        <div class="score-ring-wrap">
-                            <svg viewBox="0 0 100 100" width="88" height="88">
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="10"/>
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="{{ $ringColor }}"
-                                    stroke-width="10" stroke-linecap="round"
-                                    stroke-dasharray="{{ $circumf }}" stroke-dashoffset="{{ $offset }}"/>
-                            </svg>
-                            <div class="score-ring-inner">
-                                <span style="font-size:22px;font-weight:900;color:var(--text);line-height:1;">{{ $sc['score'] }}</span>
-                                <span style="font-size:10px;color:var(--text-faint);">/{{ $sc['max'] }}</span>
-                            </div>
-                        </div>
-                        <div>
-                            <p style="font-size:11px;color:var(--text-faint);margin-bottom:6px;">Architecture Score</p>
-                            <span style="font-size:15px;font-weight:800;color:{{ $gradeColor }};background:{{ $gradeBg }};border:1px solid {{ $gradeBdr }};padding:3px 12px;border-radius:8px;display:inline-block;">{{ $sc['grade'] }}</span>
-                        </div>
+        {{-- Architecture score --}}
+        @if(!empty($sc))
+        <div class="ov-score-wrap">
+            <div class="ov-ring-box">
+                <svg viewBox="0 0 100 100" width="88" height="88">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="10"/>
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="{{ $ringColor }}"
+                        stroke-width="10" stroke-linecap="round"
+                        stroke-dasharray="{{ $circumf }}" stroke-dashoffset="{{ $offset }}"/>
+                </svg>
+                <div class="ov-ring-inner">
+                    <span style="font-size:22px;font-weight:800;color:var(--text);line-height:1;">{{ $sc['score'] }}</span>
+                    <span style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);">/{{ $sc['max'] }}</span>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;justify-content:center;">
+                <p style="font-size:11px;color:var(--text-faint);">Architecture Score</p>
+                <span style="font-size:15px;font-weight:800;color:{{ $gradeColor }};background:{{ $gradeBg }};border:1px solid {{ $gradeBdr }};padding:3px 14px;border-radius:8px;display:inline-block;width:fit-content;">{{ $sc['grade'] }}</span>
+                <p style="font-size:11px;color:var(--text-faint);margin-top:4px;">{{ $data['project']['name'] }} &mdash; {{ \Carbon\Carbon::parse($data['generated_at'])->format('d M Y') }}</p>
+            </div>
+            <div style="flex:1;min-width:220px;display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;align-content:start;">
+                @foreach($sc['checks'] as $check)
+                @php [$ick,$icc] = match($check['status']??'fail'){'pass'=>['✔','var(--emerald)'],'warn'=>['⚠','var(--amber)'],default=>['✘','var(--rose)']}; @endphp
+                <div style="display:flex;align-items:flex-start;gap:6px;">
+                    <span style="font-weight:700;color:{{ $icc }};flex:none;margin-top:1px;">{{ $ick }}</span>
+                    <div>
+                        <span style="font-size:12px;color:var(--text-dim);">{{ $check['label'] }}</span>
+                        @if(!empty($check['note']))<span style="font-size:10.5px;color:var(--text-faint);display:block;font-family:var(--font-mono);">{{ $check['note'] }}</span>@endif
                     </div>
-                    <div style="flex:1;min-width:220px;display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;">
-                        @foreach($sc['checks'] as $check)
-                        @php
-                        [$icon,$col] = match($check['status']){
-                            'pass'  => ['✔','#16A34A'],
-                            'warn'  => ['⚠','#D97706'],
-                            default => ['✘','#DC2626'],
-                        };
-                        @endphp
-                        <div style="display:flex;align-items:flex-start;gap:6px;">
-                            <span style="font-weight:700;color:{{ $col }};flex:none;margin-top:1px;">{{ $icon }}</span>
-                            <div>
-                                <span style="font-size:12.5px;color:var(--text-dim);">{{ $check['label'] }}</span>
-                                @if($check['note'])<span style="font-size:11px;color:var(--text-faint);margin-left:4px;">{{ $check['note'] }}</span>@endif
-                            </div>
-                        </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- KPI cards --}}
+        <div class="ov-kpi-grid">
+            @foreach($ovStats as [$label, $count, $sec])
+            <div class="ov-kpi-card" onclick="showSec('{{ $sec }}')">
+                <div class="ov-kpi-icon" style="background:var(--brand-bg);color:var(--brand);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">{!! $ovIcons[$label] ?? '' !!}</svg>
+                </div>
+                <span class="ov-kpi-label">{{ $label }}</span>
+                <span class="ov-kpi-num">{{ $count }}</span>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Charts row --}}
+        <div class="ov-cards-row">
+
+            {{-- Route breakdown --}}
+            <div class="ov-card">
+                <p class="ov-card-hd">Route Breakdown</p>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-faint);">Total</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ $rs['total']??0 }}</span></div>
+                    @foreach($rs['by_group']??[] as $group => $cnt)
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-faint);">{{ ucfirst($group) }}</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ $cnt }}</span></div>
+                    @endforeach
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-faint);">Named</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ $rs['named_count']??0 }} / {{ $rs['total']??0 }}</span></div>
+                    @if(!empty($rs['api_versions']))
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-faint);">API Versions</span><span style="font-family:var(--font-mono);font-weight:600;color:var(--text);">{{ implode(', ', array_keys($rs['api_versions'])) }}</span></div>
+                    @endif
+                </div>
+                @if(!empty($rs['by_method']))
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+                    <p style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;">By Method</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                        @foreach($rs['by_method'] as $method => $cnt)
+                        @php $mc = strtolower($method); @endphp
+                        <span class="rp-pill method-{{ $mc }}" style="font-family:var(--font-mono);font-size:11px;padding:3px 9px;">{{ strtoupper($method) }} {{ $cnt }}</span>
                         @endforeach
                     </div>
+                </div>
+                @endif
+            </div>
+
+            {{-- Performance --}}
+            <div class="ov-card">
+                <p class="ov-card-hd">Scan Performance</p>
+                <div style="display:flex;flex-direction:column;gap:20px;">
+                    <div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+                            <span style="color:var(--text-faint);">Scan Time</span>
+                            <span style="font-family:var(--font-mono);color:var(--brand);">{{ $perf['execution_time_ms']??0 }} ms</span>
+                        </div>
+                        @php $timePct = min(100, ($perf['execution_time_ms']??0) / 50); @endphp
+                        <div class="ov-score-bar"><div class="ov-score-fill" style="width:{{ $timePct }}%;background:linear-gradient(90deg,var(--brand),#FF5349);"></div></div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+                            <span style="color:var(--text-faint);">Memory</span>
+                            <span style="font-family:var(--font-mono);color:var(--emerald);">{{ $perf['memory_usage_mb']??0 }} MB</span>
+                        </div>
+                        @php $memPct = min(100, ($perf['memory_usage_mb']??0) / 1.28); @endphp
+                        <div class="ov-score-bar"><div class="ov-score-fill" style="width:{{ $memPct }}%;background:var(--emerald);"></div></div>
+                    </div>
+                    <div style="padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;font-size:12px;">
+                        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-faint);">Laravel</span><span style="font-family:var(--font-mono);color:var(--text);">{{ $data['laravel_version'] }}</span></div>
+                        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-faint);">PHP</span><span style="font-family:var(--font-mono);color:var(--text);">{{ $data['php_version'] }}</span></div>
+                        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-faint);">Laradar</span><span style="font-family:var(--font-mono);color:var(--text);">v{{ $data['package_version'] }}</span></div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Score checks --}}
+            @if(!empty($sc['checks']))
+            <div class="ov-card">
+                <p class="ov-card-hd">Score Checks</p>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    @foreach($sc['checks'] as $check)
+                    @php [$ick,$icc] = match($check['status']??'fail'){'pass'=>['✔','var(--emerald)'],'warn'=>['⚠','var(--amber)'],default=>['✘','var(--rose)']}; @endphp
+                    <div style="display:flex;align-items:flex-start;gap:10px;">
+                        <span style="font-weight:700;font-size:13px;color:{{ $icc }};flex:none;margin-top:1px;">{{ $ick }}</span>
+                        <div>
+                            <p style="font-size:13px;color:var(--text);">{{ $check['label'] }}</p>
+                            @if(!empty($check['note']))<p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $check['note'] }}</p>@endif
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
             </div>
             @endif
 
-            {{-- KPI grid --}}
-            <div class="rp-kpi-grid">
-                <div class="rp-kpi">
-                    <p class="rp-kpi-lbl">Models</p>
-                    <div class="rp-kpi-num">{{ $data['summary']['models'] }}</div>
-                    <p class="rp-kpi-sub">{{ array_sum($data['summary']['relationship_summary'] ?? []) }} relationships</p>
-                </div>
-                <div class="rp-kpi">
-                    <p class="rp-kpi-lbl">Controllers</p>
-                    <div class="rp-kpi-num">{{ $data['summary']['controllers'] }}</div>
-                    <p class="rp-kpi-sub">{{ $data['summary']['jobs'] }} jobs &nbsp;·&nbsp; {{ $data['summary']['events'] }} events</p>
-                </div>
-                <div class="rp-kpi">
-                    <p class="rp-kpi-lbl">Routes</p>
-                    <div class="rp-kpi-num">{{ $rs['total'] ?? 0 }}</div>
-                    <p class="rp-kpi-sub">{{ $namedPct }}% named</p>
-                </div>
-                <div class="rp-kpi">
-                    <p class="rp-kpi-lbl">Packages</p>
-                    <div class="rp-kpi-num">{{ $data['summary']['packages'] }}</div>
-                    <p class="rp-kpi-sub">{{ $data['summary']['services'] }} services</p>
-                </div>
-            </div>
-
-            {{-- Charts row --}}
-            <div class="grid-3">
-                {{-- HTTP Methods --}}
-                @if(!empty($rs['by_method']))
-                <div class="rp-card rp-card-body">
-                    <p style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:14px;">Routes by HTTP Method</p>
-                    @foreach($rs['by_method'] as $method => $count)
-                    @php $pct = ($rs['total'] ?? 0) > 0 ? round(($count / $rs['total']) * 100) : 0; @endphp
-                    <div class="rp-bar-row">
-                        <div class="rp-bar-row-top">
-                            <span style="font-weight:700;text-transform:uppercase;font-size:11px;color:var(--text-dim);">{{ $method }}</span>
-                            <span style="color:var(--text-faint);">{{ $count }} / {{ $pct }}%</span>
-                        </div>
-                        <div class="rp-bar-track"><div class="rp-bar-fill" style="width:{{ $pct }}%"></div></div>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
-
-                {{-- Middleware --}}
-                @if(!empty($rs['middleware_usage']))
-                <div class="rp-card rp-card-body">
-                    <p style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:14px;">Middleware Usage</p>
-                    @php $topMw = array_slice($rs['middleware_usage'],0,6,true); $maxMw = max(array_values($topMw)); @endphp
-                    @foreach($topMw as $mw => $cnt)
-                    @php $pct = $maxMw > 0 ? round(($cnt/$maxMw)*100) : 0; @endphp
-                    <div class="rp-bar-row">
-                        <div class="rp-bar-row-top">
-                            <span style="color:var(--text-dim);font-size:11px;">{{ $mw }}</span>
-                            <span style="color:var(--text-faint);">{{ $cnt }}</span>
-                        </div>
-                        <div class="rp-bar-track"><div class="rp-bar-fill" style="width:{{ $pct }}%;background:var(--emerald);"></div></div>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
-
-                {{-- Relationship Types --}}
-                @if(!empty($data['summary']['relationship_summary']))
-                <div class="rp-card rp-card-body">
-                    <p style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:14px;">Relationship Types</p>
-                    @php $totalRels = array_sum($data['summary']['relationship_summary']); @endphp
-                    @foreach($data['summary']['relationship_summary'] as $type => $cnt)
-                    @php $pct = $totalRels > 0 ? round(($cnt/$totalRels)*100) : 0; @endphp
-                    <div class="rp-bar-row">
-                        <div class="rp-bar-row-top">
-                            <span style="color:var(--text-dim);font-size:11px;">{{ $type }}</span>
-                            <span style="color:var(--text-faint);">{{ $cnt }} / {{ $pct }}%</span>
-                        </div>
-                        <div class="rp-bar-track"><div class="rp-bar-fill" style="width:{{ $pct }}%;background:var(--amber);"></div></div>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
-            </div>
+        </div>
         </div>
 
         {{-- ── MODELS ── --}}
@@ -446,58 +524,44 @@ if (!empty($sc)) {
                 <h3>Models</h3>
                 <span class="count">{{ $data['summary']['models'] }}</span>
             </div>
-            <div class="grid-3">
-                @foreach($data['models'] as $model)
-                <div class="rp-card">
-                    <div class="rp-card-hd">
-                        <div style="min-width:0;">
-                            <h4>{{ $model['name'] }}</h4>
-                            <p>{{ $model['namespace'] }}</p>
-                        </div>
-                        <span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);white-space:nowrap;font-size:10px;">{{ $model['table'] }}</span>
-                    </div>
-                    <div class="rp-card-body" style="display:flex;flex-direction:column;gap:12px;">
-                        @if(!empty($model['relationships']))
-                        <div>
-                            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px;">Relationships</p>
-                            <div style="display:flex;flex-direction:column;gap:5px;">
-                                @foreach($model['relationships'] as $rel)
-                                <div style="display:flex;align-items:center;gap:6px;font-size:11px;">
-                                    <span class="rp-pill" style="color:var(--amber);background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.25);">{{ $rel['type'] }}</span>
-                                    <span style="color:var(--text-faint);">→</span>
-                                    <span style="font-weight:600;color:var(--text-dim);">{{ class_basename($rel['related'] ?? '—') }}</span>
-                                    <span style="color:var(--text-faint);font-family:var(--font-mono);">({{ $rel['method'] }})</span>
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Model</th><th>Table</th><th>Relationships</th><th>Fillable</th><th>Traits</th><th>Hidden</th></tr></thead>
+                    <tbody>
+                        @foreach($data['models'] as $model)
+                        <tr>
+                            <td>
+                                <div style="font-weight:700;color:var(--text);">{{ $model['name'] }}</div>
+                                <div style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);">{{ $model['namespace'] ?? '' }}</div>
+                            </td>
+                            <td><span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);">{{ $model['table'] }}</span></td>
+                            <td>
+                                @if(!empty($model['relationships']))
+                                <div style="display:flex;flex-direction:column;gap:3px;">
+                                    @foreach($model['relationships'] as $rel)
+                                    <div style="display:flex;align-items:center;gap:5px;font-size:11px;">
+                                        <span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);">{{ $rel['type'] }}</span>
+                                        <span style="color:var(--text-dim);font-weight:600;">{{ class_basename($rel['related'] ?? '—') }}</span>
+                                    </div>
+                                    @endforeach
                                 </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        @endif
-                        @if(!empty($model['fillable']))
-                        <div>
-                            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px;">Fillable</p>
-                            <div style="display:flex;flex-wrap:wrap;gap:5px;">
-                                @foreach($model['fillable'] as $f)
-                                <span style="font-family:var(--font-mono);font-size:10px;background:var(--bg-sunken);color:var(--text-dim);padding:2px 7px;border-radius:5px;border:1px solid var(--border);">{{ $f }}</span>
-                                @endforeach
-                            </div>
-                        </div>
-                        @endif
-                        @if(!empty($model['hidden']))
-                        <div>
-                            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px;">Hidden</p>
-                            <div style="display:flex;flex-wrap:wrap;gap:5px;">
-                                @foreach($model['hidden'] as $f)
-                                <span style="font-family:var(--font-mono);font-size:10px;background:rgba(220,38,38,.06);color:var(--rose);padding:2px 7px;border-radius:5px;border:1px solid rgba(220,38,38,.2);">{{ $f }}</span>
-                                @endforeach
-                            </div>
-                        </div>
-                        @endif
-                        @if(empty($model['relationships']) && empty($model['fillable']) && empty($model['hidden']))
-                        <p style="font-size:12px;color:var(--text-faint);text-align:center;padding:8px 0;">No details detected.</p>
-                        @endif
-                    </div>
-                </div>
-                @endforeach
+                                @else<span style="color:var(--text-faint);">—</span>@endif
+                            </td>
+                            <td>
+                                @if(!empty($model['fillable']))
+                                <div style="display:flex;flex-wrap:wrap;gap:3px;">
+                                    @foreach($model['fillable'] as $f)
+                                    <span style="font-family:var(--font-mono);font-size:10px;background:var(--bg-sunken);color:var(--text-dim);padding:1px 6px;border-radius:4px;border:1px solid var(--border);">{{ $f }}</span>
+                                    @endforeach
+                                </div>
+                                @else<span style="color:var(--text-faint);">—</span>@endif
+                            </td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ count($model['traits'] ?? []) }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ count($model['hidden'] ?? []) }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -507,33 +571,28 @@ if (!empty($sc)) {
                 <h3>Controllers</h3>
                 <span class="count">{{ $data['summary']['controllers'] }}</span>
             </div>
-            <div class="grid-2">
-                @foreach($data['controllers'] as $ctrl)
-                <div class="rp-card">
-                    <div class="rp-card-hd">
-                        <div style="min-width:0;">
-                            <h4>{{ $ctrl['name'] }}</h4>
-                            <p>{{ $ctrl['namespace'] }}</p>
-                        </div>
-                        <span class="rp-pill" style="color:var(--emerald);background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.25);white-space:nowrap;">{{ $ctrl['method_count'] }} methods</span>
-                    </div>
-                    <div class="rp-card-body">
-                        @if(!empty($ctrl['methods']))
-                        @php
-                        $mc=['index'=>'method-get','show'=>'method-get','create'=>'method-post','store'=>'method-post',
-                             'edit'=>'method-put','update'=>'method-patch','destroy'=>'method-delete'];
-                        @endphp
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                            @foreach($ctrl['methods'] as $m)
-                            <span class="rp-pill {{ $mc[$m] ?? '' }}" style="font-family:var(--font-mono);font-size:11px;">{{ $m }}</span>
-                            @endforeach
-                        </div>
-                        @else
-                        <p style="font-size:12px;color:var(--text-faint);">No public methods detected.</p>
-                        @endif
-                    </div>
-                </div>
-                @endforeach
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Controller</th><th>Namespace</th><th>Methods</th><th>Method Names</th></tr></thead>
+                    <tbody>
+                        @foreach($data['controllers'] as $ctrl)
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);">{{ $ctrl['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $ctrl['namespace'] ?? '' }}</td>
+                            <td><span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);">{{ $ctrl['method_count'] }}</span></td>
+                            <td>
+                                @if(!empty($ctrl['methods']))
+                                <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                                    @foreach($ctrl['methods'] as $m)
+                                    <span style="font-family:var(--font-mono);font-size:10px;background:var(--bg-sunken);color:var(--text-dim);padding:1px 6px;border-radius:4px;border:1px solid var(--border);">{{ $m }}</span>
+                                    @endforeach
+                                </div>
+                                @else<span style="color:var(--text-faint);">—</span>@endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -593,19 +652,21 @@ if (!empty($sc)) {
         @if($data['summary']['jobs'] > 0)
         <div id="sec-jobs" class="rp-section">
             <div class="rp-section-hd"><h3>Jobs</h3><span class="count">{{ $data['summary']['jobs'] }}</span></div>
-            <div class="grid-3">
-                @foreach($data['jobs'] as $item)
-                <div class="rp-item-card">
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
-                        <div style="min-width:0;">
-                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
-                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
-                            @if(!empty($item['queue']))<span class="rp-pill" style="color:var(--amber);background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.25);margin-top:6px;display:inline-block;">{{ $item['queue'] }}</span>@endif
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Job</th><th>Namespace</th><th>Queue</th><th>Tries</th><th>Timeout</th></tr></thead>
+                    <tbody>
+                        @foreach($data['jobs'] as $item)
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);">{{ $item['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $item['namespace'] ?? '—' }}</td>
+                            <td><span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);">{{ $item['queue'] ?? 'default' }}</span></td>
+                            <td style="font-family:var(--font-mono);color:var(--text-faint);">{{ $item['tries'] ?? '—' }}</td>
+                            <td style="font-family:var(--font-mono);color:var(--text-faint);">{{ $item['timeout'] ? $item['timeout'].'s' : '—' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
         @endif
@@ -614,19 +675,20 @@ if (!empty($sc)) {
         @if($data['summary']['events'] > 0)
         <div id="sec-events" class="rp-section">
             <div class="rp-section-hd"><h3>Events</h3><span class="count">{{ $data['summary']['events'] }}</span></div>
-            <div class="grid-3">
-                @foreach($data['events'] as $item)
-                <div class="rp-item-card">
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
-                        <div style="min-width:0;">
-                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
-                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
-                            @if(!empty($item['properties']))<p style="font-size:11px;color:var(--text-faint);margin-top:4px;">{{ count($item['properties']) }} payload prop(s)</p>@endif
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Event</th><th>Namespace</th><th>Listeners</th><th>Properties</th></tr></thead>
+                    <tbody>
+                        @foreach($data['events'] as $item)
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);">{{ $item['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $item['namespace'] ?? '—' }}</td>
+                            <td style="font-family:var(--font-mono);color:var(--text-faint);">{{ count($item['listeners'] ?? []) }}</td>
+                            <td style="font-family:var(--font-mono);color:var(--text-faint);">{{ count($item['properties'] ?? []) }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
         @endif
@@ -635,19 +697,19 @@ if (!empty($sc)) {
         @if($data['summary']['services'] > 0)
         <div id="sec-services" class="rp-section">
             <div class="rp-section-hd"><h3>Services</h3><span class="count">{{ $data['summary']['services'] }}</span></div>
-            <div class="grid-3">
-                @foreach($data['services'] as $item)
-                <div class="rp-item-card">
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
-                        <div style="min-width:0;">
-                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
-                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
-                            @if(!empty($item['methods']))<p style="font-size:11px;color:var(--text-faint);margin-top:4px;">{{ count($item['methods']) }} method(s)</p>@endif
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Service</th><th>Namespace</th><th>Methods</th></tr></thead>
+                    <tbody>
+                        @foreach($data['services'] as $item)
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);">{{ $item['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $item['namespace'] ?? '—' }}</td>
+                            <td><span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);">{{ count($item['methods'] ?? []) }}</span></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
         @endif
@@ -656,19 +718,19 @@ if (!empty($sc)) {
         @if($data['summary']['repositories'] > 0)
         <div id="sec-repositories" class="rp-section">
             <div class="rp-section-hd"><h3>Repositories</h3><span class="count">{{ $data['summary']['repositories'] }}</span></div>
-            <div class="grid-3">
-                @foreach($data['repositories'] as $item)
-                <div class="rp-item-card">
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
-                        <div style="min-width:0;">
-                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
-                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
-                            @if(!empty($item['methods']))<p style="font-size:11px;color:var(--text-faint);margin-top:4px;">{{ count($item['methods']) }} method(s)</p>@endif
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Repository</th><th>Namespace</th><th>Methods</th></tr></thead>
+                    <tbody>
+                        @foreach($data['repositories'] as $item)
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);">{{ $item['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $item['namespace'] ?? '—' }}</td>
+                            <td><span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);">{{ count($item['methods'] ?? []) }}</span></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
         @endif
@@ -677,19 +739,20 @@ if (!empty($sc)) {
         @if($data['summary']['observers'] > 0)
         <div id="sec-observers" class="rp-section">
             <div class="rp-section-hd"><h3>Observers</h3><span class="count">{{ $data['summary']['observers'] }}</span></div>
-            <div class="grid-3">
-                @foreach($data['observers'] as $item)
-                <div class="rp-item-card">
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
-                        <div style="min-width:0;">
-                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
-                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
-                            @if(!empty($item['model']))<span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);margin-top:6px;display:inline-block;">{{ class_basename($item['model']) }}</span>@endif
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Observer</th><th>Namespace</th><th>Observed Model</th><th>Events</th></tr></thead>
+                    <tbody>
+                        @foreach($data['observers'] as $item)
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);">{{ $item['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $item['namespace'] ?? '—' }}</td>
+                            <td><span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);">{{ class_basename($item['model'] ?? '—') }}</span></td>
+                            <td style="font-family:var(--font-mono);color:var(--text-faint);">{{ implode(', ', $item['events'] ?? []) ?: '—' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
         @endif
@@ -698,26 +761,26 @@ if (!empty($sc)) {
         @if($data['summary']['policies'] > 0)
         <div id="sec-policies" class="rp-section">
             <div class="rp-section-hd"><h3>Policies</h3><span class="count">{{ $data['summary']['policies'] }}</span></div>
-            <div class="grid-3">
-                @foreach($data['policies'] as $item)
-                <div class="rp-item-card">
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
-                        <div style="min-width:0;">
-                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
-                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
-                            @if(!empty($item['model']))<span class="rp-pill" style="color:var(--text-dim);background:var(--bg-sunken);border-color:var(--border);margin-top:6px;display:inline-block;">{{ class_basename($item['model']) }}</span>@endif
-                            @if(!empty($item['actions']))
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
-                                @foreach(array_slice($item['actions'],0,5) as $a)
-                                <span style="font-family:var(--font-mono);font-size:10px;background:var(--bg-sunken);color:var(--text-faint);padding:1px 6px;border-radius:4px;border:1px solid var(--border);">{{ $a }}</span>
-                                @endforeach
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Policy</th><th>Namespace</th><th>Model</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach($data['policies'] as $item)
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);">{{ $item['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $item['namespace'] ?? '—' }}</td>
+                            <td><span class="rp-pill" style="color:var(--text-dim);background:var(--bg-sunken);border-color:var(--border);">{{ class_basename($item['model'] ?? '—') }}</span></td>
+                            <td>
+                                <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                                    @foreach(array_slice($item['actions'] ?? [], 0, 6) as $a)
+                                    <span style="font-family:var(--font-mono);font-size:10px;background:var(--bg-sunken);color:var(--text-faint);padding:1px 6px;border-radius:4px;border:1px solid var(--border);">{{ $a }}</span>
+                                    @endforeach
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
         @endif
@@ -726,19 +789,121 @@ if (!empty($sc)) {
         @if($data['summary']['modules'] > 0)
         <div id="sec-modules" class="rp-section">
             <div class="rp-section-hd"><h3>Modules</h3><span class="count">{{ $data['summary']['modules'] }}</span></div>
-            <div class="grid-2">
-                @foreach($data['modules'] as $item)
-                <div class="rp-item-card">
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
-                        <div style="min-width:0;">
-                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
-                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['path'] ?? '' }}</p>
-                            @if(!empty($item['routes']))<p style="font-size:11px;color:var(--text-faint);margin-top:4px;">{{ $item['routes'] }} route(s)</p>@endif
-                        </div>
-                    </div>
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Module</th><th>Path</th><th>Routes</th></tr></thead>
+                    <tbody>
+                        @foreach($data['modules'] as $item)
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);">{{ $item['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $item['path'] ?? '—' }}</td>
+                            <td style="font-family:var(--font-mono);color:var(--text-faint);">{{ $item['routes'] ?? 0 }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
+        {{-- ── MIGRATIONS ── --}}
+        @if(!empty($data['migrations']))
+        <div id="sec-migrations" class="rp-section">
+            <div class="rp-section-hd"><h3>Migrations</h3><span class="count">{{ count($data['migrations']) }}</span></div>
+            @php
+            $rpOpMeta = [
+                'create'  => ['label'=>'CREATE', 'color'=>'#ffffff', 'bg'=>'#FF2D20',             'border'=>'#FF2D20'],
+                'modify'  => ['label'=>'MODIFY', 'color'=>'#FF2D20', 'bg'=>'rgba(255,45,32,.10)', 'border'=>'rgba(255,45,32,.35)'],
+                'drop'    => ['label'=>'DROP',   'color'=>'#FF2D20', 'bg'=>'rgba(255,45,32,.10)', 'border'=>'rgba(255,45,32,.35)'],
+                'rename'  => ['label'=>'RENAME', 'color'=>'#FF2D20', 'bg'=>'rgba(255,45,32,.10)', 'border'=>'rgba(255,45,32,.35)'],
+                'unknown' => ['label'=>'?',      'color'=>'#94A3B8', 'bg'=>'rgba(148,163,184,.1)','border'=>'rgba(148,163,184,.3)'],
+            ];
+            @endphp
+            @foreach($data['migrations'] as $mg)
+            @php $opm = $rpOpMeta[$mg['operation']??'unknown'] ?? $rpOpMeta['unknown']; $cols = $mg['columns']??[]; $fks = $mg['foreign_keys']??[]; @endphp
+            <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;flex-wrap:wrap;">
+                    <span style="font-size:10px;font-weight:700;font-family:var(--font-mono);padding:3px 9px;border-radius:5px;white-space:nowrap;flex:none;color:{{ $opm['color'] }};background:{{ $opm['bg'] }};border:1px solid {{ $opm['border'] }};">{{ $opm['label'] }}</span>
+                    @if($mg['table'])<span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);">{{ $mg['table'] }}</span>@endif
+                    <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $mg['filename']??'' }}</span>
+                    @if($mg['date'])<span style="font-size:11px;font-family:var(--font-mono);color:var(--text-faint);background:var(--bg-sunken);border:1px solid var(--border);padding:2px 8px;border-radius:5px;white-space:nowrap;">{{ $mg['date'] }}</span>@endif
+                    @if(count($cols)>0)<span style="font-size:11px;font-family:var(--font-mono);color:#FF2D20;background:rgba(255,45,32,.08);border:1px solid rgba(255,45,32,.2);padding:2px 8px;border-radius:5px;white-space:nowrap;">{{ count($cols) }} cols</span>@endif
+                    @if(count($fks)>0)<span style="font-size:11px;font-family:var(--font-mono);color:#FF2D20;background:rgba(255,45,32,.08);border:1px solid rgba(255,45,32,.2);padding:2px 8px;border-radius:5px;white-space:nowrap;">{{ count($fks) }} FKs</span>@endif
                 </div>
-                @endforeach
+                @if(count($cols)>0)
+                <div style="overflow-x:auto;border-top:1px solid var(--border);">
+                    <table class="rp-table" style="font-size:11px;">
+                        <thead><tr><th>#</th><th>Column</th><th>Type</th><th>Nullable</th><th>Modifiers</th></tr></thead>
+                        <tbody>
+                        @foreach($cols as $ci => $col)
+                        <tr>
+                            <td style="color:var(--text-faint);width:32px;">{{ $ci+1 }}</td>
+                            <td style="font-family:var(--font-mono);font-weight:600;color:var(--text);">
+                                {{ $col['name'] }}
+                                @if($col['type']==='id'||str_contains($col['type'],'Increments')||in_array('primary',$col['modifiers']??[]))<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(255,45,32,.1);color:#FF2D20;border:1px solid rgba(255,45,32,.2);margin-left:4px;">PK</span>@endif
+                            </td>
+                            <td><code style="font-family:var(--font-mono);font-size:10px;color:#FF2D20;background:rgba(255,45,32,.07);padding:1px 6px;border-radius:3px;border:1px solid rgba(255,45,32,.18);">{{ $col['type'] }}</code></td>
+                            <td style="color:{{ $col['nullable'] ? '#FF2D20' : 'var(--text-faint)' }};">{{ $col['nullable'] ? '✓' : '—' }}</td>
+                            <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);">
+                                @php $dm = array_filter($col['modifiers']??[], fn($m)=>$m!=='nullable'); @endphp
+                                {{ implode(', ', $dm) ?: '—' }}
+                            </td>
+                        </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @endif
+                @if(count($fks)>0)
+                <div style="padding:10px 16px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+                    <span style="font-size:10px;font-weight:700;font-family:var(--font-mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;">FK:</span>
+                    @foreach($fks as $fk)
+                    <span style="font-family:var(--font-mono);font-size:11px;background:var(--bg-sunken);border:1px solid var(--border);border-radius:6px;padding:3px 10px;">
+                        <span style="color:var(--text);font-weight:600;">{{ $fk['column'] }}</span>
+                        <span style="color:#FF2D20;margin:0 4px;">→</span>
+                        <span style="color:#FF2D20;">{{ $fk['on'] }}.{{ $fk['references'] }}</span>
+                    </span>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+            @endforeach
+        </div>
+        @endif
+
+        {{-- ── MIDDLEWARE ── --}}
+        @php
+        $middlewareList = [];
+        $seenMw = [];
+        foreach(($data['routes'] ?? []) as $route) {
+            foreach(($route['middleware'] ?? []) as $mw) {
+                if (!isset($seenMw[$mw])) {
+                    $seenMw[$mw] = true;
+                    $type = in_array($mw, ['web', 'api']) ? 'group'
+                          : (str_starts_with($mw, 'auth') ? 'auth'
+                          : (str_contains($mw, ':') ? 'parametric' : 'named'));
+                    $middlewareList[] = ['name' => explode(':', $mw)[0], 'full' => $mw, 'type' => $type];
+                }
+            }
+        }
+        usort($middlewareList, fn($a,$b) => strcmp($a['name'], $b['name']));
+        @endphp
+        @if(count($middlewareList) > 0)
+        <div id="sec-middleware" class="rp-section">
+            <div class="rp-section-hd"><h3>Middleware</h3><span class="count">{{ count($middlewareList) }}</span></div>
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Alias</th><th>Full Value</th><th>Type</th></tr></thead>
+                    <tbody>
+                        @foreach($middlewareList as $mw)
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);font-family:var(--font-mono);">{{ $mw['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $mw['full'] }}</td>
+                            <td><span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);">{{ $mw['type'] }}</span></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
         @endif
@@ -747,20 +912,21 @@ if (!empty($sc)) {
         @if($data['summary']['packages'] > 0)
         <div id="sec-packages" class="rp-section">
             <div class="rp-section-hd"><h3>Packages</h3><span class="count">{{ $data['summary']['packages'] }}</span></div>
-            <div class="grid-3">
-                @foreach($data['packages'] as $pkg)
-                <div class="rp-card">
-                    <div class="rp-card-body">
-                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;">
-                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $pkg['name'] }}</p>
-                            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);white-space:nowrap;">{{ $pkg['version'] ?? '' }}</span>
-                        </div>
-                        @if(!empty($pkg['description']))<p style="font-size:11.5px;color:var(--text-faint);line-height:1.5;margin-bottom:8px;">{{ $pkg['description'] }}</p>@endif
+            <div class="rp-table-wrap">
+                <table class="rp-table">
+                    <thead><tr><th>Package</th><th>Version</th><th>Type</th><th>Description</th></tr></thead>
+                    <tbody>
+                        @foreach($data['packages'] as $pkg)
                         @php $pkgType = $pkg['type'] ?? 'library'; @endphp
-                        <span class="rp-pill" style="{{ $pkgType === 'laravel-package' ? 'color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);' : 'color:var(--text-faint);background:var(--bg-sunken);border-color:var(--border);' }}">{{ $pkgType }}</span>
-                    </div>
-                </div>
-                @endforeach
+                        <tr>
+                            <td style="font-weight:700;color:var(--text);">{{ $pkg['name'] }}</td>
+                            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $pkg['version'] ?? '—' }}</td>
+                            <td><span class="rp-pill" style="{{ $pkgType === 'laravel-package' ? 'color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);' : 'color:var(--text-faint);background:var(--bg-sunken);border-color:var(--border);' }}">{{ $pkgType }}</span></td>
+                            <td style="font-size:11.5px;color:var(--text-faint);">{{ $pkg['description'] ?? '—' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
         @endif
@@ -791,7 +957,8 @@ if (!empty($sc)) {
 const SEC_LABELS = {
     overview:'Overview', models:'Models', controllers:'Controllers', routes:'Routes',
     jobs:'Jobs', events:'Events', services:'Services', repositories:'Repositories',
-    observers:'Observers', policies:'Policies', modules:'Modules', packages:'Packages', errors:'Errors'
+    observers:'Observers', policies:'Policies', modules:'Modules', migrations:'Migrations', middleware:'Middleware',
+    packages:'Packages', errors:'Errors'
 };
 
 function showSec(id) {

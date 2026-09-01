@@ -36,7 +36,7 @@ return [
         'models'       => true,
         'controllers'  => true,
         'routes'       => true,
-        'dependencies' => true,
+        'migrations'   => true,
         'jobs'         => true,
         'events'       => true,
         'services'     => true,
@@ -45,8 +45,6 @@ return [
         'policies'     => true,
         'modules'      => true,
         'packages'     => true,
-        'api_docs'     => true,
-        'dead_code'    => true,
     ],
 
     /*
@@ -59,6 +57,7 @@ return [
         'models'       => null,
         'controllers'  => null,
         'routes'       => null,
+        'migrations'   => null,
         'jobs'         => null,
         'events'       => null,
         'services'     => null,

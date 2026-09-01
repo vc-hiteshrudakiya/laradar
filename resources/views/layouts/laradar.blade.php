@@ -568,11 +568,6 @@ code{background:var(--bg-sunken)!important;color:var(--cyan)!important;border:1p
 .sec2-name{font-weight:700;font-size:14px;color:var(--text);margin:0 0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .sec2-sub{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .sec2-chip{font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid;}
-@keyframes backBtnIn{from{opacity:0;transform:translateX(-14px) scale(.94);}to{opacity:1;transform:none;}}
-@keyframes backBtnPulse{0%{box-shadow:0 0 0 0 rgba(255,45,32,0.4);}60%{box-shadow:0 0 0 7px rgba(255,45,32,0);}100%{box-shadow:0 0 0 0 rgba(255,45,32,0);}}
-.topbar-back-btn{display:none;align-items:center;gap:8px;background:rgba(255,45,32,0.08);border:1px solid rgba(255,45,32,0.25);border-radius:9px;padding:6px 13px 6px 10px;cursor:pointer;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#FF2D20;transition:background .15s,border-color .15s,transform .15s;}
-.topbar-back-btn:hover{background:rgba(255,45,32,0.14);border-color:rgba(255,45,32,0.45);transform:translateX(-2px);}
-.topbar-back-btn.is-visible{display:inline-flex;animation:backBtnIn .26s var(--ease) both,backBtnPulse 1.4s ease .26s infinite;}
 /* ── Doc Preview Modal ── */
 .doc-modal-ov{position:fixed;inset:0;z-index:300;background:rgba(23,43,77,0.52);backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:32px 20px;overflow-y:auto;}
 .doc-modal-box{background:var(--bg-elevated);border-radius:20px;width:100%;max-width:860px;box-shadow:0 24px 80px rgba(23,43,77,0.22);border:1px solid var(--border);overflow:hidden;margin:auto;}
@@ -745,6 +740,11 @@ $nav = fn(string $s) => $section === $s ? 'nav-item nav-active' : 'nav-item';
                 <span class="nav-label">Routes</span>
                 @if(($rs['total']??0)>0)<span class="nav-badge">{{ $rs['total'] }}</span>@endif
             </button>
+            <button onclick="navigate('migrations')" id="nav-migrations" class="{{ $nav('migrations') }}" title="Migrations">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12c0 2.21 3.582 4 8 4s8-1.79 8-4"/></svg>
+                <span class="nav-label">Migrations</span>
+                @if(($summary['migrations']??0)>0)<span class="nav-badge">{{ $summary['migrations'] }}</span>@endif
+            </button>
         </div>
 
         <div class="nav-group">
@@ -818,10 +818,6 @@ $nav = fn(string $s) => $section === $s ? 'nav-item nav-active' : 'nav-item';
     </button>
     <div class="breadcrumb">
         <b id="topbar-section">{{ $sectionLabel }}</b>
-        <button id="topbar-back-btn" onclick="topbarGoBack()" class="topbar-back-btn">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex:none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            <span id="topbar-back-label">Back</span>
-        </button>
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-left:auto;">
         <div class="sync-pill">
@@ -837,7 +833,7 @@ $nav = fn(string $s) => $section === $s ? 'nav-item nav-active' : 'nav-item';
         @yield('content')
     </div>
 @else
-    @foreach(['overview','models','controllers','routes','jobs','events','services','repositories','observers','policies','modules','middleware','packages','ai','chat','aidocs'] as $__sec)
+    @foreach(['overview','models','controllers','routes','migrations','jobs','events','services','repositories','observers','policies','modules','middleware','packages','ai','chat','aidocs'] as $__sec)
     <div id="sec-{{ $__sec }}" class="p-6 section-pane" @if($__sec !== $section) style="display:none" @endif>
         @include('laradar::sections.' . $__sec)
     </div>
@@ -872,9 +868,8 @@ $nav = fn(string $s) => $section === $s ? 'nav-item nav-active' : 'nav-item';
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','models','controllers','routes','jobs','events','services','repositories','observers','policies','modules','middleware','packages','ai','chat','aidocs'];
+const SECTIONS = ['overview','models','controllers','routes','migrations','jobs','events','services','repositories','observers','policies','modules','middleware','packages','ai','chat','aidocs'];
 
-let mapTreeRendered = false;
 let _navTimer = null;
 function _moveNavIndicator(s) {
     const ind  = document.getElementById('nav-indicator');
@@ -890,6 +885,7 @@ const LARADAR_ROUTES = {
     models:       '{{ route("laradar.models") }}',
     controllers:  '{{ route("laradar.controllers") }}',
     routes:       '{{ route("laradar.routes") }}',
+    migrations:   '{{ route("laradar.migrations") }}',
     jobs:         '{{ route("laradar.jobs") }}',
     events:       '{{ route("laradar.events") }}',
     services:     '{{ route("laradar.services") }}',
@@ -945,7 +941,28 @@ function navigate(s) {
 history.replaceState({ section: '{{ $section }}' }, '', window.location.href);
 
 window.addEventListener('popstate', (e) => {
-    const s = e.state?.section || 'overview';
+    const s   = e.state?.section || 'overview';
+    const det = e.state?.detail;
+    const idx = e.state?.idx;
+
+    // If going back to a detail view (e.g. model detail)
+    if (det !== undefined && idx !== undefined && s === 'models') {
+        SECTIONS.forEach(sec => { const el = document.getElementById('sec-' + sec); if (el) el.style.display = 'none'; });
+        const target = document.getElementById('sec-models');
+        if (target) target.style.display = '';
+        showDetail('models', idx, false);
+        return;
+    }
+
+    // If going back to a list — reset any open detail first
+    if (_activeDetailType) {
+        document.getElementById(_activeDetailType + '-list').style.display = 'block';
+        document.getElementById(_activeDetailType + '-detail').style.display = 'none';
+        _activeDetailType = null;
+        _activeDetailIdx  = null;
+        _hideBackBtn();
+    }
+
     SECTIONS.forEach(sec => {
         const el = document.getElementById('sec-' + sec);
         if (el) el.style.display = 'none';
@@ -972,37 +989,35 @@ const _SECTION_LABELS = {
     repositories:'Repositories', observers:'Observers', policies:'Policies',
 };
 let _activeDetailType = null;
+let _activeDetailIdx  = null;
 
-function _showBackBtn(label) {
-    document.getElementById('topbar-section').style.display = 'none';
-    document.getElementById('topbar-back-label').textContent = label;
-    const btn = document.getElementById('topbar-back-btn');
-    btn.classList.remove('is-visible');
-    void btn.offsetWidth; // force reflow so animation replays
-    btn.classList.add('is-visible');
-}
+function _showBackBtn(label) {}
+function _hideBackBtn() {}
 
-function _hideBackBtn() {
-    document.getElementById('topbar-section').style.display = '';
-    const btn = document.getElementById('topbar-back-btn');
-    btn.classList.remove('is-visible');
-}
-
-function showDetail(type, idx) {
+function showDetail(type, idx, pushState = true) {
     document.getElementById(type + '-list').style.display = 'none';
     document.getElementById(type + '-detail').style.display = 'block';
     const contentEl = document.getElementById(type + '-detail-content');
     contentEl.innerHTML = renderDetail(type, APP[type][idx]);
     _atlasTheme(contentEl);
     _activeDetailType = type;
+    _activeDetailIdx  = idx;
     _showBackBtn('Back to ' + (_SECTION_LABELS[type] || type));
+    if (pushState && type === 'models' && APP.models[idx]) {
+        const name = APP.models[idx].name || idx;
+        history.pushState({ section: type, detail: name, idx }, '', LARADAR_ROUTES.models + '/' + encodeURIComponent(name));
+    }
 }
 
 function showList(type) {
     document.getElementById(type + '-list').style.display = 'block';
     document.getElementById(type + '-detail').style.display = 'none';
     _activeDetailType = null;
+    _activeDetailIdx  = null;
     _hideBackBtn();
+    if (type === 'models') {
+        history.pushState({ section: 'models' }, '', LARADAR_ROUTES.models);
+    }
 }
 
 function topbarGoBack() {
@@ -1102,22 +1117,22 @@ function avatar(letter, color) {
 }
 
 const MDS_PALETTE = [
-    {color:'var(--cyan)',    rgb:'255,45,32',   hex:'#FF2D20'},
-    {color:'var(--violet)',  rgb:'167,139,250',  hex:'#A78BFA'},
-    {color:'var(--emerald)', rgb:'52,211,153',   hex:'#34D399'},
-    {color:'var(--amber)',   rgb:'251,191,36',   hex:'#FBBF24'},
-    {color:'var(--rose)',    rgb:'248,113,113',  hex:'#F87171'},
-    {color:'var(--sky)',     rgb:'96,165,250',   hex:'#60A5FA'},
+    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
+    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
+    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
+    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
+    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
+    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
 ];
 const MDS_REL_CFG = {
-    hasMany:       {hex:'#34D399',color:'var(--emerald)',bg:'rgba(52,211,153,.12)', border:'rgba(52,211,153,.3)'},
-    hasOne:        {hex:'#FF2D20',color:'var(--cyan)',   bg:'rgba(255,45,32,.12)',  border:'rgba(255,45,32,.3)'},
-    belongsTo:     {hex:'#60A5FA',color:'var(--sky)',    bg:'rgba(96,165,250,.12)', border:'rgba(96,165,250,.3)'},
-    belongsToMany: {hex:'#A78BFA',color:'var(--violet)', bg:'rgba(167,139,250,.12)',border:'rgba(167,139,250,.3)'},
-    morphMany:     {hex:'#F87171',color:'var(--rose)',   bg:'rgba(248,113,113,.12)',border:'rgba(248,113,113,.3)'},
-    morphTo:       {hex:'#F87171',color:'var(--rose)',   bg:'rgba(248,113,113,.12)',border:'rgba(248,113,113,.3)'},
-    morphOne:      {hex:'#F87171',color:'var(--rose)',   bg:'rgba(248,113,113,.12)',border:'rgba(248,113,113,.3)'},
-    hasManyThrough:{hex:'#FBBF24',color:'var(--amber)',  bg:'rgba(251,191,36,.12)', border:'rgba(251,191,36,.3)'},
+    hasMany:       {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
+    hasOne:        {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
+    belongsTo:     {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
+    belongsToMany: {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
+    morphMany:     {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
+    morphTo:       {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
+    morphOne:      {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
+    hasManyThrough:{hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
 };
 
 function _mdsColor(name) {
@@ -1179,20 +1194,20 @@ function renderModel(m) {
         </div>
 
         <div class="mds-side-stats">
-          ${fillCnt  ? `<div class="mds-side-stat" onclick="mdsTab('fields')" title="Go to fields"><span class="mds-side-stat-lbl">Fillable</span><span class="mds-side-stat-val" style="color:${pal.color};">${fillCnt}</span></div>` : ''}
+          ${fillCnt  ? `<div class="mds-side-stat" onclick="mdsTab('fields')" title="Go to fields"><span class="mds-side-stat-lbl">Fillable</span><span class="mds-side-stat-val" style="color:#FF2D20;">${fillCnt}</span></div>` : ''}
           ${hideCnt  ? `<div class="mds-side-stat" onclick="mdsTab('fields')" title="Go to fields"><span class="mds-side-stat-lbl">Hidden</span><span class="mds-side-stat-val" style="color:#FF2D20;">${hideCnt}</span></div>` : ''}
-          ${castCnt  ? `<div class="mds-side-stat" onclick="mdsTab('fields')" title="Go to fields"><span class="mds-side-stat-lbl">Casts</span><span class="mds-side-stat-val" style="color:var(--amber);">${castCnt}</span></div>` : ''}
-          ${relCnt   ? `<div class="mds-side-stat" onclick="mdsTab('relations')" title="Go to relationships"><span class="mds-side-stat-lbl">Relationships</span><span class="mds-side-stat-val" style="color:var(--violet);">${relCnt}</span></div>` : ''}
-          ${usedBy.length ? `<div class="mds-side-stat" onclick="mdsTab('usedby')" title="Go to used by"><span class="mds-side-stat-lbl">Used by</span><span class="mds-side-stat-val" style="color:var(--sky);">${usedBy.length}</span></div>` : ''}
+          ${castCnt  ? `<div class="mds-side-stat" onclick="mdsTab('fields')" title="Go to fields"><span class="mds-side-stat-lbl">Casts</span><span class="mds-side-stat-val" style="color:#FF2D20;">${castCnt}</span></div>` : ''}
+          ${relCnt   ? `<div class="mds-side-stat" onclick="mdsTab('relations')" title="Go to relationships"><span class="mds-side-stat-lbl">Relationships</span><span class="mds-side-stat-val" style="color:#FF2D20;">${relCnt}</span></div>` : ''}
+          ${usedBy.length ? `<div class="mds-side-stat" onclick="mdsTab('usedby')" title="Go to used by"><span class="mds-side-stat-lbl">Used by</span><span class="mds-side-stat-val" style="color:#FF2D20;">${usedBy.length}</span></div>` : ''}
           ${!fillCnt && !relCnt && !usedBy.length ? `<p style="font-size:12px;color:var(--text-faint);text-align:center;padding:8px 0;">No data available</p>` : ''}
         </div>
 
         <div class="mds-side-meta">
           ${m.observer ? `<p style="font-size:10.5px;color:var(--text-faint);font-family:var(--font-mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Observer</p>
-          <span class="mds-side-chip" style="background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.25);">${esc(m.observer.split('\\').pop())}</span>` : ''}
+          <span class="mds-side-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.25);">${esc(m.observer.split('\\').pop())}</span>` : ''}
           ${traits.length ? `<p style="font-size:10.5px;color:var(--text-faint);font-family:var(--font-mono);margin:${m.observer?'12':'0'}px 0 8px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Traits</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;">${traits.map(t => `<span class="mds-side-chip" style="background:rgba(167,139,250,.1);color:var(--violet);border-color:rgba(167,139,250,.25);">${esc(t)}</span>`).join('')}</div>` : ''}
-          ${m.timestamps !== false ? `<span class="mds-side-chip" style="background:rgba(96,165,250,.08);color:var(--sky);border-color:rgba(96,165,250,.2);margin-top:8px;">timestamps</span>` : ''}
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">${traits.map(t => `<span class="mds-side-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.25);">${esc(t)}</span>`).join('')}</div>` : ''}
+          ${m.timestamps !== false ? `<span class="mds-side-chip" style="background:rgba(255,45,32,.06);color:#FF2D20;border-color:rgba(255,45,32,.2);margin-top:8px;">timestamps</span>` : ''}
         </div>
       </div>
     </aside>`;
@@ -1203,10 +1218,10 @@ function renderModel(m) {
     // Tabs
     h += `<div class="mds-tabs" id="mds-tabs-row">
       <button class="mds-tab-btn active" id="mds-tab-fields"    onclick="mdsTab('fields')">
-        Fields ${fieldMap.size ? `<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(${pal.rgb},.15);color:${pal.color};margin-left:5px;font-family:var(--font-mono);">${fieldMap.size}</span>` : ''}
+        Fields ${fieldMap.size ? `<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.12);color:#FF2D20;margin-left:5px;font-family:var(--font-mono);">${fieldMap.size}</span>` : ''}
       </button>
-      ${relCnt ? `<button class="mds-tab-btn" id="mds-tab-relations" onclick="mdsTab('relations')">Relationships <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(167,139,250,.15);color:var(--violet);margin-left:5px;font-family:var(--font-mono);">${relCnt}</span></button>` : ''}
-      ${usedBy.length ? `<button class="mds-tab-btn" id="mds-tab-usedby" onclick="mdsTab('usedby')">Used By <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.12);color:var(--cyan);margin-left:5px;font-family:var(--font-mono);">${usedBy.length}</span></button>` : ''}
+      ${relCnt ? `<button class="mds-tab-btn" id="mds-tab-relations" onclick="mdsTab('relations')">Relationships <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.12);color:#FF2D20;margin-left:5px;font-family:var(--font-mono);">${relCnt}</span></button>` : ''}
+      ${usedBy.length ? `<button class="mds-tab-btn" id="mds-tab-usedby" onclick="mdsTab('usedby')">Used By <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.12);color:#FF2D20;margin-left:5px;font-family:var(--font-mono);">${usedBy.length}</span></button>` : ''}
     </div>`;
 
     // ── Fields Tab ──
@@ -1233,10 +1248,10 @@ function renderModel(m) {
 
     // Feature flags
     const flags = [];
-    if (traits.some(t => t.includes('SoftDeletes'))) flags.push({label:'SoftDeletes', color:'var(--rose)',    bg:'rgba(248,113,113,.1)', border:'rgba(248,113,113,.2)'});
-    if (traits.some(t => t.includes('HasFactory')))  flags.push({label:'HasFactory',  color:'var(--emerald)', bg:'rgba(52,211,153,.1)',  border:'rgba(52,211,153,.2)'});
-    if (traits.some(t => t.includes('Searchable')))  flags.push({label:'Searchable',  color:'var(--sky)',     bg:'rgba(96,165,250,.1)',  border:'rgba(96,165,250,.2)'});
-    if (m.timestamps !== false)                       flags.push({label:'$timestamps = true', color:'var(--sky)', bg:'rgba(96,165,250,.08)', border:'rgba(96,165,250,.15)'});
+    if (traits.some(t => t.includes('SoftDeletes'))) flags.push({label:'SoftDeletes',        color:'#FF2D20', bg:'rgba(255,45,32,.08)', border:'rgba(255,45,32,.2)'});
+    if (traits.some(t => t.includes('HasFactory')))  flags.push({label:'HasFactory',          color:'#FF2D20', bg:'rgba(255,45,32,.08)', border:'rgba(255,45,32,.2)'});
+    if (traits.some(t => t.includes('Searchable')))  flags.push({label:'Searchable',          color:'#FF2D20', bg:'rgba(255,45,32,.08)', border:'rgba(255,45,32,.2)'});
+    if (m.timestamps !== false)                       flags.push({label:'$timestamps = true', color:'#FF2D20', bg:'rgba(255,45,32,.06)', border:'rgba(255,45,32,.15)'});
     if (flags.length) {
         h += `<div class="mds-flag-row">${flags.map(f => `<span class="mds-flag" style="color:${f.color};background:${f.bg};border-color:${f.border};">${esc(f.label)}</span>`).join('')}</div>`;
     }
@@ -1275,7 +1290,7 @@ function renderModel(m) {
                 <span style="font-size:14px;font-weight:700;color:var(--text);">${esc(u.name)}</span>
                 <span style="font-size:11px;color:var(--text-faint);margin-left:10px;font-family:var(--font-mono);">${u.routes} route${u.routes!==1?'s':''}</span>
               </div>
-              ${ci >= 0 ? `<button class="mds-nav-btn" style="color:var(--sky);background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.2);" onclick="event.stopPropagation();navigate('controllers');setTimeout(()=>showDetail('controllers',${ci}),100);">View controller →</button>` : ''}
+              ${ci >= 0 ? `<button class="mds-nav-btn" style="color:#FF2D20;background:rgba(255,45,32,.08);border-color:rgba(255,45,32,.2);" onclick="event.stopPropagation();navigate('controllers');setTimeout(()=>showDetail('controllers',${ci}),100);">View controller →</button>` : ''}
             </div>`;
         });
         h += `</div>`;
@@ -1584,126 +1599,6 @@ const REL_COLORS = {
     hasManyThrough: { color:'#2DD4BF', bg:'rgba(45,212,191,.13)',  border:'rgba(45,212,191,.3)'  },
     hasOneThrough:  { color:'#38BDF8', bg:'rgba(56,189,248,.13)',  border:'rgba(56,189,248,.3)'  },
 };
-
-function buildRelBranch(modelName, depth, visited) {
-    if (depth > 2 || visited.has(modelName)) return '';
-    const model = (APP.models || []).find(m => m.name === modelName);
-    if (!model) return '';
-
-    const rels = model.relationships || [];
-    if (rels.length === 0) return '';
-
-    const newVis = new Set(visited);
-    newVis.add(modelName);
-
-    let html = `<div style="padding-left:16px;border-left:1px solid rgba(148,178,222,0.18);margin-top:2px;">`;
-
-    rels.forEach((rel, i) => {
-        const relName = rel.related ? rel.related.split('\\').pop() : null;
-        const cfg     = REL_COLORS[rel.type] || { color:'#6B778C', bg:'rgba(142,155,184,.1)', border:'rgba(142,155,184,.25)' };
-        const isLast  = i === rels.length - 1;
-        const isCirc  = relName && newVis.has(relName);
-        const hasSub  = relName && depth < 1 && !newVis.has(relName) &&
-                        (APP.models || []).some(m => m.name === relName && (m.relationships||[]).length > 0);
-
-        html += `<div style="display:flex;align-items:flex-start;gap:0;padding:3px 0;">
-            <span style="color:rgba(148,178,222,0.3);font-family:var(--font-mono);font-size:11px;padding-top:2px;margin-right:8px;flex:none;user-select:none;">${isLast ? '└─' : '├─'}</span>
-            <div style="flex:1;">
-                <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
-                    <span style="font-family:var(--font-mono);font-size:10px;padding:1px 6px;border-radius:4px;border:1px solid ${cfg.border};background:${cfg.bg};color:${cfg.color};flex:none;">${rel.type}</span>
-                    <span style="font-size:13px;font-weight:600;color:var(--text);">${relName || '<em style="color:var(--text-faint);font-style:italic;">unknown</em>'}</span>
-                    ${rel.method ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);">.${rel.method}()</span>` : ''}
-                    ${isCirc ? '<span style="font-size:10px;color:var(--rose);">↩ circular</span>' : ''}
-                </div>
-                ${hasSub ? buildRelBranch(relName, depth + 1, newVis) : ''}
-            </div>
-        </div>`;
-    });
-
-    html += '</div>';
-    return html;
-}
-
-function renderModelTree() {
-    const search    = (document.getElementById('map-search')?.value || '').toLowerCase();
-    const allModels = APP.models || [];
-    const models    = allModels.filter(m => !search || m.name.toLowerCase().includes(search));
-    const container = document.getElementById('map-tree-content');
-
-    if (!models.length) {
-        container.innerHTML = '<p style="color:var(--text-faint);font-size:13px;padding:20px 0;">No models match your search.</p>';
-        return;
-    }
-
-    // Sort: models with rels first, then alphabetically
-    const sorted = [...models].sort((a, b) => {
-        const da = (b.relationships||[]).length - (a.relationships||[]).length;
-        return da !== 0 ? da : a.name.localeCompare(b.name);
-    });
-
-    const PALETTE = ['#FF2D20','#A78BFA','#34D399','#FBBF24','#F87171','#60A5FA'];
-
-    let html = `<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;overflow:hidden;">`;
-
-    sorted.forEach((model, idx) => {
-        const rels    = model.relationships || [];
-        const total   = rels.length;
-        const color   = PALETTE[idx % PALETTE.length];
-        const domId   = 'tv-body-' + idx;
-        const isLast  = idx === sorted.length - 1;
-        const hasRels = total > 0;
-
-        html += `
-        <div class="model-tree-card" data-name="${model.name.toLowerCase()}"
-             style="border-bottom:${isLast ? 'none' : '1px solid var(--border)'};">
-
-            <div onclick="tvToggle('${domId}','${domId}-arrow',${hasRels})"
-                 style="display:flex;align-items:center;gap:12px;padding:12px 18px;cursor:${hasRels ? 'pointer' : 'default'};transition:background .18s;user-select:none;"
-                 onmouseenter="if(${hasRels})this.style.background='rgba(255,255,255,.03)'" onmouseleave="this.style.background=''">
-
-                <svg id="${domId}-arrow" viewBox="0 0 10 10" style="width:10px;height:10px;flex:none;transition:transform .2s;opacity:${hasRels ? '1' : '.2'};" fill="currentColor" color="var(--text-faint)">
-                    <path d="M3 2l4 3-4 3z"/>
-                </svg>
-
-                <div style="width:32px;height:32px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;background:${color}18;color:${color};border:1px solid ${color}35;">
-                    ${model.name[0]}
-                </div>
-
-                <span style="font-size:13.5px;font-weight:700;color:var(--text);flex:1;">${model.name}</span>
-                <code style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);margin-right:4px;">${model.table || ''}</code>
-
-                ${model.observer ? '<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.2);font-family:var(--font-mono);flex:none;">obs</span>' : ''}
-
-                ${hasRels
-                    ? `<span style="font-family:var(--font-mono);font-size:10px;padding:2px 8px;border-radius:10px;background:${color}14;color:${color};border:1px solid ${color}30;flex:none;margin-left:6px;">${total} rel${total !== 1 ? 's' : ''}</span>`
-                    : `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);opacity:.45;margin-left:6px;">no rels</span>`
-                }
-            </div>
-
-            <div id="${domId}" style="display:none;padding:0 18px 14px 56px;">
-                ${hasRels ? buildRelBranch(model.name, 0, new Set()) : ''}
-            </div>
-        </div>`;
-    });
-
-    html += '</div>';
-    container.innerHTML = html;
-}
-
-function tvToggle(bodyId, arrowId, hasRels) {
-    if (!hasRels) return;
-    const body  = document.getElementById(bodyId);
-    const arrow = document.getElementById(arrowId);
-    if (!body) return;
-    const open = body.style.display !== 'none';
-    body.style.display  = open ? 'none' : 'block';
-    arrow.style.transform = open ? '' : 'rotate(90deg)';
-}
-
-function filterModelTree() {
-    if (!mapTreeRendered) return;
-    renderModelTree();
-}
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 

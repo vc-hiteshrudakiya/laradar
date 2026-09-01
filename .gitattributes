@@ -1,0 +1,13 @@
+* text=auto
+
+# Exclude from Composer archive
+/art              export-ignore
+/tests            export-ignore
+/workbench        export-ignore
+/.claude          export-ignore
+/.idea            export-ignore
+/.vscode          export-ignore
+/.github          export-ignore
+/phpunit.xml      export-ignore
+/.gitattributes   export-ignore
+/.gitignore       export-ignore

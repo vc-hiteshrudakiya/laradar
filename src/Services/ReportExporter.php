@@ -168,11 +168,36 @@ class ReportExporter
         $out[] = "| Jobs | {$data['summary']['jobs']} |";
         $out[] = "| Events | {$data['summary']['events']} |";
         $out[] = "| Services | {$data['summary']['services']} |";
+        $out[] = "| Repositories | {$data['summary']['repositories']} |";
+        $out[] = "| Observers | {$data['summary']['observers']} |";
+        $out[] = "| Policies | {$data['summary']['policies']} |";
+        $out[] = "| Modules | {$data['summary']['modules']} |";
         $out[] = "| Packages | {$data['summary']['packages']} |";
 
         $rs = $data['route_summary'];
+        $mwCount = count($rs['middleware_usage'] ?? []);
         $out[] = "| Named Routes | {$rs['named_count']} / {$rs['total']} |";
+        $out[] = "| Unique Middleware | {$mwCount} |";
         $out[] = '';
+
+        // ── Migrations ────────────────────────────────────────────
+        if (!empty($data['migrations'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Migrations';
+            $out[] = '';
+            $out[] = '| Date | Operation | Table | Columns | Foreign Keys |';
+            $out[] = '|------|-----------|-------|--------:|-------------:|';
+            foreach ($data['migrations'] as $mg) {
+                $op   = strtoupper($mg['operation'] ?? 'unknown');
+                $tbl  = $mg['table'] ?? '—';
+                $cols = count($mg['columns'] ?? []);
+                $fks  = count($mg['foreign_keys'] ?? []);
+                $date = $mg['date'] ?? '—';
+                $out[] = "| {$date} | {$op} | `{$tbl}` | {$cols} | {$fks} |";
+            }
+            $out[] = '';
+        }
 
         // ── Models ────────────────────────────────────────────────
         $out[] = '---';
@@ -232,6 +257,143 @@ class ReportExporter
             $out[] = "| {$methods} | `{$route['uri']}` | {$ctrl} | {$action} | {$name} | {$mw} |";
         }
         $out[] = '';
+
+        // ── Middleware ────────────────────────────────────────────
+        if (!empty($rs['middleware_usage'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Middleware Usage';
+            $out[] = '';
+            $out[] = '| Middleware | Count |';
+            $out[] = '|------------|------:|';
+            foreach ($rs['middleware_usage'] as $mw => $cnt) {
+                $out[] = "| `{$mw}` | {$cnt} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Jobs ─────────────────────────────────────────────────
+        if (!empty($data['jobs'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Jobs';
+            $out[] = '';
+            $out[] = '| Job | Namespace | Queue | Tries | Timeout |';
+            $out[] = '|-----|-----------|-------|------:|--------:|';
+            foreach ($data['jobs'] as $item) {
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$item['queue']} | {$item['tries']} | {$item['timeout']} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Events ───────────────────────────────────────────────
+        if (!empty($data['events'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Events';
+            $out[] = '';
+            $out[] = '| Event | Namespace | Listeners | Properties |';
+            $out[] = '|-------|-----------|----------:|-----------:|';
+            foreach ($data['events'] as $item) {
+                $listeners = count($item['listeners'] ?? []);
+                $props     = count($item['properties'] ?? []);
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$listeners} | {$props} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Services ─────────────────────────────────────────────
+        if (!empty($data['services'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Services';
+            $out[] = '';
+            $out[] = '| Service | Namespace | Methods |';
+            $out[] = '|---------|-----------|--------:|';
+            foreach ($data['services'] as $item) {
+                $mc = count($item['methods'] ?? []);
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$mc} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Repositories ─────────────────────────────────────────
+        if (!empty($data['repositories'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Repositories';
+            $out[] = '';
+            $out[] = '| Repository | Namespace | Methods |';
+            $out[] = '|------------|-----------|--------:|';
+            foreach ($data['repositories'] as $item) {
+                $mc = count($item['methods'] ?? []);
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$mc} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Observers ────────────────────────────────────────────
+        if (!empty($data['observers'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Observers';
+            $out[] = '';
+            $out[] = '| Observer | Namespace | Observed Model | Events |';
+            $out[] = '|----------|-----------|----------------|--------|';
+            foreach ($data['observers'] as $item) {
+                $model  = class_basename($item['model'] ?? '—');
+                $events = implode(', ', $item['events'] ?? []) ?: '—';
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$model} | {$events} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Policies ─────────────────────────────────────────────
+        if (!empty($data['policies'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Policies';
+            $out[] = '';
+            $out[] = '| Policy | Namespace | Model | Actions |';
+            $out[] = '|--------|-----------|-------|---------|';
+            foreach ($data['policies'] as $item) {
+                $model   = class_basename($item['model'] ?? '—');
+                $actions = implode(', ', $item['actions'] ?? []) ?: '—';
+                $out[] = "| {$item['name']} | `{$item['namespace']}` | {$model} | {$actions} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Modules ──────────────────────────────────────────────
+        if (!empty($data['modules'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Modules';
+            $out[] = '';
+            $out[] = '| Module | Path | Routes |';
+            $out[] = '|--------|------|-------:|';
+            foreach ($data['modules'] as $item) {
+                $out[] = "| {$item['name']} | `{$item['path']}` | {$item['routes']} |";
+            }
+            $out[] = '';
+        }
+
+        // ── Packages ─────────────────────────────────────────────
+        if (!empty($data['packages'])) {
+            $out[] = '---';
+            $out[] = '';
+            $out[] = '## Packages';
+            $out[] = '';
+            $out[] = '| Package | Version | Type | Description |';
+            $out[] = '|---------|---------|------|-------------|';
+            foreach ($data['packages'] as $pkg) {
+                $desc    = str_replace('|', '\\|', $pkg['description'] ?? '—');
+                $version = $pkg['version'] ?? '—';
+                $type    = $pkg['type'] ?? 'library';
+                $out[] = "| {$pkg['name']} | {$version} | {$type} | {$desc} |";
+            }
+            $out[] = '';
+        }
 
         return implode("\n", $out);
     }

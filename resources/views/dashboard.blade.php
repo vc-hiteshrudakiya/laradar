@@ -221,7 +221,7 @@
                     $mRelGrp = collect($mRels)->groupBy('type');
                     $mTotalFieldsInCard = $mRelCnt + $mFillCnt;
                 @endphp
-                <div class="mds-card" onclick="showDetail('models',{{ $i }})" data-name="{{ strtolower($model['name']) }}" style="--card-hover-border:{{ $mp['border'] }};">
+                <div class="mds-card" onclick="showDetail('models',{{ $i }})" data-name="{{ strtolower($model['name']) }}" style="cursor:pointer;--card-hover-border:{{ $mp['border'] }};">
                     <div class="mds-card-glow" style="background:linear-gradient(90deg,{{ $mp['color'] }},transparent);"></div>
                     <div class="mds-card-head">
                         <div class="mds-card-av" style="background:{{ $mp['bg'] }};color:{{ $mp['color'] }};border-color:{{ $mp['border'] }};">{{ substr($model['name'],0,1) }}</div>
@@ -1613,26 +1613,6 @@
 
 </section>
 
-{{-- ── Dead Code Section ───────────────────────────────────────────────────── --}}
-@php
-    $deadData    = $data['dead_code'] ?? ['items' => [], 'summary' => [], 'errors' => []];
-    $deadItems   = $deadData['items']   ?? [];
-    $deadSummary = $deadData['summary'] ?? [];
-    $dTotal  = $deadSummary['total']             ?? 0;
-    $dHigh   = $deadSummary['high']              ?? 0;
-    $dMedium = $deadSummary['medium']            ?? 0;
-    $dLow    = $deadSummary['low']               ?? 0;
-    $dDebug  = $deadSummary['debug_statements']  ?? 0;
-    $dComm   = $deadSummary['commented_code']    ?? 0;
-    $dModels = $deadSummary['unused_models']     ?? 0;
-    $dOrphan = $deadSummary['orphan_methods']    ?? 0;
-    $dJobs   = $deadSummary['undispatched_jobs'] ?? 0;
-    $dEvents = $deadSummary['unfired_events']    ?? 0;
-    $dSvc    = $deadSummary['unused_services']   ?? 0;
-    $dHighPct = $dTotal > 0 ? round($dHigh   / $dTotal * 100) : 0;
-    $dMedPct  = $dTotal > 0 ? round($dMedium / $dTotal * 100) : 0;
-    $dLowPct  = $dTotal > 0 ? max(0, 100 - $dHighPct - $dMedPct) : 0;
-@endphp
 
 </main>
 

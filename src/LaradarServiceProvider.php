@@ -5,12 +5,11 @@ namespace Vcian\Laradar;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Vcian\Laradar\Analyzers\ControllerAnalyzer;
-use Vcian\Laradar\Analyzers\DependencyAnalyzer;
 use Vcian\Laradar\Analyzers\EventAnalyzer;
 use Vcian\Laradar\Analyzers\JobAnalyzer;
+use Vcian\Laradar\Analyzers\MigrationAnalyzer;
 use Vcian\Laradar\Analyzers\ModelAnalyzer;
 use Vcian\Laradar\Analyzers\ObserverAnalyzer;
-use Vcian\Laradar\Analyzers\ApiDocAnalyzer;
 use Vcian\Laradar\Analyzers\ModuleAnalyzer;
 use Vcian\Laradar\Analyzers\PackageDetector;
 use Vcian\Laradar\Analyzers\PolicyAnalyzer;
@@ -19,7 +18,6 @@ use Vcian\Laradar\Analyzers\ServiceAnalyzer;
 use Vcian\Laradar\AI\AIManager;
 use Vcian\Laradar\Http\Controllers\AIController;
 use Vcian\Laradar\Http\Controllers\DashboardController;
-use Vcian\Laradar\Http\Controllers\ExportController;
 use Vcian\Laradar\Services\ArchitectureScanner;
 use Vcian\Laradar\Services\ReportExporter;
 
@@ -55,10 +53,6 @@ class LaradarServiceProvider extends ServiceProvider
 
             if ($scan['routes'] ?? true) {
                 $analyzers['routes'] = new RouteAnalyzer($appNamespace);
-            }
-
-            if ($scan['dependencies'] ?? true) {
-                $analyzers['dependencies'] = new DependencyAnalyzer(app_path());
             }
 
             if ($scan['jobs'] ?? true) {
@@ -109,17 +103,10 @@ class LaradarServiceProvider extends ServiceProvider
                 $analyzers['packages'] = new PackageDetector(base_path());
             }
 
-            if ($scan['api_docs'] ?? true) {
-                $analyzers['api_docs'] = new ApiDocAnalyzer(
-                    $appNamespace,
-                    app_path()
+            if ($scan['migrations'] ?? true) {
+                $analyzers['migrations'] = new MigrationAnalyzer(
+                    $paths['migrations'] ?? database_path('migrations')
                 );
-            }
-
-            // Dead code detector — opt-out default so it runs even on published configs
-            // that pre-date this key. Set dead_code => false in config to disable.
-            if ($scan['dead_code'] ?? true) {
-                $analyzers['dead_code'] = true;
             }
 
             return new ArchitectureScanner($analyzers);
@@ -180,7 +167,7 @@ class LaradarServiceProvider extends ServiceProvider
             ->name('laradar.dashboard');
 
         // Per-section pages
-        foreach (['models','controllers','routes','jobs','events','services',
+        foreach (['models','controllers','routes','migrations','jobs','events','services',
                   'repositories','observers','policies','modules','middleware',
                   'packages','ai','chat','aidocs'] as $section) {
             $method = $section === 'middleware' ? 'middlewarePage' : $section;
@@ -194,11 +181,6 @@ class LaradarServiceProvider extends ServiceProvider
             ->get($path . '/models/{model}', [DashboardController::class, 'modelDetail'])
             ->name('laradar.model.detail')
             ->where('model', '[a-zA-Z0-9_]+');
-
-        Route::middleware($middleware)
-            ->get($path . '/export/{format}', ExportController::class)
-            ->name('laradar.export')
-            ->where('format', 'html|svg');
 
         // Serve the last generated HTML scan report
         Route::middleware($middleware)

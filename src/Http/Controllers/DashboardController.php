@@ -67,6 +67,7 @@ class DashboardController extends Controller
     public function modules(Laradar $discovery)      { return $this->render('modules',      $discovery); }
     public function middlewarePage(Laradar $discovery) { return $this->render('middleware',   $discovery); }
     public function packages(Laradar $discovery)     { return $this->render('packages',     $discovery); }
+    public function migrations(Laradar $discovery)    { return $this->render('migrations',   $discovery); }
     public function ai(Laradar $discovery)           { return $this->render('ai',           $discovery); }
     public function chat(Laradar $discovery)         { return $this->render('chat',         $discovery); }
     public function aidocs(Laradar $discovery)       { return $this->render('aidocs',       $discovery); }

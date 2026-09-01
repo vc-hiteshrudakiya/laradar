@@ -58,6 +58,7 @@ The dashboard provides:
 - **Models** — relationships, fillable fields, table mappings
 - **Controllers** — methods, route bindings, dependencies
 - **Routes** — full route list with methods, middleware, and controllers
+- **Migrations** — all migration files with table name, operation (create/modify/drop), columns, types, and foreign keys
 - **Jobs / Events / Services / Repositories / Observers / Policies / Middleware / Modules / Packages** — per-component explorer
 - **AI Insights** — AI-powered review of your architecture (requires AI config)
 
@@ -77,7 +78,11 @@ php artisan laradar:scan --format=json
 php artisan laradar:scan --format=markdown
 ```
 
-Reports are saved to `storage/architecture/`.
+Reports are saved to `storage/architecture/`. After scanning, the HTML report is also accessible in the browser at:
+
+```
+http://your-app.test/laradar/report
+```
 
 ---
 
@@ -97,6 +102,7 @@ return [
         'models'       => true,
         'controllers'  => true,
         'routes'       => true,
+        'migrations'   => true,
         'jobs'         => true,
         'events'       => true,
         'services'     => true,
@@ -159,7 +165,7 @@ OLLAMA_BASE_URL=http://localhost:11434/v1
 # OpenRouter (200+ models, free tier available)
 AI_PROVIDER=openrouter
 OPENROUTER_API_KEY=your-key
-OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
+OPENROUTER_MODEL=openrouter/auto       # auto-selects best available model
 ```
 
 ---
@@ -177,6 +183,7 @@ OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
 | **Repositories** | Repository classes in `App\Repositories` |
 | **Observers** | Observed models, event hooks |
 | **Policies** | Guarded models, defined abilities |
+| **Migrations** | Migration files, table operations, column types, foreign keys |
 | **Middleware** | Registered middleware and aliases |
 | **Modules** | Module detection from `Modules/` directory |
 | **Packages** | Installed Composer packages with version info |

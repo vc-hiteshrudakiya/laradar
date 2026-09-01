@@ -88,7 +88,6 @@ PROMPT;
             ],
             'generationConfig' => [
                 'temperature'     => (float) ($this->config['temperature'] ?? 0.2),
-                'maxOutputTokens' => 8192,
             ],
         ];
 
@@ -96,8 +95,7 @@ PROMPT;
             $body['generationConfig']['responseMimeType'] = 'application/json';
         }
 
-        $response = Http::timeout(60)
-            ->withHeaders(['Content-Type' => 'application/json'])
+        $response = Http::withHeaders(['Content-Type' => 'application/json'])
             ->post($url, $body);
 
         if (!$response->successful()) {
