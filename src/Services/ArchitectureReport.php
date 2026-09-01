@@ -94,7 +94,6 @@ class ArchitectureReport
                 'relationship_summary' => $this->buildRelationshipSummary(),
             ],
             'route_summary' => $this->buildRouteSummary(),
-            'dependencies'  => $this->dependencies,
             'models'        => $this->models,
             'controllers'   => $this->controllers,
             'routes'        => $this->routes,
@@ -106,8 +105,6 @@ class ArchitectureReport
             'policies'      => $this->policies,
             'modules'       => $this->modules,
             'packages'      => $this->packages,
-            'api_docs'      => $this->apiDocs,
-            'dead_code'     => $this->deadCode,
             'errors'        => $this->errors,
         ];
     }

@@ -52,14 +52,10 @@ class LaradarCommand extends Command
         $this->line('  <fg=green>✓</> ' . str_pad('Models', 18) . '<fg=white;options=bold>' . $summary['models'] . '</>');
         $this->line('  <fg=green>✓</> ' . str_pad('Controllers', 18) . '<fg=white;options=bold>' . $summary['controllers'] . '</>');
         $this->line('  <fg=green>✓</> ' . str_pad('Routes', 18) . '<fg=white;options=bold>' . $summary['routes'] . '</>');
-        $this->line('  <fg=green>✓</> ' . str_pad('Dependencies', 18) . '<fg=white;options=bold>' . count($data['dependencies']['edges']) . '</>');
-
-        $dcTotal = $data['dead_code']['summary']['total'] ?? 0;
-        if ($dcTotal > 0) {
-            $this->line('  <fg=red>!</> ' . str_pad('Dead Code', 18) . '<fg=red;options=bold>' . $dcTotal . '</> issues');
-        } else {
-            $this->line('  <fg=green>✓</> ' . str_pad('Dead Code', 18) . '<fg=white;options=bold>0</>');
-        }
+        $this->line('  <fg=green>✓</> ' . str_pad('Jobs', 18) . '<fg=white;options=bold>' . $summary['jobs'] . '</>');
+        $this->line('  <fg=green>✓</> ' . str_pad('Events', 18) . '<fg=white;options=bold>' . $summary['events'] . '</>');
+        $this->line('  <fg=green>✓</> ' . str_pad('Services', 18) . '<fg=white;options=bold>' . $summary['services'] . '</>');
+        $this->line('  <fg=green>✓</> ' . str_pad('Packages', 18) . '<fg=white;options=bold>' . $summary['packages'] . '</>');
 
         $this->newLine();
         $this->line('  <fg=gray>⏱  ' . $data['performance']['execution_time_ms'] . 'ms &nbsp; 💾 ' . $data['performance']['memory_usage_mb'] . 'MB</>');
@@ -92,6 +88,26 @@ class LaradarCommand extends Command
         $this->line('  <fg=green;options=bold>✓ Completed Successfully.</>');
         $this->newLine();
 
+        // Auto-open the report via HTTP route if HTML was exported
+        if (in_array('html', $formats)) {
+            $reportUrl = rtrim(config('app.url', 'http://localhost:8000'), '/')
+                . '/' . ltrim(config('laradar.dashboard.path', 'laradar'), '/')
+                . '/report';
+
+            $this->line("  <fg=cyan>↗  Opening report:</> <fg=yellow>{$reportUrl}</>");
+            $this->newLine();
+            $this->openBrowser($reportUrl);
+        }
+
         return self::SUCCESS;
+    }
+
+    private function openBrowser(string $path): void
+    {
+        match (PHP_OS_FAMILY) {
+            'Darwin'  => exec('open '     . escapeshellarg($path) . ' > /dev/null 2>&1 &'),
+            'Windows' => exec('start "" ' . escapeshellarg($path)),
+            default   => exec('xdg-open ' . escapeshellarg($path) . ' > /dev/null 2>&1 &'),
+        };
     }
 }

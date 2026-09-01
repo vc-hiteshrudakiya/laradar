@@ -1,2136 +1,832 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Architecture Report — {{ $data['project']['name'] }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #F4F5F7; }
-        ::-webkit-scrollbar-thumb { background: #B3BAC5; border-radius: 4px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laradar Report — {{ $data['project']['name'] }}</title>
+<link rel="icon" type="image/x-icon" href="{{ route('laradar.asset', ['filename' => 'favicon.ico']) }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF;--bg-elevated:#FFFFFF;--bg-sunken:#F9F6EF;--bg-hover:#F9FAFB;
+  --border:#E5E7EB;--border-strong:#D1D5DB;
+  --text:#1D1D1F;--text-dim:#374151;--text-faint:#6B7280;
+  --brand:#FF2D20;--brand-bg:rgba(255,45,32,0.08);--brand-border:rgba(255,45,32,0.20);
+  --emerald:#16A34A;--amber:#D97706;--rose:#DC2626;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
+  --font-sans:'Figtree',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px;}
 
-        /* Section show/hide */
-        .section-panel { display: none; }
-        .section-panel.active { display: block; }
+/* Layout */
+.rp-layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh;}
 
-        /* Active nav item */
-        .nav-item.nav-active { background: rgba(0,82,204,0.08); color: #0052CC; font-weight: 600; }
+/* Sidebar */
+.rp-sidebar{background:var(--bg-elevated);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:none;}
+.rp-sidebar::-webkit-scrollbar{display:none;}
+.rp-brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid var(--border);}
+.rp-brand-mark{width:34px;height:34px;border-radius:8px;background:transparent;border:none;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;}
+.rp-brand-mark img{display:block;width:34px;height:34px;object-fit:cover;border-radius:8px;}
+.rp-brand strong{font-size:15px;font-weight:800;letter-spacing:.04em;color:var(--text);text-transform:uppercase;}
+.rp-project{padding:12px 20px;background:var(--bg-sunken);border-bottom:1px solid var(--border);}
+.rp-project p{font-size:11px;color:var(--text-faint);}
+.rp-project strong{font-size:13px;font-weight:700;color:var(--text);display:block;margin-bottom:2px;}
+.rp-project span{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rp-nav{flex:1;padding:12px 12px;display:flex;flex-direction:column;gap:2px;}
+.rp-nav-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);padding:8px 8px 4px;}
+.rp-nav-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:9px 12px;border-radius:10px;border:none;background:transparent;cursor:pointer;font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-dim);transition:background .15s,color .15s;text-align:left;}
+.rp-nav-btn:hover{background:var(--bg-hover);color:var(--text);}
+.rp-nav-btn.active{background:var(--brand-bg);color:var(--brand);font-weight:700;}
+.rp-nav-btn .left{display:flex;align-items:center;gap:8px;}
+.rp-nav-badge{font-size:10px;font-weight:700;font-family:var(--font-mono);background:var(--brand-bg);color:var(--brand);border:1px solid var(--brand-border);padding:1px 7px;border-radius:20px;}
+.rp-sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);font-size:11px;color:var(--text-faint);}
+.rp-sidebar-footer div{display:flex;justify-content:space-between;padding:3px 0;}
+.rp-sidebar-footer span:last-child{color:var(--text-dim);font-family:var(--font-mono);}
 
-        /* Diagram SVG node state transitions */
-        .g-node { transition: opacity 0.15s ease; }
+/* Main */
+.rp-main{display:flex;flex-direction:column;min-height:100vh;}
+.rp-topbar{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-between;}
+.rp-topbar-left h2{font-size:15px;font-weight:800;color:var(--text);}
+.rp-topbar-left p{font-size:11px;color:var(--text-faint);margin-top:1px;}
+.rp-section-chip{display:inline-block;font-size:11px;font-weight:600;background:var(--bg-sunken);color:var(--text-faint);padding:2px 10px;border-radius:20px;margin-left:8px;border:1px solid var(--border);}
+.rp-content{flex:1;padding:28px;}
 
-        /* Sidebar slide transition */
-        #sidebar {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #sidebar.sidebar-hidden {
-            transform: translateX(-100%);
-        }
-        #main-content {
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #main-content.sidebar-hidden {
-            margin-left: 0;
-        }
-    </style>
+/* Sections */
+.rp-section{display:none;}
+.rp-section.active{display:block;}
+.rp-section-hd{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.rp-section-hd h3{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);}
+.rp-section-hd .count{font-size:10px;font-weight:700;font-family:var(--font-mono);background:var(--brand-bg);color:var(--brand);border:1px solid var(--brand-border);padding:1px 8px;border-radius:20px;}
+
+/* Cards */
+.rp-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:box-shadow .15s;}
+.rp-card:hover{box-shadow:var(--shadow);}
+.rp-card-hd{padding:14px 18px;background:var(--bg-sunken);border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.rp-card-hd h4{font-size:13.5px;font-weight:700;color:var(--text);}
+.rp-card-hd p{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;}
+.rp-card-body{padding:14px 18px;}
+.rp-pill{display:inline-block;font-size:10px;font-weight:600;font-family:var(--font-mono);padding:2px 8px;border-radius:6px;border:1px solid;}
+
+/* KPI grid */
+.rp-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.rp-kpi{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:18px;border-left:3px solid var(--brand);}
+.rp-kpi-num{font-size:30px;font-weight:900;color:var(--text);line-height:1;}
+.rp-kpi-lbl{font-size:11px;color:var(--text-faint);margin-bottom:6px;}
+.rp-kpi-sub{font-size:11px;color:var(--brand);margin-top:4px;}
+
+/* Grid layouts */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;}
+@media(max-width:1100px){.grid-4{grid-template-columns:1fr 1fr;}.rp-kpi-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:800px){.grid-3,.grid-2{grid-template-columns:1fr;}}
+
+/* Table */
+.rp-table-wrap{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.rp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.rp-table th{background:var(--bg-sunken);padding:10px 16px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);border-bottom:1px solid var(--border);white-space:nowrap;}
+.rp-table td{padding:10px 16px;border-bottom:1px solid var(--border);color:var(--text-dim);vertical-align:top;}
+.rp-table tr:last-child td{border-bottom:none;}
+.rp-table tr:hover td{background:var(--bg-hover);}
+
+/* Score ring */
+.score-ring-wrap{position:relative;width:88px;height:88px;}
+.score-ring-wrap svg{transform:rotate(-90deg);}
+.score-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+
+/* Method badges */
+.method-get{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;}
+.method-post{background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0;}
+.method-put{background:#FFFBEB;color:#B45309;border:1px solid #FDE68A;}
+.method-patch{background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA;}
+.method-delete{background:#FEF2F2;color:#B91C1C;border:1px solid #FECACA;}
+
+/* Bar chart */
+.rp-bar-row{margin-bottom:10px;}
+.rp-bar-row-top{display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px;}
+.rp-bar-track{height:5px;background:var(--bg-sunken);border-radius:3px;overflow:hidden;}
+.rp-bar-fill{height:5px;border-radius:3px;background:var(--brand);}
+
+/* Toolbar */
+.rp-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.rp-search{border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px;font-family:var(--font-mono);background:var(--bg);color:var(--text);outline:none;flex:1;max-width:260px;}
+.rp-search:focus{border-color:var(--brand);}
+.rp-filter-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--text-dim);cursor:pointer;transition:all .15s;font-family:var(--font-sans);}
+.rp-filter-btn.active,.rp-filter-btn:hover{background:var(--brand);color:#fff;border-color:var(--brand);}
+
+/* Item list card (jobs/events/services etc) */
+.rp-item-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:16px;transition:box-shadow .15s;}
+.rp-item-card:hover{box-shadow:var(--shadow);}
+.rp-item-av{width:38px;height:38px;border-radius:10px;background:var(--brand-bg);border:1px solid var(--brand-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--brand);flex:none;}
+
+/* Footer */
+.rp-footer{text-align:center;font-size:11px;color:var(--text-faint);border-top:1px solid var(--border);padding:16px 28px;}
+</style>
 </head>
-<body class="bg-gray-50 font-sans antialiased overflow-x-hidden">
+<body>
 
-<div class="min-h-screen">
+@php
+$rs       = $data['route_summary'] ?? [];
+$sc       = $data['score'] ?? [];
+$namedPct = ($rs['total'] ?? 0) > 0 ? round(($rs['named_count'] / $rs['total']) * 100) : 0;
+if (!empty($sc)) {
+    $circumf   = 251.2;
+    $ringPct   = $sc['score'] / $sc['max'];
+    $offset    = round($circumf * (1 - $ringPct), 2);
+    $scorePct  = $sc['max'] > 0 ? ($sc['score'] / $sc['max']) * 100 : 0;
+    $ringColor = $scorePct >= 90 ? '#16A34A' : ($scorePct >= 70 ? '#D97706' : ($scorePct >= 50 ? '#EA580C' : '#DC2626'));
+    $gradeColor= $scorePct >= 90 ? '#16A34A' : ($scorePct >= 70 ? '#D97706' : ($scorePct >= 50 ? '#EA580C' : '#DC2626'));
+    $gradeBg   = $scorePct >= 90 ? 'rgba(22,163,74,.10)' : ($scorePct >= 70 ? 'rgba(217,119,6,.10)' : ($scorePct >= 50 ? 'rgba(234,88,12,.10)' : 'rgba(220,38,38,.10)'));
+    $gradeBdr  = $scorePct >= 90 ? 'rgba(22,163,74,.3)' : ($scorePct >= 70 ? 'rgba(217,119,6,.3)' : ($scorePct >= 50 ? 'rgba(234,88,12,.3)' : 'rgba(220,38,38,.3)'));
+}
+@endphp
 
-    {{-- ============================================================ --}}
-    {{-- SIDEBAR                                                       --}}
-    {{-- ============================================================ --}}
-    <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 fixed inset-y-0 left-0 flex flex-col overflow-y-auto z-20">
+<div class="rp-layout">
 
-        {{-- Brand --}}
-        <div class="px-6 py-5 border-b border-gray-200">
-            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Laravel</p>
-            <h1 class="text-base font-bold leading-tight text-gray-900">Architecture Report</h1>
-            <span class="inline-block mt-1 text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded">v{{ $data['package_version'] }}</span>
+{{-- ── SIDEBAR ── --}}
+<aside class="rp-sidebar">
+    <div class="rp-brand">
+        <div class="rp-brand-mark">
+            <img src="{{ route('laradar.asset', ['filename' => 'laradar-icon.svg']) }}" alt="Laradar" width="34" height="34" style="display:block;object-fit:cover;border-radius:8px;">
         </div>
+        <strong>Laradar</strong>
+    </div>
 
-        {{-- Project --}}
-        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
-            <p class="text-xs text-gray-400 mb-0.5">Project</p>
-            <p class="text-sm font-semibold text-gray-900">{{ $data['project']['name'] }}</p>
-            <p class="text-xs text-gray-400 mt-1 truncate font-mono">{{ $data['project']['base_path'] }}</p>
+    <div class="rp-project">
+        <p>Project</p>
+        <strong>{{ $data['project']['name'] }}</strong>
+        <span>{{ $data['project']['base_path'] }}</span>
+    </div>
+
+    <nav class="rp-nav">
+        <div class="rp-nav-label">Sections</div>
+
+        <button class="rp-nav-btn active" data-sec="overview" onclick="showSec('overview')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Overview
+            </span>
+        </button>
+
+        <button class="rp-nav-btn" data-sec="models" onclick="showSec('models')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v4c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 9v4c0 1.66 4.03 3 9 3s9-1.34 9-3V9"/><path d="M3 13v4c0 1.66 4.03 3 9 3s9-1.34 9-3v-4"/></svg>
+                Models
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['models'] }}</span>
+        </button>
+
+        <button class="rp-nav-btn" data-sec="controllers" onclick="showSec('controllers')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+                Controllers
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['controllers'] }}</span>
+        </button>
+
+        <button class="rp-nav-btn" data-sec="routes" onclick="showSec('routes')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                Routes
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['routes'] }}</span>
+        </button>
+
+        @if($data['summary']['jobs'] > 0)
+        <button class="rp-nav-btn" data-sec="jobs" onclick="showSec('jobs')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Jobs
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['jobs'] }}</span>
+        </button>
+        @endif
+
+        @if($data['summary']['events'] > 0)
+        <button class="rp-nav-btn" data-sec="events" onclick="showSec('events')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.22 1.17 2 2 0 012.2 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                Events
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['events'] }}</span>
+        </button>
+        @endif
+
+        @if($data['summary']['services'] > 0)
+        <button class="rp-nav-btn" data-sec="services" onclick="showSec('services')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M21 12h-2M5 12H3M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93"/></svg>
+                Services
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['services'] }}</span>
+        </button>
+        @endif
+
+        @if($data['summary']['repositories'] > 0)
+        <button class="rp-nav-btn" data-sec="repositories" onclick="showSec('repositories')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Repositories
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['repositories'] }}</span>
+        </button>
+        @endif
+
+        @if($data['summary']['observers'] > 0)
+        <button class="rp-nav-btn" data-sec="observers" onclick="showSec('observers')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Observers
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['observers'] }}</span>
+        </button>
+        @endif
+
+        @if($data['summary']['policies'] > 0)
+        <button class="rp-nav-btn" data-sec="policies" onclick="showSec('policies')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Policies
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['policies'] }}</span>
+        </button>
+        @endif
+
+        @if($data['summary']['modules'] > 0)
+        <button class="rp-nav-btn" data-sec="modules" onclick="showSec('modules')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                Modules
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['modules'] }}</span>
+        </button>
+        @endif
+
+        @if($data['summary']['packages'] > 0)
+        <button class="rp-nav-btn" data-sec="packages" onclick="showSec('packages')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Packages
+            </span>
+            <span class="rp-nav-badge">{{ $data['summary']['packages'] }}</span>
+        </button>
+        @endif
+
+        @if(!empty($data['errors']))
+        <button class="rp-nav-btn" data-sec="errors" onclick="showSec('errors')">
+            <span class="left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Errors
+            </span>
+            <span class="rp-nav-badge">{{ count($data['errors']) }}</span>
+        </button>
+        @endif
+    </nav>
+
+    <div class="rp-sidebar-footer">
+        <div><span>Scan time</span><span>{{ $data['performance']['execution_time_ms'] }}ms</span></div>
+        <div><span>Memory</span><span>{{ $data['performance']['memory_usage_mb'] }}MB</span></div>
+        <div><span>Generated</span><span>{{ \Carbon\Carbon::parse($data['generated_at'])->format('d M Y') }}</span></div>
+    </div>
+</aside>
+
+{{-- ── MAIN ── --}}
+<main class="rp-main">
+
+    <header class="rp-topbar">
+        <div class="rp-topbar-left">
+            <h2>
+                {{ $data['project']['name'] }}
+                <span class="rp-section-chip" id="sec-chip">Overview</span>
+            </h2>
+            <p>Laradar Report &nbsp;·&nbsp; {{ \Carbon\Carbon::parse($data['generated_at'])->format('d M Y \a\t H:i') }}</p>
         </div>
+    </header>
 
-        {{-- Navigation --}}
-        <nav class="flex-1 px-3 py-5 space-y-1">
-            <p class="text-xs text-gray-400 uppercase tracking-widest px-3 mb-3">Sections</p>
+    <div class="rp-content">
 
-            <button onclick="showSection('overview')" data-nav="overview"
-                class="nav-item nav-active w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">📊</span> Overview
-                </span>
-            </button>
+        {{-- ── OVERVIEW ── --}}
+        <div id="sec-overview" class="rp-section active">
 
-            <button onclick="showSection('diagram')" data-nav="diagram"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">🔷</span> Diagram
-                </span>
-                <span class="bg-indigo-600/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['models'] }}</span>
-            </button>
-
-            <button onclick="showSection('dependencies')" data-nav="dependencies"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">🔗</span> Dependencies
-                </span>
-                <span class="bg-amber-600/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ count($data['dependencies']['edges']) }}</span>
-            </button>
-
-            <button onclick="showSection('models')" data-nav="models"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">🗃️</span> Models
-                </span>
-                <span class="bg-blue-600/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['models'] }}</span>
-            </button>
-
-            <button onclick="showSection('controllers')" data-nav="controllers"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">⚙️</span> Controllers
-                </span>
-                <span class="bg-emerald-600/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['controllers'] }}</span>
-            </button>
-
-            <button onclick="showSection('routes')" data-nav="routes"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">🛣️</span> Routes
-                </span>
-                <span class="bg-violet-600/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['routes'] }}</span>
-            </button>
-
-            @if($data['summary']['jobs'] > 0)
-            <button onclick="showSection('jobs')" data-nav="jobs"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">⚡</span> Jobs
-                </span>
-                <span class="bg-amber-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['jobs'] }}</span>
-            </button>
-            @endif
-
-            @if($data['summary']['events'] > 0)
-            <button onclick="showSection('events')" data-nav="events"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">📡</span> Events
-                </span>
-                <span class="bg-pink-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['events'] }}</span>
-            </button>
-            @endif
-
-            @if($data['summary']['services'] > 0)
-            <button onclick="showSection('services')" data-nav="services"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">🔧</span> Services
-                </span>
-                <span class="bg-teal-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['services'] }}</span>
-            </button>
-            @endif
-
-            @if($data['summary']['repositories'] > 0)
-            <button onclick="showSection('repositories')" data-nav="repositories"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">🗄️</span> Repositories
-                </span>
-                <span class="bg-cyan-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['repositories'] }}</span>
-            </button>
-            @endif
-
-            @if($data['summary']['observers'] > 0)
-            <button onclick="showSection('observers')" data-nav="observers"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">👁️</span> Observers
-                </span>
-                <span class="bg-indigo-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['observers'] }}</span>
-            </button>
-            @endif
-
-            @if($data['summary']['policies'] > 0)
-            <button onclick="showSection('policies')" data-nav="policies"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">🛡️</span> Policies
-                </span>
-                <span class="bg-slate-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['policies'] }}</span>
-            </button>
-            @endif
-
-            @if($data['summary']['modules'] > 0)
-            <button onclick="showSection('modules')" data-nav="modules"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">📦</span> Modules
-                </span>
-                <span class="bg-violet-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['modules'] }}</span>
-            </button>
-            @endif
-
-            @if($data['summary']['packages'] > 0)
-            <button onclick="showSection('packages')" data-nav="packages"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">📚</span> Packages
-                </span>
-                <span class="bg-green-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['packages'] }}</span>
-            </button>
-            @endif
-
-            @if(!empty($data['api_docs']))
-            <button onclick="showSection('apidocs')" data-nav="apidocs"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-blue-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">📖</span> API Docs
-                </span>
-                <span class="bg-blue-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ count($data['api_docs']) }}</span>
-            </button>
-            @endif
-
-            @php $dcTotal = $data['dead_code']['summary']['total'] ?? 0; @endphp
-            <button onclick="showSection('deadcode')" data-nav="deadcode"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">🚫</span> Dead Code
-                </span>
-                @if($dcTotal > 0)
-                <span class="bg-red-500/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $dcTotal }}</span>
-                @endif
-            </button>
-
-            @if(!empty($data['errors']))
-            <button onclick="showSection('errors')" data-nav="errors"
-                class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 transition-all text-sm">
-                <span class="flex items-center gap-2.5">
-                    <span class="w-6 text-center">⚠️</span> Errors
-                </span>
-                <span class="bg-red-600/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ count($data['errors']) }}</span>
-            </button>
-            @endif
-        </nav>
-
-        {{-- System Info --}}
-        <div class="px-6 py-4 border-t border-gray-200 space-y-2 text-xs">
-            <p class="text-gray-400 uppercase tracking-widest text-xs mb-2">System</p>
-            <div class="flex justify-between text-gray-500">
-                <span>Laravel</span> <span class="text-gray-700">{{ $data['laravel_version'] }}</span>
-            </div>
-            <div class="flex justify-between text-gray-500">
-                <span>PHP</span> <span class="text-gray-700">{{ $data['php_version'] }}</span>
-            </div>
-            <div class="flex justify-between text-gray-500">
-                <span>Scan time</span> <span class="text-gray-700">{{ $data['performance']['execution_time_ms'] }}ms</span>
-            </div>
-            <div class="flex justify-between text-gray-500">
-                <span>Memory</span> <span class="text-gray-700">{{ $data['performance']['memory_usage_mb'] }}MB</span>
-            </div>
-        </div>
-
-    </aside>
-
-    {{-- ============================================================ --}}
-    {{-- MAIN CONTENT                                                  --}}
-    {{-- ============================================================ --}}
-    <main id="main-content" class="ml-64 min-h-screen flex flex-col">
-
-        {{-- Top bar --}}
-        <header class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-3">
-                {{-- Sidebar toggle button --}}
-                <button onclick="toggleSidebar()" id="sidebar-toggle"
-                    class="w-9 h-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors focus:outline-none"
-                    title="Toggle sidebar">
-                    <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                    <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h2 class="text-base font-bold text-gray-800 leading-tight">{{ $data['project']['name'] }}</h2>
-                        <span id="section-label" class="text-xs bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full font-semibold">Overview</span>
-                    </div>
-                    <p class="text-xs text-gray-400">Generated on {{ \Carbon\Carbon::parse($data['generated_at'])->format('d M Y \a\t H:i') }}</p>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Laravel {{ $data['laravel_version'] }}</span>
-                <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">PHP {{ $data['php_version'] }}</span>
-            </div>
-        </header>
-
-        <div class="flex-1 px-8 py-8 space-y-14">
-
-            {{-- ====================================================== --}}
-            {{-- OVERVIEW                                                --}}
-            {{-- ====================================================== --}}
-            <section id="overview" class="section-panel active">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">Overview</p>
-
-                {{-- ── Architecture Score Card ──────────────────────────── --}}
-                @if(!empty($data['score']))
-                @php
-                    $sc        = $data['score'];
-                    $ringPct   = $sc['score'] / $sc['max'];
-                    $circumf   = 251.2;
-                    $offset    = round($circumf * (1 - $ringPct), 2);
-                    $ringColor = match($sc['color']) {
-                        'emerald' => '#10b981', 'blue' => '#3b82f6',
-                        'amber'   => '#f59e0b', default => '#ef4444',
-                    };
-                    $gradeBg   = match($sc['color']) {
-                        'emerald' => 'bg-emerald-50 border-emerald-200',
-                        'blue'    => 'bg-blue-50 border-blue-200',
-                        'amber'   => 'bg-amber-50 border-amber-200',
-                        default   => 'bg-red-50 border-red-200',
-                    };
-                    $gradeText = match($sc['color']) {
-                        'emerald' => 'text-emerald-700', 'blue' => 'text-blue-700',
-                        'amber'   => 'text-amber-700',   default => 'text-red-700',
-                    };
-                @endphp
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-                    <div class="flex flex-col lg:flex-row gap-6">
-
-                        {{-- Ring + grade --}}
-                        <div class="flex items-center gap-5 shrink-0">
-                            <div class="relative w-24 h-24">
-                                <svg viewBox="0 0 100 100" class="-rotate-90 w-24 h-24">
-                                    <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" stroke-width="10"/>
-                                    <circle cx="50" cy="50" r="40" fill="none" stroke="{{ $ringColor }}"
-                                        stroke-width="10" stroke-linecap="round"
-                                        stroke-dasharray="{{ $circumf }}"
-                                        stroke-dashoffset="{{ $offset }}"/>
-                                </svg>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span class="text-2xl font-black text-gray-800 leading-none">{{ $sc['score'] }}</span>
-                                    <span class="text-xs text-gray-400">/ {{ $sc['max'] }}</span>
-                                </div>
+            {{-- Score card --}}
+            @if(!empty($sc))
+            <div class="rp-card" style="margin-bottom:20px;">
+                <div class="rp-card-body" style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:16px;flex:none;">
+                        <div class="score-ring-wrap">
+                            <svg viewBox="0 0 100 100" width="88" height="88">
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="10"/>
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="{{ $ringColor }}"
+                                    stroke-width="10" stroke-linecap="round"
+                                    stroke-dasharray="{{ $circumf }}" stroke-dashoffset="{{ $offset }}"/>
+                            </svg>
+                            <div class="score-ring-inner">
+                                <span style="font-size:22px;font-weight:900;color:var(--text);line-height:1;">{{ $sc['score'] }}</span>
+                                <span style="font-size:10px;color:var(--text-faint);">/{{ $sc['max'] }}</span>
                             </div>
+                        </div>
+                        <div>
+                            <p style="font-size:11px;color:var(--text-faint);margin-bottom:6px;">Architecture Score</p>
+                            <span style="font-size:15px;font-weight:800;color:{{ $gradeColor }};background:{{ $gradeBg }};border:1px solid {{ $gradeBdr }};padding:3px 12px;border-radius:8px;display:inline-block;">{{ $sc['grade'] }}</span>
+                        </div>
+                    </div>
+                    <div style="flex:1;min-width:220px;display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;">
+                        @foreach($sc['checks'] as $check)
+                        @php
+                        [$icon,$col] = match($check['status']){
+                            'pass'  => ['✔','#16A34A'],
+                            'warn'  => ['⚠','#D97706'],
+                            default => ['✘','#DC2626'],
+                        };
+                        @endphp
+                        <div style="display:flex;align-items:flex-start;gap:6px;">
+                            <span style="font-weight:700;color:{{ $col }};flex:none;margin-top:1px;">{{ $icon }}</span>
                             <div>
-                                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Architecture Score</p>
-                                <span class="inline-block text-lg font-black {{ $gradeText }} {{ $gradeBg }} border px-3 py-0.5 rounded-xl">
-                                    {{ $sc['grade'] }}
-                                </span>
+                                <span style="font-size:12.5px;color:var(--text-dim);">{{ $check['label'] }}</span>
+                                @if($check['note'])<span style="font-size:11px;color:var(--text-faint);margin-left:4px;">{{ $check['note'] }}</span>@endif
                             </div>
                         </div>
-
-                        {{-- Checks grid --}}
-                        <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-                            @foreach($sc['checks'] as $check)
-                            @php
-                                [$icon, $cls] = match($check['status']) {
-                                    'pass'  => ['✔', 'text-emerald-600'],
-                                    'warn'  => ['⚠', 'text-amber-500'],
-                                    default => ['✘', 'text-red-500'],
-                                };
-                            @endphp
-                            <div class="flex items-start gap-2">
-                                <span class="mt-0.5 text-sm font-bold {{ $cls }} shrink-0">{{ $icon }}</span>
-                                <div class="min-w-0">
-                                    <span class="text-sm text-gray-700">{{ $check['label'] }}</span>
-                                    @if($check['note'])
-                                    <span class="text-xs text-gray-400 ml-1">{{ $check['note'] }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-
-                    </div>
-                </div>
-                @endif
-
-                {{-- ── 4 Stat Cards ─────────────────────────────────────── --}}
-                @php
-                    $rs          = $data['route_summary'];
-                    $namedPct    = $rs['total'] > 0 ? round(($rs['named_count'] / $rs['total']) * 100) : 0;
-                    $apiVersions = $rs['api_versions'] ?? [];
-                @endphp
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-blue-500">
-                        <p class="text-xs text-gray-400 mb-1">Models</p>
-                        <p class="text-3xl font-black text-gray-800">{{ $data['summary']['models'] }}</p>
-                        <p class="text-xs text-blue-500 mt-1">{{ array_sum($data['summary']['relationship_summary'] ?? []) }} relationships</p>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-emerald-500">
-                        <p class="text-xs text-gray-400 mb-1">Controllers</p>
-                        <p class="text-3xl font-black text-gray-800">{{ $data['summary']['controllers'] }}</p>
-                        <p class="text-xs text-emerald-500 mt-1">{{ count($data['dependencies']['edges']) }} dep edges</p>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-violet-500">
-                        <p class="text-xs text-gray-400 mb-1">Routes</p>
-                        <p class="text-3xl font-black text-gray-800">{{ $rs['total'] }}</p>
-                        <p class="text-xs text-violet-500 mt-1">{{ implode(' · ', array_map(fn($g, $c) => $c . ' ' . $g, array_keys($rs['by_group'] ?? []), array_values($rs['by_group'] ?? []))) }}</p>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-indigo-500">
-                        <p class="text-xs text-gray-400 mb-1">Named Routes</p>
-                        <p class="text-3xl font-black text-gray-800">{{ $namedPct }}<span class="text-lg font-bold text-gray-400">%</span></p>
-                        <p class="text-xs text-indigo-500 mt-1">
-                            {{ $rs['named_count'] }}/{{ $rs['total'] }} named
-                            @if(!empty($apiVersions))
-                                · {{ implode(', ', array_keys($apiVersions)) }}
-                            @endif
-                        </p>
-                    </div>
-
-                </div>
-
-                {{-- ── 3 Charts ──────────────────────────────────────────── --}}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-
-                    {{-- Routes by HTTP method --}}
-                    @if(!empty($rs['by_method']))
-                    <div class="bg-white rounded-2xl p-5 shadow-sm">
-                        <p class="text-sm font-bold text-gray-700 mb-4">By HTTP Method</p>
-                        <div class="space-y-3">
-                            @php
-                                $methodColors = ['get'=>['bar'=>'bg-blue-500','text'=>'text-blue-600'],
-                                                 'post'=>['bar'=>'bg-emerald-500','text'=>'text-emerald-600'],
-                                                 'put'=>['bar'=>'bg-yellow-500','text'=>'text-yellow-600'],
-                                                 'patch'=>['bar'=>'bg-orange-500','text'=>'text-orange-600'],
-                                                 'delete'=>['bar'=>'bg-red-500','text'=>'text-red-600']];
-                            @endphp
-                            @foreach($rs['by_method'] as $method => $count)
-                            @php
-                                $c   = $methodColors[$method] ?? ['bar'=>'bg-gray-400','text'=>'text-gray-500'];
-                                $pct = $rs['total'] > 0 ? round(($count / $rs['total']) * 100) : 0;
-                            @endphp
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-bold uppercase {{ $c['text'] }}">{{ $method }}</span>
-                                    <span class="text-xs text-gray-500">{{ $count }} / {{ $pct }}%</span>
-                                </div>
-                                <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                    <div class="{{ $c['bar'] }} h-1.5 rounded-full" style="width:{{ $pct }}%"></div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-
-                    {{-- Middleware Usage --}}
-                    @if(!empty($rs['middleware_usage']))
-                    <div class="bg-white rounded-2xl p-5 shadow-sm">
-                        <p class="text-sm font-bold text-gray-700 mb-4">Middleware Usage</p>
-                        <div class="space-y-3">
-                            @php
-                                $topMw    = array_slice($rs['middleware_usage'], 0, 6, true);
-                                $maxMwCnt = max(array_values($topMw));
-                            @endphp
-                            @foreach($topMw as $mw => $count)
-                            @php $pct = $maxMwCnt > 0 ? round(($count / $maxMwCnt) * 100) : 0; @endphp
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-semibold text-gray-700">{{ $mw }}</span>
-                                    <span class="text-xs text-gray-500">{{ $count }}</span>
-                                </div>
-                                <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                    <div class="bg-gray-400 h-1.5 rounded-full" style="width:{{ $pct }}%"></div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-
-                    {{-- Relationship Types --}}
-                    @if(!empty($data['summary']['relationship_summary']))
-                    <div class="bg-white rounded-2xl p-5 shadow-sm">
-                        <p class="text-sm font-bold text-gray-700 mb-4">Relationship Types</p>
-                        <div class="space-y-3">
-                            @php $totalRels = array_sum($data['summary']['relationship_summary']); @endphp
-                            @foreach($data['summary']['relationship_summary'] as $type => $count)
-                            @php $pct = $totalRels > 0 ? round(($count / $totalRels) * 100) : 0; @endphp
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-semibold text-amber-700">{{ $type }}</span>
-                                    <span class="text-xs text-gray-500">{{ $count }} / {{ $pct }}%</span>
-                                </div>
-                                <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                    <div class="bg-amber-400 h-1.5 rounded-full" style="width:{{ $pct }}%"></div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-
-                </div>
-            </section>
-
-            {{-- ====================================================== --}}
-            {{-- DIAGRAM                                                 --}}
-            {{-- ====================================================== --}}
-            <section id="diagram" class="section-panel">
-
-                @php
-                    $graphNodes = [];
-                    $graphEdges = [];
-                    $erPairs    = [];
-
-                    foreach ($data['models'] as $model) {
-                        $graphNodes[] = [
-                            'id'    => $model['name'],
-                            'table' => $model['table'],
-                            'rels'  => count($model['relationships'] ?? []),
-                            'fields'=> count($model['fillable'] ?? []),
-                        ];
-                        foreach ($model['relationships'] ?? [] as $rel) {
-                            $to = class_basename($rel['related'] ?? '');
-                            if (!$to || $to === $model['name']) continue;
-
-                            $graphEdges[] = ['from' => $model['name'], 'to' => $to, 'type' => $rel['type']];
-
-                            $pairKey = $model['name'] . ':' . $to;
-                            $revKey  = $to . ':' . $model['name'];
-                            if (!isset($erPairs[$pairKey]) && !isset($erPairs[$revKey])) {
-                                $type = $rel['type'];
-                                if (str_contains($type, 'BelongsToMany') || str_contains($type, 'MorphToMany')) {
-                                    $lhs = '}o'; $rhs = 'o{';
-                                } elseif (str_contains($type, 'BelongsTo') || str_contains($type, 'MorphTo')) {
-                                    $lhs = '}o'; $rhs = '||';
-                                } elseif (str_contains($type, 'HasOne') || str_contains($type, 'MorphOne') || str_contains($type, 'HasOneThrough')) {
-                                    $lhs = '||'; $rhs = 'o|';
-                                } else {
-                                    $lhs = '||'; $rhs = 'o{';
-                                }
-                                $erPairs[$pairKey] = "    {$model['name']} {$lhs}--{$rhs} {$to} : \"{$rel['method']}\"";
-                            }
-                        }
-                    }
-
-                    // Collect every model name that already appears in a relationship line
-                    $erMentioned = [];
-                    foreach (array_keys($erPairs) as $pk) {
-                        [$a, $b] = explode(':', $pk);
-                        $erMentioned[$a] = true;
-                        $erMentioned[$b] = true;
-                    }
-
-                    // Declare standalone entity blocks for models with no relationships
-                    $erStandalone = [];
-                    foreach ($data['models'] as $model) {
-                        if (!isset($erMentioned[$model['name']])) {
-                            $erStandalone[] = "    {$model['name']} {";
-                            $erStandalone[] = "        string table \"{$model['table']}\"";
-                            $erStandalone[] = "    }";
-                        }
-                    }
-
-                    $erCode     = "erDiagram\n"
-                                . implode("\n", $erStandalone)
-                                . (!empty($erStandalone) ? "\n" : '')
-                                . implode("\n", $erPairs);
-                    $modelCount = count($graphNodes);
-                @endphp
-
-                {{-- ── Tab bar ────────────────────────────────────────────────────────────────── --}}
-                <div class="flex items-center gap-2 mb-5">
-                    <button id="diag-tab-er" onclick="switchDiagTab('er')"
-                        class="diag-tab text-xs font-bold px-4 py-1.5 rounded-xl border transition-all">
-                        🔗 ER Diagram
-                    </button>
-                    <button id="diag-tab-map" onclick="switchDiagTab('map')"
-                        class="diag-tab text-xs font-bold px-4 py-1.5 rounded-xl border transition-all">
-                        🫧 Relation Graph
-                    </button>
-                    <div class="ml-auto flex items-center gap-2 text-xs">
-                        <span class="bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold">{{ $modelCount }} models</span>
-                        <span class="bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full font-semibold">{{ count($graphEdges) }} relationships</span>
-                    </div>
-                </div>
-
-                {{-- ── ER Diagram panel ──────────────────────────────────────────── --}}
-                <div id="diag-panel-er" class="diag-panel overflow-auto rounded-2xl border border-gray-100 bg-white" style="min-height:420px;padding:2rem;">
-                    @if(count($erPairs) > 0)
-                        @if($modelCount > 18)
-                        <div class="mb-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-700">
-                            ⚠ Large project ({{ $modelCount }} models) — the ER diagram may be dense. Switch to <strong>Dependency Map</strong> for interactive exploration.
-                        </div>
-                        @endif
-                        <div class="mermaid">{{ $erCode }}</div>
-                    @else
-                        <div class="flex flex-col items-center justify-center py-20 text-gray-300">
-                            <div class="text-5xl mb-3">🔗</div>
-                            <p class="text-sm font-medium text-gray-400">No model relationships detected</p>
-                            <p class="text-xs mt-1 text-gray-300">Define Eloquent relationships to see them here.</p>
-                        </div>
-                    @endif
-                </div>
-
-                {{-- ── Dependency Map panel ────────────────────────────────────────── --}}
-                <div id="diag-panel-map" class="diag-panel hidden">
-
-                    {{-- Controls row --}}
-                    <div class="flex items-center gap-2 mb-3 min-h-[36px]">
-                        <input id="diag-search" type="text" placeholder="Search model…" oninput="diagSearch(this.value)"
-                            class="text-xs bg-white border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition w-48">
-                        <button id="diag-clear-btn" onclick="diagClear()"
-                            class="hidden text-xs text-gray-400 hover:text-gray-700 px-3 py-1.5 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors">
-                            ✕ Clear
-                        </button>
-
-                        {{-- Legend — hidden when a node is selected --}}
-                        <div id="diag-legend" class="ml-auto flex items-center gap-3 text-xs text-gray-400">
-                            <span class="flex items-center gap-1.5"><span class="inline-block w-6 h-px bg-indigo-400"></span>hasMany</span>
-                            <span class="flex items-center gap-1.5"><span class="inline-block w-6 h-px bg-teal-400"></span>hasOne</span>
-                            <span class="flex items-center gap-1.5"><span class="inline-block w-6 h-px bg-emerald-400"></span>belongsTo</span>
-                            <span class="flex items-center gap-1.5"><span class="inline-block w-6 h-px bg-violet-400"></span>M:M</span>
-                        </div>
-
-                        {{-- Selected model info — shown in-row when a node is selected --}}
-                        <div id="diag-info" class="hidden ml-auto flex items-center gap-2">
-                            <span id="diag-info-name"  class="font-black text-indigo-900 text-xs"></span>
-                            <span id="diag-info-table" class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-lg font-mono"></span>
-                            <button id="diag-rels-btn" onclick="toggleDiagRels()"
-                                class="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-xl border bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition-colors shadow-sm">
-                                <span id="diag-info-count"></span>
-                                <svg id="diag-rels-chevron" class="w-3 h-3 transition-transform" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    {{-- Relationship cards panel — expands below controls when button is clicked --}}
-                    <div id="diag-rels-panel" class="hidden mb-3 bg-white border border-indigo-100 rounded-2xl p-4 shadow-sm">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3" id="diag-rels-title"></p>
-                        <div id="diag-info-rels" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
-                    </div>
-
-                    {{-- SVG canvas --}}
-                    <div class="relative rounded-2xl border border-gray-200 shadow-sm overflow-hidden" style="background:#f8fafc;">
-                        <svg id="diag-canvas" xmlns="http://www.w3.org/2000/svg"
-                             style="width:100%;height:580px;display:block;cursor:grab;user-select:none;">
-                            <defs>
-                                <pattern id="dot-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-                                    <circle cx="1" cy="1" r="1" fill="#cbd5e1" opacity="0.5"/>
-                                </pattern>
-                                <marker id="g-arr-many"      viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                                <marker id="g-arr-one"       viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#2dd4bf" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                                <marker id="g-arr-belongs"   viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                                <marker id="g-arr-mm"        viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                                <marker id="g-arr-many-a"    viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                                <marker id="g-arr-one-a"     viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                                <marker id="g-arr-belongs-a" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                                <marker id="g-arr-mm-a"      viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M1,1.5 L9,5 L1,8.5" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
-                                <filter id="f-node"     x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="4"  flood-color="rgba(15,23,42,0.10)"/></filter>
-                                <filter id="f-node-sel" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="rgba(99,102,241,0.30)"/></filter>
-                                <filter id="f-node-rel" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="7"  flood-color="rgba(16,185,129,0.25)"/></filter>
-                            </defs>
-                            <rect width="100%" height="100%" fill="url(#dot-grid)"/>
-                            <g id="diag-vp">
-                                <g id="diag-edges-g"></g>
-                                <g id="diag-nodes-g"></g>
-                            </g>
-                        </svg>
-
-                        {{-- Zoom controls (top-right) --}}
-                        <div class="absolute top-3 right-3 flex items-center gap-1">
-                            <button onclick="diagZoom(1.25)"  class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 shadow-sm font-bold transition-colors text-base leading-none">+</button>
-                            <button onclick="diagZoom(0.8)"   class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 shadow-sm font-bold transition-colors text-base leading-none">−</button>
-                            <button onclick="diagFitView()"   class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 shadow-sm transition-colors text-sm" title="Fit to screen">⊡</button>
-                            <button onclick="diagResetView()" class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 shadow-sm transition-colors text-sm" title="Reset view">⟳</button>
-                        </div>
-
-                        {{-- Minimap (bottom-right) --}}
-                        <div class="absolute bottom-3 right-3 rounded-xl border border-gray-200 bg-white/90 backdrop-blur shadow-md overflow-hidden" style="width:160px;height:100px;">
-                            <svg id="diag-mm" width="160" height="100" style="display:block;"></svg>
-                        </div>
-
-                        {{-- Hint (bottom-left) --}}
-                        <div class="absolute bottom-3 left-3 text-xs text-gray-400 bg-white/80 backdrop-blur px-2.5 py-1 rounded-lg border border-gray-100 shadow-sm pointer-events-none">
-                            Click node · Drag to pan · Scroll to zoom
-                        </div>
-                    </div>
-
-                </div>
-
-            </section>
-
-            {{-- ====================================================== --}}
-            {{-- DEPENDENCIES                                            --}}
-            {{-- ====================================================== --}}
-            <section id="dependencies" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Dependency Graph</p>
-                    <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">Layer Architecture</span>
-                </div>
-
-                @php
-                    $depNodes = $data['dependencies']['nodes'] ?? [];
-                    $depEdges = $data['dependencies']['edges'] ?? [];
-
-                    // Sanitize name to a valid Mermaid node ID (alphanumeric + underscore only)
-                    $depSanitize = fn(string $n): string => preg_replace('/[^A-Za-z0-9_]/', '_', class_basename($n));
-
-                    $layerOrder  = ['controller','job','event','listener','service','repository','model','database'];
-                    $layerLabels = [
-                        'controller' => 'Controllers', 'job' => 'Jobs', 'event' => 'Events',
-                        'listener'   => 'Listeners', 'service' => 'Services',
-                        'repository' => 'Repositories', 'model' => 'Models', 'database' => 'Database',
-                    ];
-                    $byLayer = array_fill_keys($layerOrder, []);
-                    foreach ($depNodes as $node) {
-                        $l = $node['layer'] ?? 'model';
-                        if (isset($byLayer[$l])) $byLayer[$l][] = $depSanitize($node['name']);
-                    }
-
-                    $edgeLabel = ['injects' => '', 'uses' => 'uses', 'triggers' => 'triggers', 'persists' => 'persists'];
-
-                    $flowLines = ['flowchart TD'];
-                    foreach ($layerOrder as $layer) {
-                        if (empty($byLayer[$layer])) continue;
-                        if ($layer === 'database') continue;
-                        $flowLines[] = "    subgraph {$layerLabels[$layer]}";
-                        foreach ($byLayer[$layer] as $name) { $flowLines[] = "        {$name}"; }
-                        $flowLines[] = "    end";
-                    }
-                    if (!empty($byLayer['database'])) {
-                        $flowLines[] = '    Database[("Database")]';
-                    }
-                    foreach ($depEdges as $edge) {
-                        $from  = $depSanitize($edge['from'] ?? '');
-                        $to    = $depSanitize($edge['to'] ?? '');
-                        if (!$from || !$to) continue;
-                        $lbl   = $edgeLabel[$edge['type'] ?? ''] ?? '';
-                        $arrow = $lbl ? "-->|{$lbl}|" : '-->';
-                        $flowLines[] = "    {$from} {$arrow} {$to}";
-                    }
-                    $validLayers = array_flip($layerOrder);
-                    foreach ($depNodes as $node) {
-                        $sName = $depSanitize($node['name']);
-                        $layer = $node['layer'] ?? '';
-                        if ($sName && isset($validLayers[$layer])) {
-                            $flowLines[] = "    class {$sName} {$layer}";
-                        }
-                    }
-                    $flowLines[] = '    classDef controller fill:#EAF2FF,stroke:#0052CC,color:#172B4D';
-                    $flowLines[] = '    classDef service    fill:#E3FCEF,stroke:#00875A,color:#172B4D';
-                    $flowLines[] = '    classDef repository fill:#FFFAE6,stroke:#FF8B00,color:#172B4D';
-                    $flowLines[] = '    classDef model      fill:#F3F0FF,stroke:#6554C0,color:#172B4D';
-                    $flowLines[] = '    classDef job        fill:#FFF4E5,stroke:#FF8B00,color:#172B4D';
-                    $flowLines[] = '    classDef event      fill:#FFF0FB,stroke:#BF40BF,color:#172B4D';
-                    $flowLines[] = '    classDef listener   fill:#FEE4FA,stroke:#DA62AC,color:#172B4D';
-                    $flowLines[] = '    classDef database   fill:#F4F5F7,stroke:#6B778C,color:#172B4D';
-                    $depCode = implode("\n", $flowLines);
-
-                    $layerCounts = [];
-                    foreach ($depNodes as $node) { $layerCounts[$node['layer']] = ($layerCounts[$node['layer']] ?? 0) + 1; }
-                @endphp
-
-                @if(empty($depEdges))
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
-                    <p class="text-gray-400 text-sm">No dependencies detected.</p>
-                    <p class="text-gray-300 text-xs mt-1">Add classes ending in <code>Service</code> or <code>Repository</code> with constructor injection.</p>
-                </div>
-                @else
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-
-                    {{-- Toolbar --}}
-                    <div class="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-gray-50/80">
-                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-                            @php
-                            $dotColors = [
-                                'controller'=>'bg-blue-500','service'=>'bg-emerald-500',
-                                'repository'=>'bg-amber-500','model'=>'bg-violet-500',
-                                'job'=>'bg-yellow-500','event'=>'bg-purple-500',
-                                'listener'=>'bg-pink-500','database'=>'bg-gray-400',
-                            ];
-                            @endphp
-                            @foreach($layerOrder as $layer)
-                            @if(isset($layerCounts[$layer]) && $layer !== 'database')
-                            <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                                <span class="w-2 h-2 rounded-full {{ $dotColors[$layer] ?? 'bg-gray-400' }}"></span>
-                                <span class="font-semibold capitalize">{{ $layer }}</span>
-                                <span class="text-gray-400">({{ $layerCounts[$layer] }})</span>
-                            </span>
-                            @endif
-                            @endforeach
-                            @if(isset($layerCounts['database']))
-                            <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                                <span class="w-2 h-2 rounded-full bg-gray-400"></span>
-                                <span class="font-semibold">Database</span>
-                            </span>
-                            @endif
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="depFit()"
-                                class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors">
-                                Fit View
-                            </button>
-                        </div>
-                    </div>
-
-                    {{-- SVG canvas --}}
-                    @php $canvasH = max(540, min(900, count($depNodes) * 8 + 220)); @endphp
-                    <div style="position:relative;background:#F4F5F7;border-radius:0 0 16px 16px;overflow:hidden;height:{{ $canvasH }}px;">
-                        <svg id="dep-canvas" width="100%" height="100%" overflow="visible" style="cursor:grab;display:block;">
-                            <defs>
-                                <marker id="dep-arr" viewBox="0 0 10 6" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
-                                    <path d="M0,0 L10,3 L0,6 Z" fill="rgba(0,82,204,0.35)"/>
-                                </marker>
-                                <marker id="dep-arr-hi" viewBox="0 0 10 6" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
-                                    <path d="M0,0 L10,3 L0,6 Z" fill="#0052CC"/>
-                                </marker>
-                                <filter id="dep-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(23,43,77,0.10)" flood-opacity="1"/>
-                                </filter>
-                            </defs>
-                            <g id="dep-vp">
-                                <g id="dep-bands-g"></g>
-                                <g id="dep-edges-g"></g>
-                                <g id="dep-nodes-g"></g>
-                            </g>
-                        </svg>
-
-                        {{-- Zoom controls --}}
-                        <div style="position:absolute;top:12px;right:12px;display:flex;gap:4px;">
-                            <button onclick="depZoom(0.15)" style="width:30px;height:30px;background:#fff;border:1px solid #DFE1E6;border-radius:8px;font-size:16px;font-weight:700;color:#42526E;cursor:pointer;">+</button>
-                            <button onclick="depZoom(-0.15)" style="width:30px;height:30px;background:#fff;border:1px solid #DFE1E6;border-radius:8px;font-size:16px;font-weight:700;color:#42526E;cursor:pointer;">−</button>
-                            <button onclick="depFit()" title="Fit" style="width:30px;height:30px;background:#fff;border:1px solid #DFE1E6;border-radius:8px;font-size:13px;color:#42526E;cursor:pointer;">⊡</button>
-                        </div>
-
-                        {{-- Selected label --}}
-                        <div id="dep-sel-label" style="display:none;position:absolute;top:12px;left:12px;background:#fff;border:1px solid #DFE1E6;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;color:#0052CC;"></div>
-
-                        {{-- Hint --}}
-                        <div style="position:absolute;bottom:10px;left:12px;font-size:11px;color:#6B778C;background:rgba(255,255,255,0.85);padding:3px 9px;border-radius:6px;border:1px solid #DFE1E6;pointer-events:none;">
-                            Click to highlight · Drag to pan · Scroll to zoom
-                        </div>
-                    </div>
-
-                </div>
-                @endif
-            </section>
-
-            {{-- ====================================================== --}}
-            {{-- MODELS                                                  --}}
-            {{-- ====================================================== --}}
-            <section id="models" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Models</p>
-                    <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['models'] }}</span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    @foreach($data['models'] as $model)
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden">
-
-                        {{-- Model Header --}}
-                        <div class="px-5 py-4 bg-gradient-to-r from-blue-50 to-white border-b border-blue-50">
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="min-w-0">
-                                    <h3 class="font-bold text-gray-800 text-base truncate">{{ $model['name'] }}</h3>
-                                    <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $model['namespace'] }}</p>
-                                </div>
-                                <span class="shrink-0 text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-lg font-mono font-semibold">
-                                    {{ $model['table'] }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="px-5 py-4 space-y-4">
-
-                            {{-- Relationships --}}
-                            @if(!empty($model['relationships']))
-                            <div>
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Relationships</p>
-                                <div class="space-y-1.5">
-                                    @foreach($model['relationships'] as $rel)
-                                    <div class="flex items-center gap-2 text-xs">
-                                        <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-semibold shrink-0">{{ $rel['type'] }}</span>
-                                        <span class="text-gray-300">→</span>
-                                        <span class="font-semibold text-gray-700">{{ $rel['related'] }}</span>
-                                        <span class="text-gray-400 font-mono">({{ $rel['method'] }})</span>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
-
-                            {{-- Fillable --}}
-                            @if(!empty($model['fillable']))
-                            <div>
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Fillable</p>
-                                <div class="flex flex-wrap gap-1.5">
-                                    @foreach($model['fillable'] as $field)
-                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-mono">{{ $field }}</span>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
-
-                            {{-- Hidden --}}
-                            @if(!empty($model['hidden']))
-                            <div>
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Hidden</p>
-                                <div class="flex flex-wrap gap-1.5">
-                                    @foreach($model['hidden'] as $field)
-                                    <span class="text-xs bg-red-50 text-red-400 border border-red-100 px-2 py-0.5 rounded-md font-mono">{{ $field }}</span>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
-
-                            @if(empty($model['relationships']) && empty($model['fillable']) && empty($model['hidden']))
-                            <p class="text-xs text-gray-300 italic text-center py-2">No details detected.</p>
-                            @endif
-
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-
-            {{-- ====================================================== --}}
-            {{-- CONTROLLERS                                             --}}
-            {{-- ====================================================== --}}
-            <section id="controllers" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Controllers</p>
-                    <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['controllers'] }}</span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @foreach($data['controllers'] as $controller)
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden">
-
-                        {{-- Controller Header --}}
-                        <div class="px-5 py-4 bg-gradient-to-r from-emerald-50 to-white border-b border-emerald-50">
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="min-w-0">
-                                    <h3 class="font-bold text-gray-800 truncate">{{ $controller['name'] }}</h3>
-                                    <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $controller['namespace'] }}</p>
-                                </div>
-                                <span class="shrink-0 text-xs bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold">
-                                    {{ $controller['method_count'] }} methods
-                                </span>
-                            </div>
-                        </div>
-
-                        {{-- Methods --}}
-                        <div class="px-5 py-4">
-                            @if(!empty($controller['methods']))
-                            @php
-                                $mc = ['index'=>'bg-blue-50 text-blue-700 border-blue-100',
-                                       'show'=>'bg-cyan-50 text-cyan-700 border-cyan-100',
-                                       'create'=>'bg-teal-50 text-teal-700 border-teal-100',
-                                       'store'=>'bg-green-50 text-green-700 border-green-100',
-                                       'edit'=>'bg-orange-50 text-orange-700 border-orange-100',
-                                       'update'=>'bg-yellow-50 text-yellow-700 border-yellow-100',
-                                       'destroy'=>'bg-red-50 text-red-700 border-red-100'];
-                            @endphp
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($controller['methods'] as $method)
-                                @php $color = $mc[$method] ?? 'bg-gray-50 text-gray-600 border-gray-100'; @endphp
-                                <span class="text-xs border px-2.5 py-1 rounded-lg font-mono font-medium {{ $color }}">{{ $method }}</span>
-                                @endforeach
-                            </div>
-                            @else
-                            <p class="text-xs text-gray-300 italic">No public methods detected.</p>
-                            @endif
-                        </div>
-
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-
-            {{-- ====================================================== --}}
-            {{-- ROUTES                                                  --}}
-            {{-- ====================================================== --}}
-            <section id="routes" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Routes</p>
-                    <span class="bg-violet-100 text-violet-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['routes'] }}</span>
-                    <span class="text-xs text-gray-400">{{ implode(' · ', array_map(fn($g, $c) => $c . ' ' . $g, array_keys($data['route_summary']['by_group'] ?? []), array_values($data['route_summary']['by_group'] ?? []))) }}</span>
-                </div>
-
-                {{-- Filter + Search --}}
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="filterRoutes('all', this)" class="route-filter text-xs px-4 py-1.5 rounded-full font-semibold border bg-blue-600 text-white border-blue-600">All</button>
-                        @foreach(array_keys($data['route_summary']['by_method'] ?? []) as $m)
-                        @php $bc=['get'=>'blue','post'=>'green','put'=>'yellow','patch'=>'orange','delete'=>'red'][$m]??'gray'; @endphp
-                        <button onclick="filterRoutes('{{ strtoupper($m) }}', this)" class="route-filter text-xs px-4 py-1.5 rounded-full font-semibold border bg-{{ $bc }}-50 text-{{ $bc }}-700 border-{{ $bc }}-200 hover:bg-{{ $bc }}-100 uppercase transition">{{ $m }}</button>
                         @endforeach
                     </div>
-                    <input id="route-search" type="text" onkeyup="searchRoutes()" placeholder="Search URI, controller, name…"
-                           class="flex-1 min-w-48 text-xs bg-white border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-300 transition">
                 </div>
-
-                {{-- Table --}}
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="overflow-x-auto">
-                    <table class="w-full text-xs" style="min-width:900px">
-                        <thead>
-                            <tr class="bg-gray-50 border-b border-gray-100 text-gray-400 uppercase tracking-wider">
-                                <th class="text-left px-5 py-3 w-20 whitespace-nowrap">Method</th>
-                                <th class="text-left px-5 py-3 whitespace-nowrap" style="min-width:220px">URI</th>
-                                <th class="text-left px-5 py-3 whitespace-nowrap">Controller</th>
-                                <th class="text-left px-5 py-3 whitespace-nowrap">Action</th>
-                                <th class="text-left px-5 py-3 whitespace-nowrap">Name</th>
-                                <th class="text-left px-5 py-3 whitespace-nowrap">Middleware</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50" id="routes-body">
-                            @foreach($data['routes'] as $route)
-                            @php
-                                $httpMethods = array_values(array_filter($route['methods'], fn($m) => $m !== 'HEAD'));
-                                $primary = $httpMethods[0] ?? 'GET';
-                                $badge = ['GET'=>'bg-blue-100 text-blue-700','POST'=>'bg-green-100 text-green-700',
-                                          'PUT'=>'bg-yellow-100 text-yellow-700','PATCH'=>'bg-orange-100 text-orange-700',
-                                          'DELETE'=>'bg-red-100 text-red-700'][$primary] ?? 'bg-gray-100 text-gray-600';
-                                $middlewares = $route['middleware'] ?? [];
-                            @endphp
-                            <tr class="route-row hover:bg-gray-50 transition" data-methods="{{ implode(',', $httpMethods) }}">
-                                <td class="px-5 py-3">
-                                    <span class="font-bold px-2 py-0.5 rounded text-xs {{ $badge }}">{{ $primary }}</span>
-                                </td>
-                                <td class="px-5 py-3 font-mono text-gray-800 whitespace-nowrap">{{ $route['uri'] }}</td>
-                                <td class="px-5 py-3 text-gray-600 whitespace-nowrap">{{ class_basename($route['controller']['class']) }}</td>
-                                <td class="px-5 py-3 text-gray-400 font-mono whitespace-nowrap">{{ $route['controller']['method'] ?? '—' }}</td>
-                                <td class="px-5 py-3 text-gray-400 whitespace-nowrap">{{ $route['name'] ?? '—' }}</td>
-                                <td class="px-5 py-3">
-                                    @if(empty($middlewares))
-                                        <span class="text-gray-300">—</span>
-                                    @else
-                                        <div class="flex flex-wrap gap-1">
-                                            @foreach($middlewares as $mw)
-                                            <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs whitespace-nowrap">{{ $mw }}</span>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    </div>
-                    <p id="no-results" class="hidden text-center text-gray-400 py-10 text-sm">No routes match your search.</p>
-                </div>
-            </section>
-
-            {{-- ====================================================== --}}
-            {{-- JOBS                                                    --}}
-            {{-- ====================================================== --}}
-            @if($data['summary']['jobs'] > 0)
-            <section id="jobs" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Jobs</p>
-                    <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['jobs'] }}</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($data['jobs'] as $item)
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5">
-                        <div class="flex items-start gap-3">
-                            <span class="text-2xl">⚡</span>
-                            <div class="min-w-0">
-                                <h3 class="font-bold text-gray-800 text-sm truncate">{{ $item['name'] }}</h3>
-                                <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $item['namespace'] ?? '' }}</p>
-                                @if(!empty($item['queue']))
-                                <span class="inline-block mt-2 text-xs bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded-lg">Queue: {{ $item['queue'] }}</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </section>
+            </div>
             @endif
 
-            {{-- ====================================================== --}}
-            {{-- EVENTS                                                  --}}
-            {{-- ====================================================== --}}
-            @if($data['summary']['events'] > 0)
-            <section id="events" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Events</p>
-                    <span class="bg-pink-100 text-pink-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['events'] }}</span>
+            {{-- KPI grid --}}
+            <div class="rp-kpi-grid">
+                <div class="rp-kpi">
+                    <p class="rp-kpi-lbl">Models</p>
+                    <div class="rp-kpi-num">{{ $data['summary']['models'] }}</div>
+                    <p class="rp-kpi-sub">{{ array_sum($data['summary']['relationship_summary'] ?? []) }} relationships</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($data['events'] as $item)
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5">
-                        <div class="flex items-start gap-3">
-                            <span class="text-2xl">📡</span>
-                            <div class="min-w-0">
-                                <h3 class="font-bold text-gray-800 text-sm truncate">{{ $item['name'] }}</h3>
-                                <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $item['namespace'] ?? '' }}</p>
-                                @if(!empty($item['properties']))
-                                <p class="text-xs text-gray-500 mt-2">{{ count($item['properties']) }} payload prop{{ count($item['properties']) === 1 ? '' : 's' }}</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
+                <div class="rp-kpi">
+                    <p class="rp-kpi-lbl">Controllers</p>
+                    <div class="rp-kpi-num">{{ $data['summary']['controllers'] }}</div>
+                    <p class="rp-kpi-sub">{{ $data['summary']['jobs'] }} jobs &nbsp;·&nbsp; {{ $data['summary']['events'] }} events</p>
                 </div>
-            </section>
-            @endif
+                <div class="rp-kpi">
+                    <p class="rp-kpi-lbl">Routes</p>
+                    <div class="rp-kpi-num">{{ $rs['total'] ?? 0 }}</div>
+                    <p class="rp-kpi-sub">{{ $namedPct }}% named</p>
+                </div>
+                <div class="rp-kpi">
+                    <p class="rp-kpi-lbl">Packages</p>
+                    <div class="rp-kpi-num">{{ $data['summary']['packages'] }}</div>
+                    <p class="rp-kpi-sub">{{ $data['summary']['services'] }} services</p>
+                </div>
+            </div>
 
-            {{-- ====================================================== --}}
-            {{-- SERVICES                                                --}}
-            {{-- ====================================================== --}}
-            @if($data['summary']['services'] > 0)
-            <section id="services" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Services</p>
-                    <span class="bg-teal-100 text-teal-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['services'] }}</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($data['services'] as $item)
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5">
-                        <div class="flex items-start gap-3">
-                            <span class="text-2xl">🔧</span>
-                            <div class="min-w-0">
-                                <h3 class="font-bold text-gray-800 text-sm truncate">{{ $item['name'] }}</h3>
-                                <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $item['namespace'] ?? '' }}</p>
-                                @if(!empty($item['methods']))
-                                <p class="text-xs text-gray-500 mt-2">{{ count($item['methods']) }} method(s)</p>
-                                @endif
-                            </div>
+            {{-- Charts row --}}
+            <div class="grid-3">
+                {{-- HTTP Methods --}}
+                @if(!empty($rs['by_method']))
+                <div class="rp-card rp-card-body">
+                    <p style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:14px;">Routes by HTTP Method</p>
+                    @foreach($rs['by_method'] as $method => $count)
+                    @php $pct = ($rs['total'] ?? 0) > 0 ? round(($count / $rs['total']) * 100) : 0; @endphp
+                    <div class="rp-bar-row">
+                        <div class="rp-bar-row-top">
+                            <span style="font-weight:700;text-transform:uppercase;font-size:11px;color:var(--text-dim);">{{ $method }}</span>
+                            <span style="color:var(--text-faint);">{{ $count }} / {{ $pct }}%</span>
                         </div>
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-            @endif
-
-            {{-- ====================================================== --}}
-            {{-- REPOSITORIES                                            --}}
-            {{-- ====================================================== --}}
-            @if($data['summary']['repositories'] > 0)
-            <section id="repositories" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Repositories</p>
-                    <span class="bg-cyan-100 text-cyan-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['repositories'] }}</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($data['repositories'] as $item)
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5">
-                        <div class="flex items-start gap-3">
-                            <span class="text-2xl">🗄️</span>
-                            <div class="min-w-0">
-                                <h3 class="font-bold text-gray-800 text-sm truncate">{{ $item['name'] }}</h3>
-                                <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $item['namespace'] ?? '' }}</p>
-                                @if(!empty($item['methods']))
-                                <p class="text-xs text-gray-500 mt-2">{{ count($item['methods']) }} method(s)</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-            @endif
-
-            {{-- ====================================================== --}}
-            {{-- OBSERVERS                                               --}}
-            {{-- ====================================================== --}}
-            @if($data['summary']['observers'] > 0)
-            <section id="observers" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Observers</p>
-                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['observers'] }}</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($data['observers'] as $item)
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5">
-                        <div class="flex items-start gap-3">
-                            <span class="text-2xl">👁️</span>
-                            <div class="min-w-0">
-                                <h3 class="font-bold text-gray-800 text-sm truncate">{{ $item['name'] }}</h3>
-                                <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $item['namespace'] ?? '' }}</p>
-                                @if(!empty($item['model']))
-                                <span class="inline-block mt-2 text-xs bg-indigo-50 text-indigo-700 border border-indigo-100 px-2 py-0.5 rounded-lg">{{ class_basename($item['model']) }}</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-            @endif
-
-            {{-- ====================================================== --}}
-            {{-- POLICIES                                                --}}
-            {{-- ====================================================== --}}
-            @if($data['summary']['policies'] > 0)
-            <section id="policies" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Policies</p>
-                    <span class="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['policies'] }}</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($data['policies'] as $item)
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5">
-                        <div class="flex items-start gap-3">
-                            <span class="text-2xl">🛡️</span>
-                            <div class="min-w-0">
-                                <h3 class="font-bold text-gray-800 text-sm truncate">{{ $item['name'] }}</h3>
-                                <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $item['namespace'] ?? '' }}</p>
-                                @if(!empty($item['model']))
-                                <span class="inline-block mt-2 text-xs bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded-lg">{{ class_basename($item['model']) }}</span>
-                                @endif
-                                @if(!empty($item['actions']))
-                                <div class="flex flex-wrap gap-1 mt-2">
-                                    @foreach(array_slice($item['actions'], 0, 5) as $m)
-                                    <span class="text-xs bg-gray-50 text-gray-500 border border-gray-100 px-2 py-0.5 rounded font-mono">{{ $m }}</span>
-                                    @endforeach
-                                </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-            @endif
-
-            {{-- ====================================================== --}}
-            {{-- MODULES                                                 --}}
-            {{-- ====================================================== --}}
-            @if($data['summary']['modules'] > 0)
-            <section id="modules" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Modules</p>
-                    <span class="bg-violet-100 text-violet-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['modules'] }}</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @foreach($data['modules'] as $item)
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5">
-                        <div class="flex items-start gap-3 mb-3">
-                            <span class="text-2xl">📦</span>
-                            <div class="min-w-0">
-                                <h3 class="font-bold text-gray-800 truncate">{{ $item['name'] }}</h3>
-                                <p class="text-xs text-gray-400 font-mono truncate mt-0.5">{{ $item['path'] ?? '' }}</p>
-                            </div>
-                        </div>
-                        @if(!empty($item['routes']))
-                        <div class="flex gap-3 text-xs text-gray-500 border-t border-gray-50 pt-3">
-                            <span>{{ $item['routes'] }} route(s)</span>
-                        </div>
-                        @endif
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-            @endif
-
-            {{-- ====================================================== --}}
-            {{-- PACKAGES                                                --}}
-            {{-- ====================================================== --}}
-            @if($data['summary']['packages'] > 0)
-            <section id="packages" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Composer Packages</p>
-                    <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $data['summary']['packages'] }}</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($data['packages'] as $pkg)
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5">
-                        <div class="flex items-start gap-3">
-                            <span class="text-xl">📚</span>
-                            <div class="min-w-0 flex-1">
-                                <h3 class="font-bold text-gray-800 text-sm truncate">{{ $pkg['name'] }}</h3>
-                                <p class="text-xs text-gray-400 font-mono mt-0.5">{{ $pkg['version'] ?? '' }}</p>
-                                @if(!empty($pkg['description']))
-                                <p class="text-xs text-gray-500 mt-2 line-clamp-2">{{ $pkg['description'] }}</p>
-                                @endif
-                                @php $pkgType = $pkg['type'] ?? 'library'; @endphp
-                                <span class="inline-block mt-2 text-xs {{ $pkgType === 'laravel-package' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-gray-50 text-gray-500 border-gray-100' }} border px-2 py-0.5 rounded-lg">{{ $pkgType }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-            @endif
-
-            {{-- ====================================================== --}}
-            {{-- API DOCS                                                --}}
-            {{-- ====================================================== --}}
-            @if(!empty($data['api_docs']))
-            <section id="apidocs" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">API Docs</p>
-                    <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ count($data['api_docs']) }}</span>
-                </div>
-                <div class="space-y-4">
-                    @foreach($data['api_docs'] as $endpoint)
-                    @php
-                        $methodColors = ['GET'=>'bg-emerald-100 text-emerald-700','POST'=>'bg-blue-100 text-blue-700','PUT'=>'bg-amber-100 text-amber-700','PATCH'=>'bg-orange-100 text-orange-700','DELETE'=>'bg-red-100 text-red-700'];
-                        $mc = $methodColors[$endpoint['method'] ?? 'GET'] ?? 'bg-gray-100 text-gray-600';
-                    @endphp
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="text-xs font-bold px-2.5 py-1 rounded-lg {{ $mc }}">{{ $endpoint['method'] ?? 'GET' }}</span>
-                            <code class="text-sm font-mono text-gray-800 font-semibold">{{ $endpoint['uri'] ?? '' }}</code>
-                        </div>
-                        @if(!empty($endpoint['summary']))
-                        <p class="text-sm text-gray-600 mb-3">{{ $endpoint['summary'] }}</p>
-                        @endif
-                        <div class="flex flex-wrap gap-3 text-xs text-gray-500">
-                            @if(!empty($endpoint['controller']))<span>Controller: <strong class="text-gray-700">{{ $endpoint['controller'] }}</strong></span>@endif
-                            @if(!empty($endpoint['middleware']))<span>Middleware: <strong class="text-gray-700">{{ implode(', ', (array)$endpoint['middleware']) }}</strong></span>@endif
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-            @endif
-
-            {{-- ====================================================== --}}
-            {{-- ERRORS                                                  --}}
-            {{-- ====================================================== --}}
-            @if(!empty($data['errors']))
-            <section id="errors" class="section-panel">
-                <div class="flex items-center gap-3 mb-5">
-                    <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Errors</p>
-                    <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ count($data['errors']) }}</span>
-                </div>
-                <div class="space-y-3">
-                    @foreach($data['errors'] as $error)
-                    <div class="flex gap-4 bg-red-50 border border-red-200 rounded-2xl px-5 py-4">
-                        <span class="text-xl shrink-0">⚠️</span>
-                        <div>
-                            <p class="text-sm font-mono font-semibold text-red-700">{{ $error['file'] }}</p>
-                            <p class="text-xs text-red-500 mt-1">{{ $error['message'] }}</p>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </section>
-            @endif
-
-            {{-- ====================================================== --}}
-            {{-- DEAD CODE                                                --}}
-            {{-- ====================================================== --}}
-            @php
-                $dc      = $data['dead_code'] ?? [];
-                $dcItems = $dc['items']   ?? [];
-                $dcSum   = $dc['summary'] ?? [];
-                $dcTotal = $dcSum['total']  ?? 0;
-                $dcHigh  = $dcSum['high']   ?? 0;
-                $dcMed   = $dcSum['medium'] ?? 0;
-                $dcLow   = $dcSum['low']    ?? 0;
-                $sevColor = fn($s) => match($s) { 'high' => ['bg-red-100','text-red-700','border-red-200'], 'medium' => ['bg-amber-100','text-amber-700','border-amber-200'], default => ['bg-slate-100','text-slate-600','border-slate-200'] };
-                $typeIcon = fn($t) => match($t) {
-                    'debug_statement'  => '🐛',
-                    'commented_code'   => '💬',
-                    'unused_model'     => '📦',
-                    'orphan_method'    => '⚡',
-                    'undispatched_job' => '📮',
-                    'unfired_event'    => '🔔',
-                    'unused_service'   => '🔧',
-                    default            => '📋',
-                };
-            @endphp
-            <section id="deadcode" class="section-panel">
-                <div class="flex items-center gap-3 mb-6">
-                    <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Dead Code</p>
-                    @if($dcTotal > 0)
-                    <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $dcTotal }} issues</span>
-                    @endif
-                </div>
-
-                @if($dcTotal === 0)
-                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl px-6 py-8 text-center">
-                    <p class="text-2xl mb-2">✅</p>
-                    <p class="text-sm font-semibold text-emerald-700">No dead code detected</p>
-                    <p class="text-xs text-emerald-500 mt-1">Every class, method, job and event appears to be in use.</p>
-                </div>
-                @else
-
-                {{-- Summary cards --}}
-                <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-center">
-                        <p class="text-2xl font-bold text-red-600">{{ $dcHigh }}</p>
-                        <p class="text-xs text-red-400 mt-1 uppercase tracking-wide font-semibold">High</p>
-                    </div>
-                    <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-center">
-                        <p class="text-2xl font-bold text-amber-600">{{ $dcMed }}</p>
-                        <p class="text-xs text-amber-400 mt-1 uppercase tracking-wide font-semibold">Medium</p>
-                    </div>
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-center">
-                        <p class="text-2xl font-bold text-slate-500">{{ $dcLow }}</p>
-                        <p class="text-xs text-slate-400 mt-1 uppercase tracking-wide font-semibold">Low</p>
-                    </div>
-                </div>
-
-                {{-- Items list --}}
-                <div class="space-y-3">
-                    @foreach($dcItems as $item)
-                    @php [$sevBg, $sevText, $sevBorder] = $sevColor($item['severity'] ?? 'low'); @endphp
-                    <div class="bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-sm">
-                        <div class="flex items-start gap-3">
-                            <span class="text-xl shrink-0 mt-0.5">{{ $typeIcon($item['type'] ?? '') }}</span>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap mb-1">
-                                    <span class="text-sm font-semibold text-gray-800 truncate">{{ $item['name'] ?? '—' }}</span>
-                                    <span class="text-xs px-2 py-0.5 rounded-full border font-semibold {{ $sevBg }} {{ $sevText }} {{ $sevBorder }}">{{ strtoupper($item['severity'] ?? 'low') }}</span>
-                                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{{ str_replace('_', ' ', $item['type'] ?? '') }}</span>
-                                </div>
-                                <p class="text-xs text-gray-500 mb-1">{{ $item['detail'] ?? '' }}</p>
-                                @if(!empty($item['path']))
-                                <p class="text-xs font-mono text-gray-400 truncate">{{ $item['path'] }}@if(!empty($item['line'])):{{ $item['line'] }}@endif</p>
-                                @endif
-                                @if(!empty($item['snippet']))
-                                <pre class="mt-2 text-xs font-mono bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 overflow-x-auto text-gray-600 whitespace-pre-wrap">{{ $item['snippet'] }}</pre>
-                                @endif
-                            </div>
-                        </div>
+                        <div class="rp-bar-track"><div class="rp-bar-fill" style="width:{{ $pct }}%"></div></div>
                     </div>
                     @endforeach
                 </div>
                 @endif
-            </section>
 
-            {{-- Footer --}}
-            <footer class="text-center text-xs text-gray-300 border-t border-gray-100 pt-6 pb-2">
-                Generated by <strong class="text-gray-400">Laradar</strong> v{{ $data['package_version'] }}
-                &nbsp;·&nbsp; {{ $data['performance']['execution_time_ms'] }}ms &nbsp;·&nbsp; {{ $data['performance']['memory_usage_mb'] }}MB
-            </footer>
+                {{-- Middleware --}}
+                @if(!empty($rs['middleware_usage']))
+                <div class="rp-card rp-card-body">
+                    <p style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:14px;">Middleware Usage</p>
+                    @php $topMw = array_slice($rs['middleware_usage'],0,6,true); $maxMw = max(array_values($topMw)); @endphp
+                    @foreach($topMw as $mw => $cnt)
+                    @php $pct = $maxMw > 0 ? round(($cnt/$maxMw)*100) : 0; @endphp
+                    <div class="rp-bar-row">
+                        <div class="rp-bar-row-top">
+                            <span style="color:var(--text-dim);font-size:11px;">{{ $mw }}</span>
+                            <span style="color:var(--text-faint);">{{ $cnt }}</span>
+                        </div>
+                        <div class="rp-bar-track"><div class="rp-bar-fill" style="width:{{ $pct }}%;background:var(--emerald);"></div></div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
 
+                {{-- Relationship Types --}}
+                @if(!empty($data['summary']['relationship_summary']))
+                <div class="rp-card rp-card-body">
+                    <p style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:14px;">Relationship Types</p>
+                    @php $totalRels = array_sum($data['summary']['relationship_summary']); @endphp
+                    @foreach($data['summary']['relationship_summary'] as $type => $cnt)
+                    @php $pct = $totalRels > 0 ? round(($cnt/$totalRels)*100) : 0; @endphp
+                    <div class="rp-bar-row">
+                        <div class="rp-bar-row-top">
+                            <span style="color:var(--text-dim);font-size:11px;">{{ $type }}</span>
+                            <span style="color:var(--text-faint);">{{ $cnt }} / {{ $pct }}%</span>
+                        </div>
+                        <div class="rp-bar-track"><div class="rp-bar-fill" style="width:{{ $pct }}%;background:var(--amber);"></div></div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+            </div>
         </div>
-    </main>
+
+        {{-- ── MODELS ── --}}
+        <div id="sec-models" class="rp-section">
+            <div class="rp-section-hd">
+                <h3>Models</h3>
+                <span class="count">{{ $data['summary']['models'] }}</span>
+            </div>
+            <div class="grid-3">
+                @foreach($data['models'] as $model)
+                <div class="rp-card">
+                    <div class="rp-card-hd">
+                        <div style="min-width:0;">
+                            <h4>{{ $model['name'] }}</h4>
+                            <p>{{ $model['namespace'] }}</p>
+                        </div>
+                        <span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);white-space:nowrap;font-size:10px;">{{ $model['table'] }}</span>
+                    </div>
+                    <div class="rp-card-body" style="display:flex;flex-direction:column;gap:12px;">
+                        @if(!empty($model['relationships']))
+                        <div>
+                            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px;">Relationships</p>
+                            <div style="display:flex;flex-direction:column;gap:5px;">
+                                @foreach($model['relationships'] as $rel)
+                                <div style="display:flex;align-items:center;gap:6px;font-size:11px;">
+                                    <span class="rp-pill" style="color:var(--amber);background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.25);">{{ $rel['type'] }}</span>
+                                    <span style="color:var(--text-faint);">→</span>
+                                    <span style="font-weight:600;color:var(--text-dim);">{{ class_basename($rel['related'] ?? '—') }}</span>
+                                    <span style="color:var(--text-faint);font-family:var(--font-mono);">({{ $rel['method'] }})</span>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                        @if(!empty($model['fillable']))
+                        <div>
+                            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px;">Fillable</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                                @foreach($model['fillable'] as $f)
+                                <span style="font-family:var(--font-mono);font-size:10px;background:var(--bg-sunken);color:var(--text-dim);padding:2px 7px;border-radius:5px;border:1px solid var(--border);">{{ $f }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                        @if(!empty($model['hidden']))
+                        <div>
+                            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px;">Hidden</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                                @foreach($model['hidden'] as $f)
+                                <span style="font-family:var(--font-mono);font-size:10px;background:rgba(220,38,38,.06);color:var(--rose);padding:2px 7px;border-radius:5px;border:1px solid rgba(220,38,38,.2);">{{ $f }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                        @if(empty($model['relationships']) && empty($model['fillable']) && empty($model['hidden']))
+                        <p style="font-size:12px;color:var(--text-faint);text-align:center;padding:8px 0;">No details detected.</p>
+                        @endif
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- ── CONTROLLERS ── --}}
+        <div id="sec-controllers" class="rp-section">
+            <div class="rp-section-hd">
+                <h3>Controllers</h3>
+                <span class="count">{{ $data['summary']['controllers'] }}</span>
+            </div>
+            <div class="grid-2">
+                @foreach($data['controllers'] as $ctrl)
+                <div class="rp-card">
+                    <div class="rp-card-hd">
+                        <div style="min-width:0;">
+                            <h4>{{ $ctrl['name'] }}</h4>
+                            <p>{{ $ctrl['namespace'] }}</p>
+                        </div>
+                        <span class="rp-pill" style="color:var(--emerald);background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.25);white-space:nowrap;">{{ $ctrl['method_count'] }} methods</span>
+                    </div>
+                    <div class="rp-card-body">
+                        @if(!empty($ctrl['methods']))
+                        @php
+                        $mc=['index'=>'method-get','show'=>'method-get','create'=>'method-post','store'=>'method-post',
+                             'edit'=>'method-put','update'=>'method-patch','destroy'=>'method-delete'];
+                        @endphp
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                            @foreach($ctrl['methods'] as $m)
+                            <span class="rp-pill {{ $mc[$m] ?? '' }}" style="font-family:var(--font-mono);font-size:11px;">{{ $m }}</span>
+                            @endforeach
+                        </div>
+                        @else
+                        <p style="font-size:12px;color:var(--text-faint);">No public methods detected.</p>
+                        @endif
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- ── ROUTES ── --}}
+        <div id="sec-routes" class="rp-section">
+            <div class="rp-section-hd">
+                <h3>Routes</h3>
+                <span class="count">{{ $data['summary']['routes'] }}</span>
+            </div>
+            <div class="rp-toolbar">
+                <button class="rp-filter-btn active" data-method="all" onclick="filterRoutes('all',this)">All</button>
+                @foreach(array_keys($rs['by_method'] ?? []) as $m)
+                <button class="rp-filter-btn" data-method="{{ strtoupper($m) }}" onclick="filterRoutes('{{ strtoupper($m) }}',this)">{{ strtoupper($m) }}</button>
+                @endforeach
+                <input id="route-search" class="rp-search" type="search" placeholder="Search URI, name, controller…" oninput="filterRoutes(null,null)">
+                <span style="margin-left:auto;font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">{{ $data['summary']['routes'] }} routes</span>
+            </div>
+            <div class="rp-table-wrap" style="overflow-x:auto;">
+                <table class="rp-table" style="min-width:820px;">
+                    <thead>
+                        <tr>
+                            <th>Method</th><th>URI</th><th>Controller</th><th>Action</th><th>Name</th><th>Middleware</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routes-body">
+                        @foreach($data['routes'] as $route)
+                        @php
+                        $methods = array_values(array_filter($route['methods'] ?? [], fn($m) => $m !== 'HEAD'));
+                        $primary = strtolower($methods[0] ?? 'get');
+                        $mws = $route['middleware'] ?? [];
+                        @endphp
+                        <tr class="route-row" data-methods="{{ implode(',', array_map('strtoupper', $methods)) }}" data-uri="{{ strtolower($route['uri']) }}" data-name="{{ strtolower($route['name'] ?? '') }}" data-ctrl="{{ strtolower(class_basename($route['controller']['class'] ?? '')) }}">
+                            <td><span class="rp-pill method-{{ $primary }}" style="font-size:10px;font-weight:700;">{{ strtoupper($primary) }}</span></td>
+                            <td style="font-family:var(--font-mono);color:var(--text);">{{ $route['uri'] }}</td>
+                            <td>{{ class_basename($route['controller']['class'] ?? '—') }}</td>
+                            <td style="font-family:var(--font-mono);color:var(--text-faint);">{{ $route['controller']['method'] ?? '—' }}</td>
+                            <td style="color:var(--text-faint);">{{ $route['name'] ?? '—' }}</td>
+                            <td>
+                                @if(empty($mws))<span style="color:var(--text-faint);">—</span>
+                                @else
+                                <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                                    @foreach($mws as $mw)
+                                    <span style="font-size:10px;background:var(--bg-sunken);color:var(--text-dim);padding:1px 6px;border-radius:4px;border:1px solid var(--border);">{{ $mw }}</span>
+                                    @endforeach
+                                </div>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <div id="routes-empty" style="display:none;text-align:center;padding:40px;color:var(--text-faint);font-size:13px;">No routes match your search.</div>
+            </div>
+        </div>
+
+        {{-- ── JOBS ── --}}
+        @if($data['summary']['jobs'] > 0)
+        <div id="sec-jobs" class="rp-section">
+            <div class="rp-section-hd"><h3>Jobs</h3><span class="count">{{ $data['summary']['jobs'] }}</span></div>
+            <div class="grid-3">
+                @foreach($data['jobs'] as $item)
+                <div class="rp-item-card">
+                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
+                        <div style="min-width:0;">
+                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
+                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
+                            @if(!empty($item['queue']))<span class="rp-pill" style="color:var(--amber);background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.25);margin-top:6px;display:inline-block;">{{ $item['queue'] }}</span>@endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- ── EVENTS ── --}}
+        @if($data['summary']['events'] > 0)
+        <div id="sec-events" class="rp-section">
+            <div class="rp-section-hd"><h3>Events</h3><span class="count">{{ $data['summary']['events'] }}</span></div>
+            <div class="grid-3">
+                @foreach($data['events'] as $item)
+                <div class="rp-item-card">
+                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
+                        <div style="min-width:0;">
+                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
+                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
+                            @if(!empty($item['properties']))<p style="font-size:11px;color:var(--text-faint);margin-top:4px;">{{ count($item['properties']) }} payload prop(s)</p>@endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- ── SERVICES ── --}}
+        @if($data['summary']['services'] > 0)
+        <div id="sec-services" class="rp-section">
+            <div class="rp-section-hd"><h3>Services</h3><span class="count">{{ $data['summary']['services'] }}</span></div>
+            <div class="grid-3">
+                @foreach($data['services'] as $item)
+                <div class="rp-item-card">
+                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
+                        <div style="min-width:0;">
+                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
+                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
+                            @if(!empty($item['methods']))<p style="font-size:11px;color:var(--text-faint);margin-top:4px;">{{ count($item['methods']) }} method(s)</p>@endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- ── REPOSITORIES ── --}}
+        @if($data['summary']['repositories'] > 0)
+        <div id="sec-repositories" class="rp-section">
+            <div class="rp-section-hd"><h3>Repositories</h3><span class="count">{{ $data['summary']['repositories'] }}</span></div>
+            <div class="grid-3">
+                @foreach($data['repositories'] as $item)
+                <div class="rp-item-card">
+                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
+                        <div style="min-width:0;">
+                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
+                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
+                            @if(!empty($item['methods']))<p style="font-size:11px;color:var(--text-faint);margin-top:4px;">{{ count($item['methods']) }} method(s)</p>@endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- ── OBSERVERS ── --}}
+        @if($data['summary']['observers'] > 0)
+        <div id="sec-observers" class="rp-section">
+            <div class="rp-section-hd"><h3>Observers</h3><span class="count">{{ $data['summary']['observers'] }}</span></div>
+            <div class="grid-3">
+                @foreach($data['observers'] as $item)
+                <div class="rp-item-card">
+                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
+                        <div style="min-width:0;">
+                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
+                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
+                            @if(!empty($item['model']))<span class="rp-pill" style="color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);margin-top:6px;display:inline-block;">{{ class_basename($item['model']) }}</span>@endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- ── POLICIES ── --}}
+        @if($data['summary']['policies'] > 0)
+        <div id="sec-policies" class="rp-section">
+            <div class="rp-section-hd"><h3>Policies</h3><span class="count">{{ $data['summary']['policies'] }}</span></div>
+            <div class="grid-3">
+                @foreach($data['policies'] as $item)
+                <div class="rp-item-card">
+                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
+                        <div style="min-width:0;">
+                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
+                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['namespace'] ?? '' }}</p>
+                            @if(!empty($item['model']))<span class="rp-pill" style="color:var(--text-dim);background:var(--bg-sunken);border-color:var(--border);margin-top:6px;display:inline-block;">{{ class_basename($item['model']) }}</span>@endif
+                            @if(!empty($item['actions']))
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+                                @foreach(array_slice($item['actions'],0,5) as $a)
+                                <span style="font-family:var(--font-mono);font-size:10px;background:var(--bg-sunken);color:var(--text-faint);padding:1px 6px;border-radius:4px;border:1px solid var(--border);">{{ $a }}</span>
+                                @endforeach
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- ── MODULES ── --}}
+        @if($data['summary']['modules'] > 0)
+        <div id="sec-modules" class="rp-section">
+            <div class="rp-section-hd"><h3>Modules</h3><span class="count">{{ $data['summary']['modules'] }}</span></div>
+            <div class="grid-2">
+                @foreach($data['modules'] as $item)
+                <div class="rp-item-card">
+                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                        <div class="rp-item-av">{{ strtoupper(substr($item['name'],0,1)) }}</div>
+                        <div style="min-width:0;">
+                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $item['name'] }}</p>
+                            <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">{{ $item['path'] ?? '' }}</p>
+                            @if(!empty($item['routes']))<p style="font-size:11px;color:var(--text-faint);margin-top:4px;">{{ $item['routes'] }} route(s)</p>@endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- ── PACKAGES ── --}}
+        @if($data['summary']['packages'] > 0)
+        <div id="sec-packages" class="rp-section">
+            <div class="rp-section-hd"><h3>Packages</h3><span class="count">{{ $data['summary']['packages'] }}</span></div>
+            <div class="grid-3">
+                @foreach($data['packages'] as $pkg)
+                <div class="rp-card">
+                    <div class="rp-card-body">
+                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;">
+                            <p style="font-weight:700;font-size:13px;color:var(--text);">{{ $pkg['name'] }}</p>
+                            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);white-space:nowrap;">{{ $pkg['version'] ?? '' }}</span>
+                        </div>
+                        @if(!empty($pkg['description']))<p style="font-size:11.5px;color:var(--text-faint);line-height:1.5;margin-bottom:8px;">{{ $pkg['description'] }}</p>@endif
+                        @php $pkgType = $pkg['type'] ?? 'library'; @endphp
+                        <span class="rp-pill" style="{{ $pkgType === 'laravel-package' ? 'color:var(--brand);background:var(--brand-bg);border-color:var(--brand-border);' : 'color:var(--text-faint);background:var(--bg-sunken);border-color:var(--border);' }}">{{ $pkgType }}</span>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- ── ERRORS ── --}}
+        @if(!empty($data['errors']))
+        <div id="sec-errors" class="rp-section">
+            <div class="rp-section-hd"><h3>Errors</h3><span class="count">{{ count($data['errors']) }}</span></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                @foreach($data['errors'] as $err)
+                <div class="rp-card rp-card-body" style="border-left:3px solid var(--rose);">
+                    <p style="font-size:13px;color:var(--text);">{{ is_string($err) ? $err : ($err['message'] ?? json_encode($err)) }}</p>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        <footer class="rp-footer" style="margin-top:40px;">
+            Generated by <strong>Laradar</strong> &nbsp;·&nbsp; {{ $data['performance']['execution_time_ms'] }}ms &nbsp;·&nbsp; {{ $data['performance']['memory_usage_mb'] }}MB
+        </footer>
+
+    </div>
+</main>
 </div>
 
 <script>
-    /* ── Mermaid init ───────────────────────────────────────────── */
-    mermaid.initialize({
-        startOnLoad: false,
-        theme: 'base',
-        themeVariables: {
-            background: '#FFFFFF',
-            primaryColor: '#EAF2FF',
-            primaryBorderColor: '#0052CC',
-            primaryTextColor: '#172B4D',
-            lineColor: '#6B778C',
-            secondaryColor: '#F4F5F7',
-            tertiaryColor: '#F3F0FF',
-            edgeLabelBackground: '#FFFFFF',
-            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-        },
-        flowchart: { rankSpacing: 80, nodeSpacing: 40, curve: 'basis', padding: 20 },
-        classDiagram: { diagramPadding: 30 },
-        securityLevel: 'loose',
+const SEC_LABELS = {
+    overview:'Overview', models:'Models', controllers:'Controllers', routes:'Routes',
+    jobs:'Jobs', events:'Events', services:'Services', repositories:'Repositories',
+    observers:'Observers', policies:'Policies', modules:'Modules', packages:'Packages', errors:'Errors'
+};
+
+function showSec(id) {
+    document.querySelectorAll('.rp-section').forEach(s => s.classList.remove('active'));
+    const t = document.getElementById('sec-' + id);
+    if (t) t.classList.add('active');
+
+    document.querySelectorAll('.rp-nav-btn').forEach(b => b.classList.remove('active'));
+    const nb = document.querySelector(`[data-sec="${id}"]`);
+    if (nb) nb.classList.add('active');
+
+    const chip = document.getElementById('sec-chip');
+    if (chip) chip.textContent = SEC_LABELS[id] || id;
+}
+
+/* ── Route filtering ── */
+let _activeMethod = 'all';
+function filterRoutes(method, btn) {
+    if (method !== null) {
+        _activeMethod = method;
+        document.querySelectorAll('.rp-filter-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+    }
+    const q = (document.getElementById('route-search')?.value || '').toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('.route-row').forEach(row => {
+        const methodOk = _activeMethod === 'all' || row.dataset.methods.includes(_activeMethod);
+        const textOk   = !q || row.dataset.uri.includes(q) || row.dataset.name.includes(q) || row.dataset.ctrl.includes(q);
+        const show = methodOk && textOk;
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
     });
-
-    /* ── Section switching ──────────────────────────────────────── */
-    const mermaidDone = new Set();
-    const sectionNames = {
-        overview: 'Overview', diagram: 'Model Diagram', dependencies: 'Dependencies',
-        models: 'Models', controllers: 'Controllers', routes: 'Routes',
-        jobs: 'Jobs', events: 'Events', services: 'Services', repositories: 'Repositories',
-        observers: 'Observers', policies: 'Policies', modules: 'Modules', packages: 'Packages',
-        apidocs: 'API Docs', errors: 'Errors', deadcode: 'Dead Code',
-    };
-
-    function showSection(id) {
-        // Hide all, show target
-        document.querySelectorAll('.section-panel').forEach(s => s.classList.remove('active'));
-        const target = document.getElementById(id);
-        if (target) target.classList.add('active');
-
-        // Update nav active highlight
-        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('nav-active'));
-        const navBtn = document.querySelector(`[data-nav="${id}"]`);
-        if (navBtn) navBtn.classList.add('nav-active');
-
-        // Update header breadcrumb chip
-        const label = document.getElementById('section-label');
-        if (label) label.textContent = sectionNames[id] || id;
-
-        // Init diagram section on first visit — default to ER tab
-        if (id === 'diagram' && !diagInited) { diagInited = true; switchDiagTab('er'); }
-
-        // Init dep graph on first visit
-        if (id === 'dependencies') {
-            requestAnimationFrame(() => requestAnimationFrame(initDepGraph));
-        }
-    }
-
-    /* ── Diagram tabs + data ───────────────────────────────────── */
-    const _gNodes = @json($graphNodes);
-    const _gEdges = @json($graphEdges);
-    let diagInited = false, _erDone = false, _mapDone = false;
-    const NW = 150, NH = 60;
-    let _diagNodes = [], _diagSel = null, _diagAdj = {};
-
-    function switchDiagTab(tab) {
-        document.querySelectorAll('.diag-panel').forEach(p => p.classList.add('hidden'));
-        document.getElementById('diag-panel-' + tab).classList.remove('hidden');
-
-        document.querySelectorAll('.diag-tab').forEach(t => {
-            t.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600', 'shadow-sm');
-            t.classList.add('bg-white', 'text-gray-500', 'border-gray-200');
-        });
-        const activeBtn = document.getElementById('diag-tab-' + tab);
-        if (activeBtn) {
-            activeBtn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600', 'shadow-sm');
-            activeBtn.classList.remove('bg-white', 'text-gray-500', 'border-gray-200');
-        }
-
-        if (tab === 'er' && !_erDone) {
-            _erDone = true;
-            const els = Array.from(document.querySelectorAll('#diag-panel-er .mermaid'));
-            if (els.length) mermaid.run({ nodes: els });
-        }
-        if (tab === 'map' && !_mapDone) {
-            _mapDone = true;
-            setTimeout(initDiagram, 20);
-        }
-    }
-
-    function edgeTheme(type) {
-        if (type.includes('BelongsToMany') || type.includes('MorphToMany'))
-            return { stroke:'#c084fc', marker:'url(#g-arr-mm)',      markerA:'url(#g-arr-mm-a)',      dash:'7,3' };
-        if (type.includes('BelongsTo') || type.includes('MorphTo'))
-            return { stroke:'#34d399', marker:'url(#g-arr-belongs)', markerA:'url(#g-arr-belongs-a)', dash:'none' };
-        if (type.includes('Many'))
-            return { stroke:'#818cf8', marker:'url(#g-arr-many)',    markerA:'url(#g-arr-many-a)',    dash:'none' };
-        return     { stroke:'#2dd4bf', marker:'url(#g-arr-one)',     markerA:'url(#g-arr-one-a)',     dash:'5,3' };
-    }
-
-    function initDiagram() {
-        const svg    = document.getElementById('diag-canvas');
-        const W      = svg.clientWidth  || 900;
-        const H      = svg.clientHeight || 580;
-        const edgesG = document.getElementById('diag-edges-g');
-        const nodesG = document.getElementById('diag-nodes-g');
-
-        // Virtual canvas scales with node count so nodes spread rather than stack
-        const N      = _gNodes.length;
-        const _vSpan = Math.ceil(Math.sqrt(N * 1.6));
-        const VW     = Math.max(W, _vSpan * 165);
-        const VH     = Math.max(H, _vSpan * 120);
-
-        const nodes = _gNodes.map((n, i) => {
-            const angle = (i / Math.max(N, 1)) * 2 * Math.PI - Math.PI / 2;
-            const r     = Math.min(VW, VH) * 0.40;
-            return { ...n, x: VW/2 + r*Math.cos(angle), y: VH/2 + r*Math.sin(angle), vx: 0, vy: 0 };
-        });
-        const nById = {};
-        nodes.forEach(n => nById[n.id] = n);
-
-        const REPEL = Math.max(9000, N * 150), IDEAL = Math.max(180, Math.min(220, Math.sqrt(N) * 18));
-        const SPRING = 0.05, GRAV = 0.0015, DAMP = 0.80;
-        for (let it = 0; it < 400; it++) {
-            for (let a = 0; a < nodes.length; a++) {
-                for (let b = a + 1; b < nodes.length; b++) {
-                    const na = nodes[a], nb = nodes[b];
-                    const dx = na.x - nb.x, dy = na.y - nb.y;
-                    const d2 = Math.max(dx*dx + dy*dy, 100), d = Math.sqrt(d2), f = REPEL / d2;
-                    na.vx += dx/d*f; na.vy += dy/d*f;
-                    nb.vx -= dx/d*f; nb.vy -= dy/d*f;
-                }
-            }
-            _gEdges.forEach(e => {
-                const na = nById[e.from], nb = nById[e.to];
-                if (!na || !nb) return;
-                const dx = nb.x - na.x, dy = nb.y - na.y;
-                const d  = Math.sqrt(dx*dx + dy*dy) || 1, f = (d - IDEAL) * SPRING;
-                na.vx += dx/d*f; na.vy += dy/d*f;
-                nb.vx -= dx/d*f; nb.vy -= dy/d*f;
-            });
-            nodes.forEach(n => {
-                n.vx += (VW/2 - n.x) * GRAV; n.vy += (VH/2 - n.y) * GRAV;
-                n.vx *= DAMP; n.vy *= DAMP;
-                n.x = Math.max(NW/2 + 20, Math.min(VW - NW/2 - 20, n.x + n.vx));
-                n.y = Math.max(NH/2 + 20, Math.min(VH - NH/2 - 20, n.y + n.vy));
-            });
-        }
-        _diagNodes = nodes;
-
-        _gEdges.forEach(e => {
-            const na = nById[e.from], nb = nById[e.to];
-            if (!na || !nb) return;
-            const th   = edgeTheme(e.type);
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('class', 'g-edge');
-            path.setAttribute('data-from', e.from); path.setAttribute('data-to', e.to); path.setAttribute('data-type', e.type);
-            path.setAttribute('fill', 'none'); path.setAttribute('stroke', th.stroke);
-            path.setAttribute('stroke-width', '1.5'); path.setAttribute('stroke-opacity', '0.4');
-            path.setAttribute('marker-end', th.marker);
-            if (th.dash !== 'none') path.setAttribute('stroke-dasharray', th.dash);
-            _setEdgePath(path, na, nb);
-            edgesG.appendChild(path);
-        });
-
-        nodes.forEach(n => {
-            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            g.setAttribute('class', 'g-node'); g.setAttribute('data-id', n.id);
-            g.style.cursor = 'pointer';
-            g.setAttribute('transform', `translate(${n.x - NW/2},${n.y - NH/2})`);
-
-            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bg.setAttribute('class', 'g-node-bg'); bg.setAttribute('width', NW); bg.setAttribute('height', NH);
-            bg.setAttribute('rx', '10'); bg.setAttribute('fill', 'white');
-            bg.setAttribute('stroke', '#e2e8f0'); bg.setAttribute('stroke-width', '1.5'); bg.setAttribute('filter', 'url(#f-node)');
-
-            const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bar.setAttribute('class', 'g-node-bar'); bar.setAttribute('width', NW); bar.setAttribute('height', '5');
-            bar.setAttribute('rx', '5'); bar.setAttribute('fill', '#6366f1');
-
-            const nm = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            nm.setAttribute('x', NW/2); nm.setAttribute('y', '26'); nm.setAttribute('text-anchor', 'middle');
-            nm.setAttribute('font-family', 'ui-sans-serif,system-ui,sans-serif');
-            nm.setAttribute('font-size', '13'); nm.setAttribute('font-weight', '800'); nm.setAttribute('fill', '#172B4D');
-            nm.textContent = n.id.length > 17 ? n.id.slice(0, 16) + '…' : n.id;
-
-            const tb = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            tb.setAttribute('x', NW/2); tb.setAttribute('y', '40'); tb.setAttribute('text-anchor', 'middle');
-            tb.setAttribute('font-family', 'ui-monospace,monospace'); tb.setAttribute('font-size', '10'); tb.setAttribute('fill', '#94a3b8');
-            tb.textContent = n.table.length > 20 ? n.table.slice(0, 19) + '…' : n.table;
-
-            g.appendChild(bg); g.appendChild(bar); g.appendChild(nm); g.appendChild(tb);
-
-            if (n.rels > 0) {
-                const rb = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                rb.setAttribute('x', NW - 8); rb.setAttribute('y', '56'); rb.setAttribute('text-anchor', 'end');
-                rb.setAttribute('font-size', '9'); rb.setAttribute('font-weight', '700'); rb.setAttribute('fill', '#a5b4fc');
-                rb.textContent = n.rels + 'r';
-                g.appendChild(rb);
-            }
-            g.addEventListener('click', ev => { ev.stopPropagation(); diagSelect(n.id); });
-            nodesG.appendChild(g);
-        });
-
-        _diagAdj = {};
-        nodes.forEach(n => _diagAdj[n.id] = new Set());
-        _gEdges.forEach(e => {
-            if (nById[e.from] && nById[e.to]) { _diagAdj[e.from].add(e.to); _diagAdj[e.to].add(e.from); }
-        });
-
-        let isPan = false, panOrigin = { x: 0, y: 0 }, vp = { x: 0, y: 0, z: 1 };
-        const vpEl = document.getElementById('diag-vp');
-
-        function applyVp() {
-            vpEl.setAttribute('transform', `translate(${-vp.x * vp.z},${-vp.y * vp.z}) scale(${vp.z})`);
-            updateMinimap(W, H, vp);
-        }
-
-        svg.addEventListener('mousedown', e => {
-            if (!e.target.closest('.g-node')) { isPan = true; panOrigin = { x: e.clientX, y: e.clientY }; svg.style.cursor = 'grabbing'; }
-        });
-        window.addEventListener('mousemove', e => {
-            if (!isPan) return;
-            vp.x -= (e.clientX - panOrigin.x) / vp.z; vp.y -= (e.clientY - panOrigin.y) / vp.z;
-            panOrigin = { x: e.clientX, y: e.clientY }; applyVp();
-        });
-        window.addEventListener('mouseup', () => { isPan = false; svg.style.cursor = 'grab'; });
-        svg.addEventListener('wheel', e => {
-            e.preventDefault();
-            const rect   = svg.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            // Pin the data-space point under the cursor so it doesn't drift
-            const dataX  = vp.x + mouseX / vp.z;
-            const dataY  = vp.y + mouseY / vp.z;
-            vp.z = Math.max(0.25, Math.min(4, vp.z * (e.deltaY > 0 ? 0.88 : 1.14)));
-            vp.x = dataX - mouseX / vp.z;
-            vp.y = dataY - mouseY / vp.z;
-            applyVp();
-        }, { passive: false });
-
-        window.diagZoom = f => {
-            // Zoom centered on the visible mid-point, not the origin
-            const cx = vp.x + W / (2 * vp.z);
-            const cy = vp.y + H / (2 * vp.z);
-            vp.z = Math.max(0.25, Math.min(4, vp.z * f));
-            vp.x = cx - W / (2 * vp.z);
-            vp.y = cy - H / (2 * vp.z);
-            applyVp();
-        };
-        window.diagResetView = () => { vp = { x: 0, y: 0, z: 1 }; applyVp(); };
-        window.diagFitView = () => {
-            if (!_diagNodes.length) return;
-            const xs = _diagNodes.map(n => n.x), ys = _diagNodes.map(n => n.y);
-            const minX = Math.min(...xs) - NW/2 - 20, maxX = Math.max(...xs) + NW/2 + 20;
-            const minY = Math.min(...ys) - NH/2 - 20, maxY = Math.max(...ys) + NH/2 + 20;
-            vp.z = Math.max(0.25, Math.min(4, Math.min(W / (maxX - minX), H / (maxY - minY))));
-            vp.x = minX - (W/vp.z - (maxX - minX)) / 2;
-            vp.y = minY - (H/vp.z - (maxY - minY)) / 2;
-            applyVp();
-        };
-        svg.addEventListener('click', e => { if (e.target === svg) diagClear(); });
-
-        initMinimap(nodes, VW, VH);
-        // Start at min 0.75× so text is legible; fit button shows full overview
-        (function diagCenterView() {
-            if (!_diagNodes.length) return;
-            const xs = _diagNodes.map(n => n.x), ys = _diagNodes.map(n => n.y);
-            const minX = Math.min(...xs), maxX = Math.max(...xs);
-            const minY = Math.min(...ys), maxY = Math.max(...ys);
-            const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-            const fitZ = Math.min(W / (maxX - minX + NW + 40), H / (maxY - minY + NH + 40));
-            vp.z = Math.max(0.75, Math.min(4, fitZ));
-            vp.x = cx - W / (2 * vp.z);
-            vp.y = cy - H / (2 * vp.z);
-            applyVp();
-        })();
-    }
-
-    function initMinimap(nodes, vW, vH) {
-        const mm = document.getElementById('diag-mm');
-        if (!mm) return;
-        const mmW = 160, mmH = 100;
-        const scale = Math.min(mmW / vW, mmH / vH) * 0.88;
-        const offX  = (mmW - vW * scale) / 2;
-        const offY  = (mmH - vH * scale) / 2;
-
-        const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        bg.setAttribute('width', mmW); bg.setAttribute('height', mmH); bg.setAttribute('fill', '#f8fafc');
-        mm.appendChild(bg);
-
-        nodes.forEach(n => {
-            const dot = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            dot.setAttribute('x', offX + (n.x - NW/2) * scale);
-            dot.setAttribute('y', offY + (n.y - NH/2) * scale);
-            dot.setAttribute('width',  Math.max(4, NW * scale));
-            dot.setAttribute('height', Math.max(3, NH * scale));
-            dot.setAttribute('rx', '2'); dot.setAttribute('fill', '#6366f1'); dot.setAttribute('opacity', '0.45');
-            mm.appendChild(dot);
-        });
-
-        const vr = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        vr.setAttribute('id', 'diag-mm-vp'); vr.setAttribute('fill', 'rgba(99,102,241,0.08)');
-        vr.setAttribute('stroke', '#6366f1'); vr.setAttribute('stroke-width', '1.5'); vr.setAttribute('rx', '2');
-        mm.appendChild(vr);
-
-        window._mmParams = { scale, offX, offY, mmW, mmH };
-    }
-
-    function updateMinimap(W, H, vp) {
-        const vr = document.getElementById('diag-mm-vp');
-        if (!vr || !window._mmParams) return;
-        const { scale, offX, offY, mmW, mmH } = window._mmParams;
-        const vpW = W / vp.z, vpH = H / vp.z;
-        vr.setAttribute('x',      Math.max(0, offX + vp.x * scale));
-        vr.setAttribute('y',      Math.max(0, offY + vp.y * scale));
-        vr.setAttribute('width',  Math.min(mmW, vpW * scale));
-        vr.setAttribute('height', Math.min(mmH, vpH * scale));
-    }
-
-    function _setEdgePath(path, na, nb) {
-        const dx = nb.x - na.x, dy = nb.y - na.y;
-        const d  = Math.sqrt(dx*dx + dy*dy) || 1, nx = dx/d, ny = dy/d;
-        const x1 = na.x + nx*(NW/2), y1 = na.y + ny*(NH/2);
-        const x2 = nb.x - nx*(NW/2 + 6), y2 = nb.y - ny*(NH/2 + 6);
-        const mx = (x1+x2)/2 - ny*28, my = (y1+y2)/2 + nx*28;
-        path.setAttribute('d', `M${x1.toFixed(1)},${y1.toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`);
-    }
-
-    function diagSearch(query) {
-        query = query.toLowerCase().trim();
-        if (!query) { diagClear(); return; }
-        document.querySelectorAll('.g-node').forEach(g => {
-            const nid   = g.getAttribute('data-id');
-            const match = nid.toLowerCase().includes(query);
-            g.setAttribute('opacity', match ? '1' : '0.12');
-            const bg = g.querySelector('.g-node-bg'), bar = g.querySelector('.g-node-bar');
-            if (bg) {
-                bg.setAttribute('stroke', match ? '#6366f1' : '#e2e8f0');
-                bg.setAttribute('stroke-width', match ? '2.5' : '1.5');
-                bg.setAttribute('filter', match ? 'url(#f-node-sel)' : 'url(#f-node)');
-            }
-            if (bar) bar.setAttribute('fill', match ? '#4f46e5' : '#6366f1');
-        });
-        document.querySelectorAll('.g-edge').forEach(p => {
-            const from  = p.getAttribute('data-from'), to = p.getAttribute('data-to');
-            const match = from.toLowerCase().includes(query) || to.toLowerCase().includes(query);
-            p.setAttribute('stroke-opacity', match ? '0.7' : '0.04');
-            p.setAttribute('stroke-width', match ? '2' : '1');
-        });
-        document.getElementById('diag-clear-btn').classList.remove('hidden');
-    }
-
-    function toggleDiagRels() {
-        const panel   = document.getElementById('diag-rels-panel');
-        const chevron = document.getElementById('diag-rels-chevron');
-        const open    = panel.classList.toggle('hidden');
-        chevron.style.transform = open ? '' : 'rotate(180deg)';
-    }
-
-    function diagSelect(id) {
-        if (_diagSel === id) { diagClear(); return; }
-        _diagSel = id;
-        const conn = _diagAdj[id] || new Set();
-
-        document.querySelectorAll('.g-node').forEach(g => {
-            const nid = g.getAttribute('data-id');
-            const bg  = g.querySelector('.g-node-bg'), bar = g.querySelector('.g-node-bar');
-            if (nid === id) {
-                bg.setAttribute('stroke', '#6366f1'); bg.setAttribute('stroke-width', '2.5');
-                bg.setAttribute('filter', 'url(#f-node-sel)'); bar.setAttribute('fill', '#4f46e5');
-                g.setAttribute('opacity', '1');
-            } else if (conn.has(nid)) {
-                bg.setAttribute('stroke', '#6ee7b7'); bg.setAttribute('stroke-width', '2');
-                bg.setAttribute('filter', 'url(#f-node-rel)'); bar.setAttribute('fill', '#10b981');
-                g.setAttribute('opacity', '1');
-            } else {
-                bg.setAttribute('stroke', '#e2e8f0'); bg.setAttribute('stroke-width', '1.5');
-                bg.setAttribute('filter', 'url(#f-node)'); bar.setAttribute('fill', '#6366f1');
-                g.setAttribute('opacity', '0.2');
-            }
-        });
-
-        document.querySelectorAll('.g-edge').forEach(p => {
-            const from = p.getAttribute('data-from'), to = p.getAttribute('data-to'), type = p.getAttribute('data-type');
-            if (from === id || to === id) {
-                const th = edgeTheme(type);
-                p.setAttribute('stroke-width', '2.5'); p.setAttribute('stroke-opacity', '0.95');
-                p.setAttribute('marker-end', th.markerA);
-            } else {
-                p.setAttribute('stroke-width', '1'); p.setAttribute('stroke-opacity', '0.07');
-            }
-        });
-
-        const n    = _gNodes.find(n => n.id === id);
-        const rels = _gEdges.filter(e => e.from === id || e.to === id);
-        document.getElementById('diag-info-name').textContent  = id;
-        document.getElementById('diag-info-table').textContent = n?.table || '';
-        document.getElementById('diag-info-count').textContent = rels.length + ' relationship' + (rels.length !== 1 ? 's' : '');
-
-        // Populate relationship cards (panel hidden until button clicked)
-        const el = document.getElementById('diag-info-rels');
-        el.innerHTML = '';
-        document.getElementById('diag-rels-title').textContent = id + ' relationships';
-        rels.forEach(e => {
-            const other     = e.from === id ? e.to : e.from;
-            const direction = e.from === id ? 'out' : 'in';
-            const th        = edgeTheme(e.type);
-            const card      = document.createElement('div');
-            card.className  = 'flex flex-col gap-1 px-3 py-2.5 rounded-xl border bg-gray-50 hover:bg-white transition-colors shadow-sm';
-            card.style.borderLeftWidth = '3px';
-            card.style.borderLeftColor = th.stroke;
-            card.innerHTML  =
-                `<div class="flex items-center justify-between gap-2">` +
-                    `<span class="text-xs font-bold truncate" style="color:#172B4D">${other}</span>` +
-                    `<span class="text-xs font-mono px-1.5 py-0.5 rounded" style="background:${th.stroke}22;color:${th.stroke}">${direction === 'out' ? '→' : '←'}</span>` +
-                `</div>` +
-                `<span class="text-xs font-semibold" style="color:${th.stroke}">${e.type}</span>` +
-                `<span class="text-xs text-gray-400 font-mono">${e.from === id ? e.from : e.to} → ${other}</span>`;
-            el.appendChild(card);
-        });
-
-        // Close rels panel when switching nodes
-        document.getElementById('diag-rels-panel').classList.add('hidden');
-        document.getElementById('diag-rels-chevron').style.transform = '';
-
-        document.getElementById('diag-info').classList.remove('hidden');
-        document.getElementById('diag-legend').classList.add('hidden');
-        document.getElementById('diag-clear-btn').classList.remove('hidden');
-    }
-
-    function diagClear() {
-        _diagSel = null;
-        document.getElementById('diag-search') && (document.getElementById('diag-search').value = '');
-        document.querySelectorAll('.g-node').forEach(g => {
-            g.setAttribute('opacity', '1');
-            const bg = g.querySelector('.g-node-bg'), bar = g.querySelector('.g-node-bar');
-            if (bg)  { bg.setAttribute('stroke', '#e2e8f0'); bg.setAttribute('stroke-width', '1.5'); bg.setAttribute('filter', 'url(#f-node)'); }
-            if (bar) bar.setAttribute('fill', '#6366f1');
-        });
-        document.querySelectorAll('.g-edge').forEach(p => {
-            const th = edgeTheme(p.getAttribute('data-type'));
-            p.setAttribute('stroke', th.stroke); p.setAttribute('stroke-width', '1.5');
-            p.setAttribute('stroke-opacity', '0.4'); p.setAttribute('marker-end', th.marker);
-        });
-        document.getElementById('diag-info').classList.add('hidden');
-        document.getElementById('diag-rels-panel').classList.add('hidden');
-        document.getElementById('diag-rels-chevron').style.transform = '';
-        document.getElementById('diag-legend').classList.remove('hidden');
-        document.getElementById('diag-clear-btn').classList.add('hidden');
-    }
-
-    /* ── Dep graph toolbar ──────────────────────────────────────── */
-    /* ── Dependency Graph (custom SVG canvas) ──────────────────── */
-    const _DEP_CFG = {
-        controller: { label:'Controllers', color:'#0052CC', order:0 },
-        job:        { label:'Jobs',        color:'#FF5630', order:1 },
-        event:      { label:'Events',      color:'#BF40BF', order:1 },
-        listener:   { label:'Listeners',   color:'#DA62AC', order:2 },
-        service:    { label:'Services',    color:'#00875A', order:2 },
-        repository: { label:'Repositories',color:'#FF8B00', order:3 },
-        model:      { label:'Models',      color:'#6554C0', order:4 },
-        database:   { label:'Database',    color:'#6B778C', order:5 },
-    };
-    const _DEP_NW = 114, _DEP_NH = 32, _DEP_HG = 10, _DEP_MR = 9, _DEP_RG = 14, _DEP_LG = 80;
-    const _NS = 'http://www.w3.org/2000/svg';
-    let _depT = { tx:0, ty:0, s:1 }, _depDrag = null, _depPos = {}, _depSel = null;
-    let _depInited = false;
-
-    function initDepGraph() {
-        if (_depInited) return;
-        _depInited = true;
-        const depData = @json($data['dependencies'] ?? []);
-        const nodes = depData.nodes || [];
-        const edges = depData.edges || [];
-        if (!nodes.length) return;
-
-        const canvas = document.getElementById('dep-canvas');
-        const bandsG = document.getElementById('dep-bands-g');
-        const edgesG = document.getElementById('dep-edges-g');
-        const nodesG = document.getElementById('dep-nodes-g');
-        if (!canvas) return;
-
-        // Group by layer order
-        const byOrder = {};
-        nodes.forEach(n => {
-            const cfg = _DEP_CFG[n.layer] || { order: 4 };
-            (byOrder[cfg.order] = byOrder[cfg.order] || []).push(n);
-        });
-
-        // Layered layout
-        let curY = 30;
-        const layerBands = [];
-        Object.keys(byOrder).sort((a,b)=>+a-+b).forEach(order => {
-            const layerNodes = byOrder[order];
-            const rows = [];
-            for (let i = 0; i < layerNodes.length; i += _DEP_MR) rows.push(layerNodes.slice(i, i + _DEP_MR));
-            const maxCols = Math.max(...rows.map(r => r.length));
-            const bandY1 = curY;
-            rows.forEach((row, ri) => {
-                const rowW   = row.length * (_DEP_NW + _DEP_HG) - _DEP_HG;
-                const maxW   = maxCols  * (_DEP_NW + _DEP_HG) - _DEP_HG;
-                const startX = -maxW / 2 + (maxW - rowW) / 2;
-                row.forEach((n, ci) => {
-                    _depPos[n.name] = { x: startX + ci * (_DEP_NW + _DEP_HG), y: curY, layer: n.layer };
-                });
-                curY += _DEP_NH + (ri < rows.length - 1 ? _DEP_RG : 0);
-            });
-            layerBands.push({ y1: bandY1, y2: curY, order: +order });
-            curY += _DEP_LG;
-        });
-
-        // Band stripes
-        const allX = Object.values(_depPos).map(p => p.x);
-        const bandMinX = Math.min(...allX) - 20;
-        const bandMaxX = Math.max(...allX) + _DEP_NW + 20;
-        layerBands.forEach(band => {
-            const repNode = byOrder[band.order]?.[0];
-            if (!repNode) return;
-            const cfg = _DEP_CFG[repNode.layer] || {};
-            const r = document.createElementNS(_NS, 'rect');
-            r.setAttribute('x', bandMinX); r.setAttribute('y', band.y1 - 8);
-            r.setAttribute('width', bandMaxX - bandMinX); r.setAttribute('height', band.y2 - band.y1 + 16);
-            r.setAttribute('rx', '10'); r.setAttribute('fill', cfg.color || '#6B778C'); r.setAttribute('opacity', '0.07');
-            bandsG.appendChild(r);
-            const lbl = document.createElementNS(_NS, 'text');
-            lbl.setAttribute('x', bandMinX + 8); lbl.setAttribute('y', band.y1 + (band.y2 - band.y1) / 2 + 4);
-            lbl.setAttribute('font-size', '10'); lbl.setAttribute('font-family', 'Inter,system-ui,sans-serif');
-            lbl.setAttribute('fill', cfg.color || '#6B778C'); lbl.setAttribute('font-weight', '700'); lbl.setAttribute('opacity', '0.75');
-            lbl.textContent = cfg.label || '';
-            bandsG.appendChild(lbl);
-        });
-
-        // Edges
-        edges.forEach(e => {
-            const fp = _depPos[e.from], tp = _depPos[e.to];
-            if (!fp || !tp) return;
-            const x1 = fp.x + _DEP_NW/2, y1 = fp.y + _DEP_NH;
-            const x2 = tp.x + _DEP_NW/2, y2 = tp.y, cy = (y1+y2)/2;
-            const path = document.createElementNS(_NS, 'path');
-            path.setAttribute('d', `M${x1},${y1} C${x1},${cy} ${x2},${cy} ${x2},${y2}`);
-            path.setAttribute('fill', 'none'); path.setAttribute('stroke', 'rgba(0,82,204,0.25)');
-            path.setAttribute('stroke-width', '1.5'); path.setAttribute('marker-end', 'url(#dep-arr)');
-            path.dataset.from = e.from; path.dataset.to = e.to;
-            edgesG.appendChild(path);
-        });
-
-        // Nodes
-        nodes.forEach(n => {
-            const pos = _depPos[n.name];
-            if (!pos) return;
-            const cfg = _DEP_CFG[n.layer] || { color:'#6B778C' };
-            const g = document.createElementNS(_NS, 'g');
-            g.style.cursor = 'pointer'; g.dataset.name = n.name;
-
-            const rect = document.createElementNS(_NS, 'rect');
-            rect.setAttribute('x', pos.x); rect.setAttribute('y', pos.y);
-            rect.setAttribute('width', _DEP_NW); rect.setAttribute('height', _DEP_NH);
-            rect.setAttribute('rx', '7'); rect.setAttribute('fill', '#FFFFFF');
-            rect.setAttribute('stroke', cfg.color); rect.setAttribute('stroke-width', '1.5');
-            rect.setAttribute('filter', 'url(#dep-shadow)');
-
-            const sfx = /Controller$|Service$|Repository$|Observer$|Policy$|Listener$|Provider$/;
-            const short = n.name.replace(sfx, '');
-            const display = short.length > 13 ? short.substring(0, 12) + '…' : short;
-
-            const text = document.createElementNS(_NS, 'text');
-            text.setAttribute('x', pos.x + _DEP_NW/2); text.setAttribute('y', pos.y + _DEP_NH/2 + 4);
-            text.setAttribute('text-anchor', 'middle'); text.setAttribute('font-size', '10.5');
-            text.setAttribute('font-family', 'Inter,system-ui,sans-serif'); text.setAttribute('font-weight', '600');
-            text.setAttribute('fill', '#172B4D'); text.textContent = display;
-
-            const title = document.createElementNS(_NS, 'title'); title.textContent = n.name;
-            g.appendChild(rect); g.appendChild(text); g.appendChild(title);
-
-            g.addEventListener('click',      () => depNodeClick(n.name));
-            g.addEventListener('mouseenter', () => depHighlight(n.name, edges));
-            g.addEventListener('mouseleave', () => { if (_depSel !== n.name) depClearHighlight(false); });
-            nodesG.appendChild(g);
-        });
-
-        depFit();
-
-        canvas.addEventListener('wheel', e => {
-            e.preventDefault();
-            const br = canvas.getBoundingClientRect();
-            const mx = e.clientX - br.left, my = e.clientY - br.top;
-            const delta = e.deltaY > 0 ? -0.1 : 0.1;
-            const newS = Math.max(0.1, Math.min(3, _depT.s + delta));
-            _depT.tx += (mx - _depT.tx) * (1 - newS / _depT.s);
-            _depT.ty += (my - _depT.ty) * (1 - newS / _depT.s);
-            _depT.s = newS; _depApplyT();
-        }, { passive: false });
-        canvas.addEventListener('mousedown', e => {
-            if (e.target.closest('g[data-name]')) return;
-            _depDrag = { sx: e.clientX - _depT.tx, sy: e.clientY - _depT.ty };
-            canvas.style.cursor = 'grabbing';
-        });
-        window.addEventListener('mousemove', e => {
-            if (!_depDrag) return;
-            _depT.tx = e.clientX - _depDrag.sx; _depT.ty = e.clientY - _depDrag.sy; _depApplyT();
-        });
-        window.addEventListener('mouseup', () => { _depDrag = null; if(canvas) canvas.style.cursor='grab'; });
-        window.addEventListener('resize', depFit, { passive: true });
-    }
-
-    function _depApplyT() {
-        const vp = document.getElementById('dep-vp');
-        if (vp) vp.setAttribute('transform', `translate(${_depT.tx},${_depT.ty}) scale(${_depT.s})`);
-    }
-    function depFit() {
-        const canvas = document.getElementById('dep-canvas');
-        if (!canvas || !Object.keys(_depPos).length) return;
-        const allX = Object.values(_depPos).map(p=>p.x), allY = Object.values(_depPos).map(p=>p.y);
-        const minX = Math.min(...allX), maxX = Math.max(...allX)+_DEP_NW;
-        const minY = Math.min(...allY), maxY = Math.max(...allY)+_DEP_NH;
-        const gW = maxX-minX, gH = maxY-minY;
-        const par = canvas.parentElement;
-        const cW = (par && par.clientWidth > 0 ? par.clientWidth : null)
-                || canvas.getBoundingClientRect().width || 800;
-        const cH = (par && par.clientHeight > 0 ? par.clientHeight : null)
-                || canvas.getBoundingClientRect().height || 540;
-        _depT.s  = Math.min((cW-80)/gW, (cH-80)/gH, 1.4);
-        _depT.tx = cW/2 - _depT.s*(minX+gW/2);
-        _depT.ty = cH/2 - _depT.s*(minY+gH/2);
-        _depApplyT();
-    }
-    function depZoom(delta) {
-        const canvas = document.getElementById('dep-canvas');
-        const cW = canvas?.clientWidth||800, cH = canvas?.clientHeight||540;
-        const newS = Math.max(0.1, Math.min(3, _depT.s+delta));
-        _depT.tx += (cW/2-_depT.tx)*(1-newS/_depT.s);
-        _depT.ty += (cH/2-_depT.ty)*(1-newS/_depT.s);
-        _depT.s = newS; _depApplyT();
-    }
-    function depNodeClick(name) {
-        if (_depSel === name) {
-            _depSel = null; depClearHighlight();
-            const lbl = document.getElementById('dep-sel-label');
-            if (lbl) lbl.style.display = 'none';
-        } else {
-            _depSel = name;
-            const depData = @json($data['dependencies'] ?? []);
-            depHighlight(name, depData.edges || []);
-            const lbl = document.getElementById('dep-sel-label');
-            if (lbl) { lbl.textContent = name; lbl.style.display = 'block'; }
-        }
-    }
-    function depHighlight(name, edges) {
-        const connected = new Set([name]);
-        (edges||[]).forEach(e => { if(e.from===name) connected.add(e.to); if(e.to===name) connected.add(e.from); });
-        document.querySelectorAll('#dep-edges-g path').forEach(p => {
-            const on = p.dataset.from===name || p.dataset.to===name;
-            p.setAttribute('stroke', on ? '#0052CC' : 'rgba(0,82,204,0.08)');
-            p.setAttribute('stroke-width', on ? '2' : '1.5');
-            p.setAttribute('marker-end', on ? 'url(#dep-arr-hi)' : 'url(#dep-arr)');
-        });
-        document.querySelectorAll('#dep-nodes-g g[data-name]').forEach(g => {
-            g.style.opacity = connected.has(g.dataset.name) ? '1' : '0.18';
-        });
-    }
-    function depClearHighlight(resetSel=true) {
-        if (resetSel) _depSel = null;
-        document.querySelectorAll('#dep-edges-g path').forEach(p => {
-            p.setAttribute('stroke','rgba(0,82,204,0.25)'); p.setAttribute('stroke-width','1.5');
-            p.setAttribute('marker-end','url(#dep-arr)');
-        });
-        document.querySelectorAll('#dep-nodes-g g[data-name]').forEach(g => { g.style.opacity='1'; });
-        const lbl = document.getElementById('dep-sel-label');
-        if (lbl && resetSel) lbl.style.display = 'none';
-    }
-
-    /* ── Sidebar toggle ─────────────────────────────────────────── */
-    let sidebarOpen = true;
-
-    function toggleSidebar() {
-        const sidebar   = document.getElementById('sidebar');
-        const main      = document.getElementById('main-content');
-        const iconMenu  = document.getElementById('icon-menu');
-        const iconClose = document.getElementById('icon-close');
-
-        sidebarOpen = !sidebarOpen;
-
-        sidebar.classList.toggle('sidebar-hidden', !sidebarOpen);
-        main.classList.toggle('sidebar-hidden', !sidebarOpen);
-        iconMenu.classList.toggle('hidden', !sidebarOpen);
-        iconClose.classList.toggle('hidden', sidebarOpen);
-    }
-
-    /* ── Route filters ──────────────────────────────────────────── */
-    let activeMethod = 'all';
-
-    function filterRoutes(method, btn) {
-        activeMethod = method;
-        document.querySelectorAll('.route-filter').forEach(b => {
-            b.classList.remove('bg-blue-600','text-white','border-blue-600');
-        });
-        btn.classList.add('bg-blue-600','text-white','border-blue-600');
-        applyFilters();
-    }
-
-    function searchRoutes() {
-        applyFilters();
-    }
-
-    function applyFilters() {
-        const query = document.getElementById('route-search').value.toLowerCase();
-        let visible = 0;
-
-        document.querySelectorAll('.route-row').forEach(row => {
-            const matchMethod = activeMethod === 'all' || row.dataset.methods.includes(activeMethod);
-            const matchSearch = !query || row.textContent.toLowerCase().includes(query);
-            const show = matchMethod && matchSearch;
-            row.style.display = show ? '' : 'none';
-            if (show) visible++;
-        });
-
-        document.getElementById('no-results').classList.toggle('hidden', visible > 0);
-    }
+    const empty = document.getElementById('routes-empty');
+    if (empty) empty.style.display = visible === 0 ? '' : 'none';
+}
 </script>
 
 </body>
