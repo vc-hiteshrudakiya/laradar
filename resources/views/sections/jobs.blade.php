@@ -35,7 +35,7 @@
                 <span></span><span>Job</span><span>Queue</span><span>Tries</span><span>Timeout</span>
             </div>
             @foreach($data['jobs'] as $i => $job)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 110px 80px 100px;cursor:pointer;" onclick="showDetail('jobs',{{$i}})" data-name="{{ strtolower($job['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 110px 80px 100px;" data-name="{{ strtolower($job['name']) }}">
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($job['name'],0,1)) }}</div>
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $job['name'] }}</div>
@@ -49,6 +49,5 @@
         </div>
         @endif
     </div>
-    <div id="jobs-detail" style="display:none"><div id="jobs-detail-content"></div></div>
 
 
