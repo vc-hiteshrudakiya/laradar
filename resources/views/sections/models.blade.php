@@ -128,7 +128,7 @@
                     @if(!empty($model['observer']))<span style="font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(255,45,32,.08);color:#FF2D20;border:1px solid rgba(255,45,32,.2);font-family:var(--font-mono);margin-left:8px;">obs</span>@endif
                 </div>
                 <span style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $model['table'] }}</span>
-                <span style="font-family:var(--font-mono);font-size:14px;font-weight:800;" style="color:{{ $mp['color'] }}">{{ count($model['relationships']??[]) }}</span>
+                <span style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:{{ $mp['color'] }}">{{ count($model['relationships']??[]) }}</span>
                 <span style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:#FF2D20;">{{ count($model['fillable']??[]) }}</span>
                 <span style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:var(--text-dim);">{{ count($model['traits']??[]) }}</span>
             </div>

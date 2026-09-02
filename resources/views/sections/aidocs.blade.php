@@ -17,29 +17,31 @@
     </div>
 
     @if(!config('laradar.ai.enabled', false))
-    <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:24px;">
+    <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:24px;">
         <p style="font-size:13px;color:var(--amber);">AI is not enabled. Set <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ai.enabled = true</code> and <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code> in your .env.</p>
     </div>
     @endif
 
-    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px;align-items:center;">
-        <button onclick="docsGenerateAll()"
-            {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
-            class="ai-analyze-btn"
-            style="opacity:{{ config('laradar.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('laradar.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            Generate All Docs
-        </button>
-        <button type="button" data-fmt-btn id="docs-fmt-all-btn" onclick="openFmtPanel(this, 'docs-fmt-all')"
-            style="height:38px;border:1px solid #FF2D20;border-radius:10px;padding:0 14px;font-size:12px;font-family:var(--font-mono);background:var(--bg-elevated);color:#FF2D20;cursor:pointer;display:inline-flex;align-items:center;gap:8px;outline:none;">
-            <span>.md</span>
-            <svg style="width:10px;height:10px;flex:none;transition:transform .2s;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <input type="hidden" id="docs-fmt-all" value="md">
-        <button onclick="docsDownloadAll()" id="docs-download-all-btn" class="atlas-btn" style="display:none;padding:9px 18px;font-size:13px;border-radius:10px;">
-            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            Download All
-        </button>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;align-items:center;">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+            <button onclick="docsGenerateAll()"
+                {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}
+                class="ai-analyze-btn"
+                style="opacity:{{ config('laradar.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('laradar.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
+                <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Generate All Docs
+            </button>
+            <button type="button" data-fmt-btn id="docs-fmt-all-btn" onclick="openFmtPanel(this, 'docs-fmt-all')"
+                style="height:38px;border:1px solid #FF2D20;border-radius:10px;padding:0 14px;font-size:12px;font-family:var(--font-mono);background:var(--bg-elevated);color:#FF2D20;cursor:pointer;display:inline-flex;align-items:center;gap:8px;outline:none;">
+                <span>.md</span>
+                <svg style="width:10px;height:10px;flex:none;transition:transform .2s;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <input type="hidden" id="docs-fmt-all" value="md">
+            <button onclick="docsDownloadAll()" id="docs-download-all-btn" class="atlas-btn" style="display:none;padding:9px 18px;font-size:13px;border-radius:10px;">
+                <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download All
+            </button>
+        </div>
 
         {{-- AI Graphic Report button --}}
         <button onclick="generateAIGraphicReport()" id="ai-report-btn"
@@ -100,7 +102,7 @@
     </div>
 
     {{-- Doc cards --}}
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:880px;" id="docs-grid">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;" id="docs-grid">
 
         @php
         $docTypes = [

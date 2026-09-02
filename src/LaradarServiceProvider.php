@@ -154,7 +154,7 @@ class LaradarServiceProvider extends ServiceProvider
             return;
         }
 
-        if (!$this->app->environment('local', 'development')) {
+        if (!$this->app->environment('local', 'development', 'testing')) {
             return;
         }
 

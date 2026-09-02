@@ -1286,7 +1286,7 @@ function renderModel(m) {
                 <span style="font-size:14px;font-weight:700;color:var(--text);">${esc(u.name)}</span>
                 <span style="font-size:11px;color:var(--text-faint);margin-left:10px;font-family:var(--font-mono);">${u.routes} route${u.routes!==1?'s':''}</span>
               </div>
-              ${ci >= 0 ? `<button class="mds-nav-btn" style="color:#FF2D20;background:rgba(255,45,32,.08);border-color:rgba(255,45,32,.2);" onclick="event.stopPropagation();navigate('controllers');setTimeout(()=>showDetail('controllers',${ci}),100);">View controller →</button>` : ''}
+              ${ci >= 0 ? `<button class="mds-nav-btn" style="color:#FF2D20;background:rgba(255,45,32,.08);border-color:rgba(255,45,32,.2);" onclick="event.stopPropagation();navigate('controllers');">View controller →</button>` : ''}
             </div>`;
         });
         h += `</div>`;
@@ -2242,20 +2242,20 @@ function chatAppendBubble(role, text, loadingId = null, contextLabels = []) {
     const id   = loadingId || ('msg-' + Date.now());
 
     const ctxHtml = contextLabels.length && isAI
-        ? `<p style="font-size:11px;color:#94a3b8;margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;">Context used: ${contextLabels.map(_esc).join(' · ')}</p>`
+        ? `<p style="font-size:11px;color:var(--text-faint);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">Context used: ${contextLabels.map(_esc).join(' · ')}</p>`
         : '';
 
-    const dot = (delay) => `<span style="width:6px;height:6px;border-radius:50%;background:#94a3b8;display:inline-block;animation:chatBounce 1.2s ease-in-out ${delay} infinite;"></span>`;
+    const dot = (delay) => `<span style="width:6px;height:6px;border-radius:50%;background:#FF2D20;opacity:.5;display:inline-block;animation:chatBounce 1.2s ease-in-out ${delay} infinite;"></span>`;
     const bodyHtml = text === null
         ? `<span style="display:inline-flex;gap:4px;align-items:center;">${dot('0s')}${dot('.15s')}${dot('.3s')}</span>`
         : `<div style="font-size:13px;color:#334155;line-height:1.65;">${chatMarkdown(text)}</div>`;
 
     const rowStyle    = `display:flex;align-items:flex-end;gap:10px;${isAI ? 'justify-content:flex-start' : 'justify-content:flex-end'}`;
-    const aiAvatar    = isAI  ? `<div style="width:28px;height:28px;border-radius:50%;background:#4f46e5;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0;margin-bottom:2px;">AI</div>` : '';
-    const userAvatar  = !isAI ? `<div style="width:28px;height:28px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#475569;font-size:10px;font-weight:700;flex-shrink:0;margin-bottom:2px;">You</div>` : '';
+    const aiAvatar    = isAI  ? `<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,45,32,.12);border:1px solid rgba(255,45,32,.25);display:flex;align-items:center;justify-content:center;color:#FF2D20;font-size:10px;font-weight:700;flex-shrink:0;margin-bottom:2px;">AI</div>` : '';
+    const userAvatar  = !isAI ? `<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,45,32,.12);border:1px solid rgba(255,45,32,.25);display:flex;align-items:center;justify-content:center;color:#FF2D20;font-size:10px;font-weight:700;flex-shrink:0;margin-bottom:2px;">You</div>` : '';
     const bubbleStyle = isAI
-        ? 'background:#fff;border:1px solid #e2e8f0;border-radius:16px;border-top-left-radius:4px;padding:12px 16px;max-width:80%;'
-        : 'background:#4f46e5;color:#fff;border-radius:16px;border-top-right-radius:4px;padding:12px 16px;max-width:80%;';
+        ? 'background:var(--bg-elevated);border:1px solid var(--border);border-radius:16px;border-top-left-radius:4px;padding:12px 16px;max-width:80%;'
+        : 'background:#FF2D20;color:#fff;border-radius:16px;border-top-right-radius:4px;padding:12px 16px;max-width:80%;';
 
     wrap.insertAdjacentHTML('beforeend', `
         <div style="${rowStyle};animation:chatBubbleIn .22s cubic-bezier(.22,1,.36,1) both;" id="${id}">
@@ -2279,7 +2279,7 @@ function chatReplaceBubble(id, text, contextLabels = [], isError = false) {
     if (!inner) return;
 
     const ctxHtml = contextLabels.length
-        ? `<p style="font-size:11px;color:#94a3b8;margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;">Context used: ${contextLabels.map(_esc).join(' · ')}</p>`
+        ? `<p style="font-size:11px;color:var(--text-faint);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">Context used: ${contextLabels.map(_esc).join(' · ')}</p>`
         : '';
 
     if (isError) {
