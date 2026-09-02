@@ -24,7 +24,7 @@
 
     @if(!config('laradar.ai.enabled', false))
     {{-- Setup card --}}
-    <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:24px;margin-bottom:24px;">
+    <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:24px;margin-bottom:24px;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
             <svg style="width:20px;height:20px;color:var(--amber);margin-top:2px;flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             <div>
@@ -73,13 +73,13 @@
     </div>
 
     {{-- Error state --}}
-    <div id="ai-error" style="display:none;margin-bottom:24px;max-width:560px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:12px;padding:16px;">
+    <div id="ai-error" style="display:none;margin-bottom:24px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:12px;padding:16px;">
         <p style="font-size:13px;font-weight:600;color:var(--rose);margin-bottom:4px;">Analysis failed</p>
         <p id="ai-error-msg" style="font-size:12px;color:var(--rose);font-family:var(--font-mono);"></p>
     </div>
 
     {{-- Results (always visible — JS populates content after analysis) --}}
-    <div id="ai-results" style="max-width:900px;display:flex;flex-direction:column;gap:16px;">
+    <div id="ai-results" style="display:flex;flex-direction:column;gap:16px;">
 
         {{-- Summary + AI Score --}}
         <div style="display:flex;gap:16px;flex-wrap:wrap;">
@@ -89,7 +89,7 @@
                     <span class="ai-placeholder" style="color:var(--text-faint);font-style:italic;">Run analysis to see an AI-generated summary of your architecture.</span>
                 </p>
             </div>
-            <div style="width:160px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex:none;">
+            <div style="min-width:160px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex:none;">
                 <p style="font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);">AI Score</p>
                 <div style="position:relative;width:90px;height:90px;">
                     <svg width="90" height="90" viewBox="0 0 90 90">

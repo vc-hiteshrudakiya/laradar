@@ -11,13 +11,13 @@
         @if(config('laradar.ai.enabled', false))
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--emerald);background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);padding:5px 12px;border-radius:20px;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>
-            {{ config('laradar.ai.model') }}
+            {{ config('laradar.ai.model', 'gemini-2.5-flash') }}
         </span>
         @endif
     </div>
 
     @if(!config('laradar.ai.enabled', false))
-    <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:20px;">
+    <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:20px;">
         <p style="font-size:13px;color:var(--amber);">AI is not enabled. Set <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ai.enabled = true</code> and <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code> in your .env.</p>
     </div>
     @endif
@@ -70,7 +70,7 @@
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend();}"
             style="width:100%;padding:14px 16px 6px;font-size:13px;color:var(--text);background:transparent;resize:none;outline:none;border:none;font-family:var(--font-sans);box-sizing:border-box;line-height:1.6;"></textarea>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px 10px;">
-            <span id="chat-context-hint" style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px;"></span>
+            <span id="chat-context-hint" style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:min(280px,50%);"></span>
             <div style="display:flex;align-items:center;gap:8px;">
                 <span style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);">Enter to send</span>
                 <button onclick="chatSend()" id="chat-send-btn" class="chat-send-btn" {{ !config('laradar.ai.enabled', false) ? 'disabled' : '' }}>
