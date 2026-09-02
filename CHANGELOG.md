@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to Laradar will be documented in this file.
-## [Unreleased]
+## v1.0.0
 
 ### Added
 
