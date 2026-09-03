@@ -3,8 +3,6 @@
 All notable changes to Laradar will be documented in this file.
 ## [Unreleased]
 
-## [1.0.0] - 2026-09-02
-
 ### Added
 
 - Interactive architecture dashboard with full component scanning and AI insights ([6cd3ad7](https://github.com/vcian/laradar/commit/6cd3ad74bf7cb7201f4cb7e172bc5cf7fec47b6b))
@@ -13,6 +11,7 @@ All notable changes to Laradar will be documented in this file.
 ### Documentation
 
 - Update changelog ([e2ecba7](https://github.com/vcian/laradar/commit/e2ecba725e1b48a1c7b05840cfbf5fd46db23f2d))
+- Update changelog ([f7686cc](https://github.com/vcian/laradar/commit/f7686cc0946d55052c12d5c609ee00efc2d8e173))
 
 ### Fixed
 
