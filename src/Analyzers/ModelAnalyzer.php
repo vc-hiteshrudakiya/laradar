@@ -22,16 +22,26 @@ class ModelAnalyzer
             return ['items' => [], 'errors' => []];
         }
 
-        $items  = [];
-        $errors = [];
+        $items    = [];
+        $errors   = [];
+        $traitMap = [];
 
-        foreach (File::allFiles($this->path) as $file) {
-            if ($file->getExtension() !== 'php') {
-                continue;
+        $allFiles = File::allFiles($this->path);
+
+        // First pass — build a map of trait name → file content
+        foreach ($allFiles as $file) {
+            if ($file->getExtension() !== 'php') continue;
+            $content = file_get_contents($file->getRealPath());
+            if (preg_match('/^\s*trait\s+\w/m', $content)) {
+                $traitMap[$file->getFilenameWithoutExtension()] = $content;
             }
+        }
 
+        // Second pass — process concrete model files
+        foreach ($allFiles as $file) {
+            if ($file->getExtension() !== 'php') continue;
             try {
-                $item = $this->processFile($file);
+                $item = $this->processFile($file, $traitMap);
                 if ($item !== null) {
                     $items[] = $item;
                 }
@@ -46,7 +56,7 @@ class ModelAnalyzer
         return ['items' => $items, 'errors' => $errors];
     }
 
-    private function processFile(SplFileInfo $file): ?array
+    private function processFile(SplFileInfo $file, array $traitMap = []): ?array
     {
         $content = file_get_contents($file->getRealPath());
 
@@ -55,8 +65,17 @@ class ModelAnalyzer
             return null;
         }
 
-        $modelName = $file->getFilenameWithoutExtension();
-        $namespace = $this->detectNamespace($content);
+        $modelName  = $file->getFilenameWithoutExtension();
+        $namespace  = $this->detectNamespace($content);
+        $traits     = $this->detectTraits($content);
+
+        // Append content of each used trait so relationship detection covers trait-defined relations
+        $combined = $content;
+        foreach ($traits as $traitName) {
+            if (isset($traitMap[$traitName])) {
+                $combined .= "\n" . $traitMap[$traitName];
+            }
+        }
 
         return [
             'name'          => $modelName,
@@ -76,8 +95,8 @@ class ModelAnalyzer
             'appends'       => $this->detectArrayProperty($content, 'appends'),
             'with'          => $this->detectArrayProperty($content, 'with'),
             'casts'         => $this->detectCasts($content),
-            'relationships' => $this->detectRelationships($content),
-            'traits'        => $this->detectTraits($content),
+            'relationships' => $this->detectRelationships($combined, $modelName),
+            'traits'        => $traits,
             'observer'      => $this->detectObserver($content),
         ];
     }
@@ -127,7 +146,13 @@ class ModelAnalyzer
 
     private function detectCasts(string $content): array
     {
+        // Property style: protected $casts = [...]
         preg_match('/protected\s+\$casts\s*=\s*\[(.*?)\]/s', $content, $match);
+
+        // Method style (Laravel 11): protected function casts(): array { return [...]; }
+        if (empty($match[1])) {
+            preg_match('/protected\s+function\s+casts\s*\(\s*\)\s*(?::\s*\w+\s*)?\{.*?return\s*\[(.*?)\]\s*;/s', $content, $match);
+        }
 
         if (empty($match[1])) {
             return [];
@@ -143,23 +168,67 @@ class ModelAnalyzer
         return $casts;
     }
 
-    private function detectRelationships(string $content): array
+    private function detectRelationships(string $content, string $modelName): array
     {
         $relationships = [];
+        $modelSnake    = Str::snake($modelName);
 
         foreach (self::RELATIONSHIP_TYPES as $type) {
+            // Pass 1: standard ::class syntax
             preg_match_all(
-                '/public\s+function\s+(\w+)\s*\(\s*\)[^{]*\{[^}]*return\s+\$this->' . $type . '\s*\(\s*([A-Za-z_\\\\]+)::class/s',
+                '/public\s+function\s+(\w+)\s*\(\s*\)[^{]*\{[^}]*return\s+\$this->' . $type . '\s*\(\s*([A-Za-z_\\\\]+)::class\s*(?:,\s*[\'"]([^\'"]+)[\'"])?/s',
                 $content,
                 $matches
             );
 
             foreach ($matches[1] as $i => $method) {
-                $related = class_basename(str_replace('\\', '/', $matches[2][$i]));
+                $related    = class_basename(str_replace('\\', '/', $matches[2][$i]));
+                $explicitFk = ($matches[3][$i] ?? '') !== '' ? $matches[3][$i] : null;
+
+                if (!$explicitFk) {
+                    if ($type === 'belongsTo') {
+                        $explicitFk = Str::snake($related) . '_id';
+                    } elseif (in_array($type, ['hasMany', 'hasOne', 'hasManyThrough'])) {
+                        $explicitFk = $modelSnake . '_id';
+                    }
+                }
+
                 $relationships[] = [
-                    'type'    => $type,
-                    'method'  => $method,
-                    'related' => $related,
+                    'type'        => $type,
+                    'method'      => $method,
+                    'related'     => $related,
+                    'foreign_key' => $explicitFk,
+                    'dynamic'     => false,
+                ];
+            }
+
+            // Pass 2: config()-based syntax e.g. $this->hasOne(config('x.y.model.class'), 'fk')
+            preg_match_all(
+                '/public\s+function\s+(\w+)\s*\(\s*\)[^{]*\{[^}]*return\s+\$this->' . $type . '\s*\(\s*config\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)\s*(?:,\s*[\'"]([^\'"]+)[\'"])?/s',
+                $content,
+                $configMatches
+            );
+
+            foreach ($configMatches[1] as $i => $method) {
+                $configKey  = $configMatches[2][$i];
+                $parts      = array_filter(explode('.', $configKey), fn($p) => $p !== 'class');
+                $related    = Str::studly(end($parts) ?: $configKey);
+                $explicitFk = ($configMatches[3][$i] ?? '') !== '' ? $configMatches[3][$i] : null;
+
+                if (!$explicitFk) {
+                    if ($type === 'belongsTo') {
+                        $explicitFk = Str::snake($related) . '_id';
+                    } elseif (in_array($type, ['hasMany', 'hasOne', 'hasManyThrough'])) {
+                        $explicitFk = $modelSnake . '_id';
+                    }
+                }
+
+                $relationships[] = [
+                    'type'        => $type,
+                    'method'      => $method,
+                    'related'     => $related,
+                    'foreign_key' => $explicitFk,
+                    'dynamic'     => true,
                 ];
             }
         }
@@ -174,18 +243,18 @@ class ModelAnalyzer
         if ($classPos === false) return [];
         $body = substr($content, $classPos);
 
-        // Match use statements inside class body (traits, not imports)
-        // Traits start with uppercase; imports would have been in file header
+        // Match ALL use statements inside class body (handles both single-line and multi-line declarations)
         $traits = [];
-        if (preg_match('/\buse\s+([\w,\s\\\\]+?)\s*;/s', $body, $m)) {
-            $parts = preg_split('/\s*,\s*/', $m[1]);
+        preg_match_all('/\buse\s+([\w,\s\\\\]+?)\s*;/s', $body, $matches);
+        foreach ($matches[1] as $group) {
+            $parts = preg_split('/\s*,\s*/', $group);
             foreach ($parts as $part) {
                 $part = trim($part);
                 if ($part === '') continue;
                 $traits[] = class_basename($part);
             }
         }
-        return $traits;
+        return array_unique($traits);
     }
 
     private function detectObserver(string $content): ?string

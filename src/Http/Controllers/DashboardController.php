@@ -54,21 +54,18 @@ class DashboardController extends Controller
         }
     }
 
-    public function overview(Laradar $discovery)    { return $this->render('overview',     $discovery); }
-    public function models(Laradar $discovery)       { return $this->render('models',       $discovery); }
-    public function controllers(Laradar $discovery)  { return $this->render('controllers',  $discovery); }
-    public function routes(Laradar $discovery)       { return $this->render('routes',       $discovery); }
-    public function jobs(Laradar $discovery)         { return $this->render('jobs',         $discovery); }
-    public function events(Laradar $discovery)       { return $this->render('events',       $discovery); }
-    public function services(Laradar $discovery)     { return $this->render('services',     $discovery); }
-    public function repositories(Laradar $discovery) { return $this->render('repositories', $discovery); }
-    public function observers(Laradar $discovery)    { return $this->render('observers',    $discovery); }
-    public function policies(Laradar $discovery)     { return $this->render('policies',     $discovery); }
-    public function modules(Laradar $discovery)      { return $this->render('modules',      $discovery); }
-    public function middlewarePage(Laradar $discovery) { return $this->render('middleware',   $discovery); }
-    public function packages(Laradar $discovery)     { return $this->render('packages',     $discovery); }
-    public function migrations(Laradar $discovery)    { return $this->render('migrations',   $discovery); }
-    public function ai(Laradar $discovery)           { return $this->render('ai',           $discovery); }
-    public function chat(Laradar $discovery)         { return $this->render('chat',         $discovery); }
-    public function aidocs(Laradar $discovery)       { return $this->render('aidocs',       $discovery); }
+    private const SECTIONS = [
+        'overview', 'models', 'controllers', 'routes', 'migrations', 'jobs', 'events',
+        'services', 'repositories', 'observers', 'policies', 'modules', 'middleware',
+        'packages', 'ai', 'chat', 'aidocs',
+    ];
+
+    public function section(Laradar $discovery): mixed
+    {
+        $section = request()->route('section');
+        if (!in_array($section, self::SECTIONS, true)) {
+            abort(404);
+        }
+        return $this->render($section, $discovery);
+    }
 }

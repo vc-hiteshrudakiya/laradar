@@ -25,7 +25,7 @@
         @if(empty($data['repositories']))
         <div class="atlas-card" style="text-align:center;padding:64px;">
             <div style="width:56px;height:56px;background:var(--bg-hover);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-                <svg style="width:28px;height:28px;color:var(--text-faint);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                <svg style="width:28px;height:28px;color:var(--text-faint);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
             </div>
             <p style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">No repositories detected</p>
             <p style="font-size:13px;color:var(--text-faint);">Create repository classes in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">app/Repositories/</code> to abstract your data layer.</p>
@@ -41,9 +41,16 @@
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $repo['name'] }}</div>
                     <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $repo['namespace'] }}</div>
+                    @if(!empty($repo['implements']))
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;">
+                        @foreach($repo['implements'] as $iface)
+                        <span style="font-family:var(--font-mono);font-size:10px;color:#FF2D20;background:rgba(255,45,32,.08);border:1px solid rgba(255,45,32,.2);padding:1px 7px;border-radius:4px;">{{ $iface }}</span>
+                        @endforeach
+                    </div>
+                    @endif
                 </div>
-                <div style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:#FF2D20;text-align:center;">{{ count($repo['methods']??[]) }}</div>
-                <div style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:var(--text-dim);text-align:center;">{{ count($repo['dependencies']??[]) ?: '—' }}</div>
+                <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:#FF2D20;text-align:center;">{{ count($repo['methods']??[]) }}</div>
+                <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-dim);text-align:center;">{{ count($repo['dependencies']??[]) ?: '—' }}</div>
             </div>
             @endforeach
         </div>

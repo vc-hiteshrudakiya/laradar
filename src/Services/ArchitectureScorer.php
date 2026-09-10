@@ -17,6 +17,7 @@ class ArchitectureScorer
 
         $this->checkModelsOrganized($data['models']);
         $this->checkFillableDefined($data['models']);
+        $this->checkCastsDefined($data['models']);
         $this->checkRelationshipsMapped($data['models']);
         $this->checkControllersFocused($data['controllers']);
         $this->checkServiceLayer($data['dependencies']['nodes'] ?? []);
@@ -24,13 +25,15 @@ class ArchitectureScorer
         $this->checkRoutesNamed($data['route_summary']);
         $this->checkApiVersioned($data['route_summary']);
         $this->checkMiddlewareSecured($data['route_summary']);
+        $this->checkJobsUsed($data['jobs']);
+        $this->checkPoliciesPresent($data['policies']);
+        $this->checkTestsPresent($data);
         $this->checkErrorFree($data['errors']);
 
         return [
             'score'  => $this->score,
             'max'    => 100,
             'grade'  => $this->grade(),
-            'color'  => $this->color(),
             'checks' => $this->checks,
         ];
     }
@@ -89,16 +92,16 @@ class ArchitectureScorer
 
     private function checkControllersFocused(array $controllers): void
     {
-        if (empty($controllers)) { $this->pass('controllers_size', 'Controllers Focused', 15); return; }
+        if (empty($controllers)) { $this->pass('controllers_size', 'Controllers Focused', 10); return; }
 
         $bloated = array_filter($controllers, fn($c) => ($c['method_count'] ?? 0) > 10);
         $fat     = array_filter($controllers, fn($c) => ($c['method_count'] ?? 0) > 15);
 
         if (empty($bloated)) {
-            $this->pass('controllers_size', 'Controllers Focused', 15);
+            $this->pass('controllers_size', 'Controllers Focused', 10);
         } elseif (empty($fat)) {
             $names = implode(', ', array_column(array_slice(array_values($bloated), 0, 2), 'name'));
-            $this->warn('controllers_size', 'Some Controllers Large', 8, "{$names} >10 methods");
+            $this->warn('controllers_size', 'Some Controllers Large', 5, "{$names} >10 methods");
         } else {
             $names = implode(', ', array_column(array_slice(array_values($fat), 0, 2), 'name'));
             $this->fail('controllers_size', 'God Controllers Detected', "{$names} >15 methods — split into smaller classes");
@@ -109,7 +112,7 @@ class ArchitectureScorer
     {
         $services = array_filter($nodes, fn($n) => ($n['layer'] ?? '') === 'service');
         if (!empty($services)) {
-            $this->pass('service_layer', 'Service Layer Present', 15);
+            $this->pass('service_layer', 'Service Layer Present', 10);
         } else {
             $this->fail('service_layer', 'Missing Service Layer', 'Add Service classes to separate business logic from controllers');
         }
@@ -119,7 +122,7 @@ class ArchitectureScorer
     {
         $repos = array_filter($nodes, fn($n) => ($n['layer'] ?? '') === 'repository');
         if (!empty($repos)) {
-            $this->pass('repository_layer', 'Repository Layer Present', 10);
+            $this->pass('repository_layer', 'Repository Layer Present', 5);
         } else {
             $this->warn('repository_layer', 'No Repository Layer', 0, 'Optional: add Repository classes for data access abstraction');
         }
@@ -129,13 +132,13 @@ class ArchitectureScorer
     {
         $total = $routeSummary['total'] ?? 0;
         $named = $routeSummary['named_count'] ?? 0;
-        if ($total === 0) { $this->pass('routes_named', 'Routes Named', 10); return; }
+        if ($total === 0) { $this->pass('routes_named', 'Routes Named', 5); return; }
 
         $pct = ($named / $total) * 100;
         if ($pct >= 70) {
-            $this->pass('routes_named', 'Routes Well Named', 10);
+            $this->pass('routes_named', 'Routes Well Named', 5);
         } elseif ($pct >= 40) {
-            $this->warn('routes_named', 'Some Routes Unnamed', 5, round($pct) . "% have names");
+            $this->warn('routes_named', 'Some Routes Unnamed', 3, round($pct) . "% have names");
         } else {
             $this->fail('routes_named', 'Routes Not Named', 'Add ->name() to your route definitions');
         }
@@ -163,13 +166,63 @@ class ArchitectureScorer
         }
     }
 
+    private function checkCastsDefined(array $models): void
+    {
+        if (empty($models)) { $this->fail('casts', 'Casts Defined', 'No models'); return; }
+
+        $defined = count(array_filter($models, fn($m) => !empty($m['casts'])));
+        $pct = ($defined / count($models)) * 100;
+
+        if ($pct >= 70) {
+            $this->pass('casts', 'Casts Defined', 5);
+        } elseif ($pct >= 30) {
+            $this->warn('casts', 'Casts Partially Defined', 2, "{$defined}/" . count($models) . " models");
+        } else {
+            $this->fail('casts', 'Casts Not Defined', 'Add $casts to models for type safety');
+        }
+    }
+
+    private function checkJobsUsed(array $jobs): void
+    {
+        if (!empty($jobs)) {
+            $this->pass('jobs_used', 'Jobs Used', 5, count($jobs) . ' job(s) found');
+        } else {
+            $this->warn('jobs_used', 'No Jobs Found', 0, 'Use Jobs to offload heavy tasks from the request cycle');
+        }
+    }
+
+    private function checkPoliciesPresent(array $policies): void
+    {
+        if (!empty($policies)) {
+            $this->pass('policies', 'Policies Present', 5, count($policies) . ' policy/policies found');
+        } else {
+            $this->warn('policies', 'No Policies Found', 0, 'Use Policies to centralise authorization logic');
+        }
+    }
+
+    private function checkTestsPresent(array $data): void
+    {
+        $basePath   = $data['project']['base_path'] ?? '';
+        $hasFeature = is_dir($basePath . '/tests/Feature') && count(\Illuminate\Support\Facades\File::allFiles($basePath . '/tests/Feature')) > 0;
+        $hasUnit    = is_dir($basePath . '/tests/Unit')    && count(\Illuminate\Support\Facades\File::allFiles($basePath . '/tests/Unit')) > 0;
+
+        if ($hasFeature && $hasUnit) {
+            $this->pass('tests', 'Feature & Unit Tests Present', 10);
+        } elseif ($hasFeature || $hasUnit) {
+            $type = $hasFeature ? 'Feature' : 'Unit';
+            $this->warn('tests', 'Partial Test Coverage', 5, "Only {$type} tests found — add both Feature and Unit tests");
+        } else {
+            $this->fail('tests', 'No Tests Found', 'Add tests in tests/Feature and tests/Unit');
+        }
+    }
+
     private function checkErrorFree(array $errors): void
     {
         $count = count($errors);
         if ($count === 0) {
-            $this->pass('error_free', 'Error Free Scan', 10);
+            $this->pass('error_free', 'Error Free Scan', 5);
         } elseif ($count <= 3) {
-            $this->warn('error_free', 'Minor Scan Errors', 5, "{$count} file(s) could not be parsed");
+            $this->warn('error_free', 'Minor Scan Errors', 3, "{$count} file(s) could not be parsed");
         } else {
             $this->fail('error_free', 'Scan Had Errors', "{$count} files failed — check permissions and syntax");
         }
@@ -204,13 +257,4 @@ class ArchitectureScorer
         };
     }
 
-    private function color(): string
-    {
-        return match (true) {
-            $this->score >= 90 => 'emerald',
-            $this->score >= 75 => 'blue',
-            $this->score >= 60 => 'amber',
-            default            => 'red',
-        };
-    }
 }

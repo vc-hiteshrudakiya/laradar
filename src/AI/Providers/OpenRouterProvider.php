@@ -68,12 +68,20 @@ class OpenRouterProvider extends OpenAICompatibleProvider
             'max_tokens'  => 8192,
         ];
 
-        $response = Http::timeout(60)
+        $response = Http::timeout(180)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type'  => 'application/json',
                 'HTTP-Referer'  => $this->config['site_url'] ?? config('app.url', 'https://laravel.com'),
                 'X-Title'       => self::SITE_TITLE,
+            ])
+            ->withOptions([
+                'curl' => [
+                    CURLOPT_NOPROGRESS       => false,
+                    CURLOPT_PROGRESSFUNCTION => static function(): int {
+                        return connection_aborted() ? 1 : 0;
+                    },
+                ],
             ])
             ->post(self::API_BASE . '/chat/completions', $body);
 

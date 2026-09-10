@@ -159,6 +159,11 @@ return [
 
         // Fallback provider if the primary fails (null = no fallback)
         'fallback_provider' => env('AI_FALLBACK_PROVIDER'),
+
+        // Async job queue — set LARADAR_AI_ASYNC=true and run queue:work for non-blocking AI calls
+        'async'       => (bool) env('LARADAR_AI_ASYNC', false),
+        'queue'       => env('LARADAR_AI_QUEUE', 'default'),
+        'job_timeout' => (int) env('LARADAR_AI_JOB_TIMEOUT', 300),
     ],
 
 ];

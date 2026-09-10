@@ -128,6 +128,11 @@ return [
     'ai' => [
         'enabled'  => env('AI_ENABLED', false),
         'provider' => env('AI_PROVIDER', 'gemini'),
+
+        // Async queue (optional — see Async AI section below)
+        'async'       => env('LARADAR_AI_ASYNC', false),
+        'queue'       => env('LARADAR_AI_QUEUE', 'default'),
+        'job_timeout' => env('LARADAR_AI_JOB_TIMEOUT', 300),
     ],
 ];
 ```
@@ -158,6 +163,57 @@ GEMINI_MODEL=gemini-2.0-flash   # the model used for the architecture review
 | Mistral | `mistral` | `MISTRAL_API_KEY` | `MISTRAL_MODEL` |
 | Ollama *(local, no key needed)* | `ollama` | — | `OLLAMA_MODEL` |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `OPENROUTER_MODEL` |
+
+---
+
+## Async AI (Queue)
+
+By default, AI requests (Analyze and Generate Docs) run synchronously — the browser waits for the AI provider to respond before the page updates. For large projects this can take 20–30 seconds and block the PHP worker during that time.
+
+You can make AI requests non-blocking by running them as background queue jobs.
+
+**1. Set up the jobs table (one time):**
+
+```bash
+php artisan queue:table
+php artisan migrate
+```
+
+**2. Enable async in `.env`:**
+
+```env
+LARADAR_AI_ASYNC=true
+QUEUE_CONNECTION=database
+```
+
+**3. Start the queue worker (second terminal):**
+
+```bash
+php artisan queue:work
+```
+
+That's it. When you click **Analyze** or **Generate Docs** in the dashboard, the request returns immediately and the result appears automatically once the job completes — no page refresh needed.
+
+**Optional env keys:**
+
+| Key | Default | Description |
+|---|---|---|
+| `LARADAR_AI_ASYNC` | `false` | Enable background job processing for AI requests |
+| `LARADAR_AI_QUEUE` | `default` | Queue name to dispatch AI jobs on |
+| `LARADAR_AI_JOB_TIMEOUT` | `300` | Max seconds the AI job is allowed to run |
+
+> **Note:** If your application already uses queues for its own jobs, set `LARADAR_AI_QUEUE=laradar` and run a dedicated worker `php artisan queue:work --queue=laradar` so AI jobs don't compete with your application jobs.
+
+---
+
+## Upgrading
+
+When upgrading Laradar, if you have a published `config/laradar.php`, re-publish it to get new config keys:
+
+```bash
+php artisan vendor:publish --tag=laradar-config --force
+php artisan optimize:clear
+```
 
 ---
 

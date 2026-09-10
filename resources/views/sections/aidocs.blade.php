@@ -63,6 +63,11 @@
                 <path style="opacity:.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
             </svg>
             <p style="font-size:13px;font-weight:600;color:#FF2D20;font-family:var(--font-mono);" id="ai-report-progress-title">Generating AI Report…</p>
+            <button onclick="cancelAIReport()" id="ai-report-cancel" title="Cancel generation" style="margin-left:auto;flex-shrink:0;width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,45,32,0.15);color:#FF2D20;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/>
+                </svg>
+            </button>
         </div>
         <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;" id="ai-report-steps">
             <div class="ai-step" style="display:flex;align-items:center;gap:12px;font-size:13px;" data-step="analyze">
@@ -102,16 +107,16 @@
     </div>
 
     {{-- Doc cards --}}
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;" id="docs-grid">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;" id="docs-grid">
 
         @php
         $docTypes = [
-            ['architecture', 'Architecture.md', 'Overall design, patterns, score, strengths & improvements.', '#4f46e5', 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
-            ['models',       'Models.md',       'Each model — purpose, fields, relationships, business role.', '#8b5cf6', 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4'],
-            ['controllers',  'Controllers.md',  'Each controller — responsibilities, methods, observations.',  '#3b82f6', 'M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18'],
-            ['routes',       'Routes.md',       'All routes grouped by resource — purpose, auth, middleware.',  '#10b981', 'M13 10V3L4 14h7v7l9-11h-7z'],
-            ['services',     'Services.md',     'Service layer, repositories, jobs, and events explained.',    '#f59e0b', 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
-            ['modules',      'Modules.md',      'Module breakdown — domain responsibilities and coupling.',    '#06b6d4', 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'],
+            ['architecture', 'Architecture.md', 'Overall design, patterns, score, strengths & improvements.', '#FF2D20', 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
+            ['models',       'Models.md',       'Each model — purpose, fields, relationships, business role.', '#FF2D20', 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4'],
+            ['controllers',  'Controllers.md',  'Each controller — responsibilities, methods, observations.',  '#FF2D20', 'M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18'],
+            ['routes',       'Routes.md',       'All routes grouped by resource — purpose, auth, middleware.',  '#FF2D20', 'M13 10V3L4 14h7v7l9-11h-7z'],
+            ['services',     'Services.md',     'Service layer, repositories, jobs, and events explained.',    '#FF2D20', 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
+            ['modules',      'Modules.md',      'Module breakdown — domain responsibilities and coupling.',    '#FF2D20', 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'],
         ];
         @endphp
 
@@ -138,6 +143,9 @@
                     style="flex:1;justify-content:center;font-size:11px;padding:7px 10px;border-radius:8px;opacity:{{ config('laradar.ai.enabled', false) ? 1 : 0.4 }};cursor:{{ config('laradar.ai.enabled', false) ? 'pointer' : 'not-allowed' }}">
                     <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                     Generate
+                </button>
+                <button onclick="cancelDocGenerate('{{ $type }}')" id="doc-cancel-btn-{{ $type }}" title="Cancel" style="display:none;height:32px;width:32px;flex-shrink:0;border:1px solid rgba(255,45,32,0.4);border-radius:8px;background:rgba(255,45,32,0.08);color:#FF2D20;cursor:pointer;align-items:center;justify-content:center;padding:0;">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
                 </button>
                 <button type="button" data-fmt-btn id="doc-fmt-btn-{{ $type }}" onclick="openFmtPanel(this, 'doc-fmt-{{ $type }}')"
                     style="height:32px;border:1px solid #FF2D20;border-radius:8px;padding:0 10px;font-size:11px;font-family:var(--font-mono);background:var(--bg-elevated);color:#FF2D20;cursor:pointer;display:inline-flex;align-items:center;gap:5px;outline:none;">

@@ -66,7 +66,7 @@ $rs      = $data['route_summary'] ?? [];
     <div class="kpi-grid" style="margin-bottom:28px;grid-template-columns:repeat(4,1fr);">
         @foreach($stats as [$label,$count])
         @php $kc = $kpiColors[$label] ?? ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,0.18)']; $ki = $kpiIcons[$label] ?? ''; $kn = $kpiNav[$label] ?? ''; @endphp
-        <div class="kpi-card ov-reveal" data-ov-reveal style="transition-delay:{{ $loop->index * 45 }}ms;{{ $kn ? 'cursor:pointer;' : '' }}" @if($kn) onclick="navigate('{{ $kn }}')" @endif>
+        <div class="kpi-card ov-reveal" data-ov-reveal style="transition-delay:{{ $loop->index * 25 }}ms;{{ $kn ? 'cursor:pointer;' : '' }}" @if($kn) onclick="navigate('{{ $kn }}')" @endif>
             <div class="kpi-card__icon" style="background:{{ $kc['bg'] }};color:{{ $kc['color'] }};">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">{!! $ki !!}</svg>
             </div>

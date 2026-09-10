@@ -37,8 +37,8 @@
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $svc['name'] }}</div>
                     <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $svc['namespace'] }}</div>
                 </div>
-                <div style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:#FF2D20;text-align:center;">{{ count($svc['methods']??[]) }}</div>
-                <div style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:var(--text-dim);text-align:center;">{{ count($svc['dependencies']??[]) ?: '—' }}</div>
+                <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:#FF2D20;text-align:center;">{{ count($svc['methods']??[]) }}</div>
+                <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-dim);text-align:center;">{{ count($svc['dependencies']??[]) ?: '—' }}</div>
             </div>
             @endforeach
         </div>

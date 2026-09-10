@@ -225,28 +225,44 @@ class PackageDetector
         $composerLock  = $this->readJson($this->basePath . '/composer.lock');
         $lockVersions  = $this->buildLockVersionMap($composerLock);
 
-        $installed = array_merge(
-            array_keys($composerJson['require']      ?? []),
-            array_keys($composerJson['require-dev']  ?? []),
-        );
-        $installed = array_map('strtolower', $installed);
+        $require    = array_keys($composerJson['require']     ?? []);
+        $requireDev = array_keys($composerJson['require-dev'] ?? []);
+        $allKeys    = array_unique(array_map('strtolower', array_merge($require, $requireDev)));
 
         $items = [];
-        foreach (self::KNOWN_PACKAGES as $packageKey => $meta) {
-            if (!in_array($packageKey, $installed, true)) continue;
+        foreach ($allKeys as $packageKey) {
+            // Skip PHP itself and platform extensions (ext-*, php, lib-*)
+            if ($packageKey === 'php' || str_starts_with($packageKey, 'ext-') || str_starts_with($packageKey, 'lib-')) {
+                continue;
+            }
 
             $version = $lockVersions[$packageKey] ?? $this->constraintFromJson($composerJson, $packageKey);
+            $isDev   = $this->isDevOnly($composerJson, $packageKey);
 
-            $items[] = [
-                'key'         => $packageKey,
-                'name'        => $meta['name'],
-                'category'    => $meta['category'],
-                'description' => $meta['description'],
-                'color'       => $meta['color'],
-                'docs'        => $meta['docs'],
-                'version'     => $version,
-                'dev'         => $this->isDevOnly($composerJson, $packageKey),
-            ];
+            if (isset(self::KNOWN_PACKAGES[$packageKey])) {
+                $meta    = self::KNOWN_PACKAGES[$packageKey];
+                $items[] = [
+                    'key'         => $packageKey,
+                    'name'        => $meta['name'],
+                    'category'    => $meta['category'],
+                    'description' => $meta['description'],
+                    'color'       => $meta['color'],
+                    'docs'        => $meta['docs'],
+                    'version'     => $version,
+                    'dev'         => $isDev,
+                ];
+            } else {
+                $items[]   = [
+                    'key'         => $packageKey,
+                    'name'        => $packageKey,
+                    'category'    => 'Other',
+                    'description' => '',
+                    'color'       => 'laravel',
+                    'docs'        => '',
+                    'version'     => $version,
+                    'dev'         => $isDev,
+                ];
+            }
         }
 
         // Sort by category then name

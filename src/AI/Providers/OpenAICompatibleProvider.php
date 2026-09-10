@@ -105,6 +105,14 @@ PROMPT;
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type'  => 'application/json',
             ])
+            ->withOptions([
+                'curl' => [
+                    CURLOPT_NOPROGRESS       => false,
+                    CURLOPT_PROGRESSFUNCTION => static function(): int {
+                        return connection_aborted() ? 1 : 0;
+                    },
+                ],
+            ])
             ->post($url, $body);
 
         if (!$response->successful()) {

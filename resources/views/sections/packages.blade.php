@@ -29,6 +29,7 @@
     $defaultCatMeta = ['color'=>'#94A3B8','bg'=>'rgba(148,163,184,.1)','border'=>'#94A3B8','icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>'];
 
     $dotHexColors = [
+        'laravel'=>'#FF2D20',
         'pink'=>'#F472B6','purple'=>'#C084FC','red'=>'#F87171','blue'=>'#60A5FA',
         'orange'=>'#FB923C','violet'=>'#A78BFA','amber'=>'#FBBF24',
         'sky'=>'#38BDF8','emerald'=>'#34D399','green'=>'#4ADE80',
@@ -40,10 +41,10 @@
     @if(empty($packages))
     <div class="atlas-card" style="text-align:center;padding:64px;">
         <div style="width:56px;height:56px;background:var(--bg-hover);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-            <svg style="width:28px;height:28px;color:var(--text-faint);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+            <svg style="width:28px;height:28px;color:var(--text-faint);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
         </div>
-        <p style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">No known packages detected</p>
-        <p style="font-size:13px;color:var(--text-faint);">None of the tracked packages appear in your <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">composer.json</code>.</p>
+        <p style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">No packages detected</p>
+        <p style="font-size:13px;color:var(--text-faint);">No packages found in your <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">composer.json</code>.</p>
     </div>
     @else
 

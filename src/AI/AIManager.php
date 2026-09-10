@@ -109,6 +109,8 @@ class AIManager
 
     private function makeProvider(string $name): AIProvider
     {
+        $name = strtolower($name);
+
         // Custom providers registered via extend() take priority.
         if (isset($this->customProviders[$name])) {
             return $this->customProviders[$name];

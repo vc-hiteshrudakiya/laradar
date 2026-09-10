@@ -9,12 +9,12 @@ use Vcian\Laradar\Services\ReportExporter;
 class LaradarCommand extends Command
 {
     protected $signature = 'laradar:scan
-                            {--format= : Override output format — json, html, markdown, or svg}
+                            {--format= : Override output format — json, html, or markdown}
                             {--output= : Custom output path (single-format runs only)}';
 
     protected $description = 'Discover and document Laravel application architecture';
 
-    private const EXTENSIONS = ['json' => 'json', 'html' => 'html', 'markdown' => 'md', 'svg' => 'svg'];
+    private const EXTENSIONS = ['json' => 'json', 'html' => 'html', 'markdown' => 'md'];
     private const GRADE_COLORS = [
         'Excellent' => 'green', 'Good' => 'cyan', 'Fair' => 'yellow', 'Needs Work' => 'red',
     ];

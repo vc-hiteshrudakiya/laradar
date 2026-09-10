@@ -23,17 +23,30 @@ $relColors = [
     'hasManyThrough'=> ['color'=>'#FF2D20','bg'=>'rgba(255,45,32,.10)','border'=>'rgba(255,45,32,.28)'],
 ];
 
+// Build column type map from migration data matched by table name
+$columnTypes = [];
+$modelTable  = $model['table'] ?? null;
+if ($modelTable) {
+    foreach ($data['migrations'] ?? [] as $migration) {
+        if (($migration['table'] ?? '') === $modelTable) {
+            foreach ($migration['columns'] ?? [] as $col) {
+                $columnTypes[$col['name']] = $col['type'];
+            }
+        }
+    }
+}
+
 // Build field map
 $fieldMap = [];
 foreach ($model['fillable'] ?? [] as $f) {
-    $fieldMap[$f] = ['fillable' => true, 'hidden' => false, 'cast' => null];
+    $fieldMap[$f] = ['fillable' => true, 'hidden' => false, 'cast' => null, 'db_type' => $columnTypes[$f] ?? null];
 }
 foreach ($model['hidden'] ?? [] as $f) {
-    if (!isset($fieldMap[$f])) $fieldMap[$f] = ['fillable' => false, 'hidden' => false, 'cast' => null];
+    if (!isset($fieldMap[$f])) $fieldMap[$f] = ['fillable' => false, 'hidden' => false, 'cast' => null, 'db_type' => $columnTypes[$f] ?? null];
     $fieldMap[$f]['hidden'] = true;
 }
 foreach ($model['casts'] ?? [] as $f => $type) {
-    if (!isset($fieldMap[$f])) $fieldMap[$f] = ['fillable' => false, 'hidden' => false, 'cast' => null];
+    if (!isset($fieldMap[$f])) $fieldMap[$f] = ['fillable' => false, 'hidden' => false, 'cast' => null, 'db_type' => $columnTypes[$f] ?? null];
     $fieldMap[$f]['cast'] = $type;
 }
 
@@ -75,24 +88,6 @@ $hasPrev   = $prevIndex >= 0;
 $hasNext   = $nextIndex < count($data['models']);
 @endphp
 
-{{-- Prev / Next nav --}}
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-    <div style="display:flex;align-items:center;gap:10px;">
-        @if($hasPrev)
-        <a href="{{ route('laradar.model.detail', $data['models'][$prevIndex]['name']) }}" style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--text-dim);background:var(--bg-elevated);border:1px solid var(--border);border-radius:9px;padding:6px 13px;text-decoration:none;transition:border-color .15s,color .15s;" onmouseenter="this.style.borderColor='rgba(255,45,32,.4)';this.style.color='#FF2D20'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
-            <svg style="width:13px;height:13px;flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-            {{ $data['models'][$prevIndex]['name'] }}
-        </a>
-        @endif
-        @if($hasNext)
-        <a href="{{ route('laradar.model.detail', $data['models'][$nextIndex]['name']) }}" style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--text-dim);background:var(--bg-elevated);border:1px solid var(--border);border-radius:9px;padding:6px 13px;text-decoration:none;transition:border-color .15s,color .15s;" onmouseenter="this.style.borderColor='rgba(255,45,32,.4)';this.style.color='#FF2D20'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
-            {{ $data['models'][$nextIndex]['name'] }}
-            <svg style="width:13px;height:13px;flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-        </a>
-        @endif
-    </div>
-    <span style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">{{ $index + 1 }} / {{ count($data['models']) }}</span>
-</div>
 
 {{-- Two-column layout --}}
 <div class="mds-det-wrap">
@@ -224,6 +219,7 @@ $hasNext   = $nextIndex < count($data['models']);
                         <tr>
                             <th>Field</th>
                             <th>Status</th>
+                            <th>Type</th>
                             <th>Cast Type</th>
                         </tr>
                     </thead>
@@ -234,6 +230,13 @@ $hasNext   = $nextIndex < count($data['models']);
                             <td>
                                 @if($info['fillable'])<span class="mds-fbadge fill">FILLABLE</span>@endif
                                 @if($info['hidden'])<span class="mds-fbadge hide">HIDDEN</span>@endif
+                            </td>
+                            <td>
+                                @if($info['db_type'])
+                                <span class="mds-cast-val">{{ $info['db_type'] }}</span>
+                                @else
+                                <span style="color:var(--text-faint);font-size:12px;">—</span>
+                                @endif
                             </td>
                             <td>
                                 @if($info['cast'])
@@ -267,14 +270,25 @@ $hasNext   = $nextIndex < count($data['models']);
         <div class="mds-tab-pane" id="mds-pane-relations">
             @foreach($model['relationships'] as $rel)
             @php
-                $rc      = $relColors[$rel['type']] ?? ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,.1)','border'=>'var(--border)'];
-                $relName = class_basename($rel['related'] ?? '—');
-                $navIdx  = $modelIndexMap[$relName] ?? -1;
+                $rc        = $relColors[$rel['type']] ?? ['color'=>'var(--text-dim)','bg'=>'rgba(91,103,133,.1)','border'=>'var(--border)'];
+                $relName   = class_basename($rel['related'] ?? '—');
+                $navIdx    = $modelIndexMap[$relName] ?? -1;
+                $fk        = $rel['foreign_key'] ?? null;
+                $isDynamic = !empty($rel['dynamic']);
+                $isManyToMany = $rel['type'] === 'belongsToMany';
             @endphp
             <div class="mds-rel-card" style="border-color:var(--border);"
                  onmouseenter="this.style.borderColor='{{ $rc['border'] }}'"
                  onmouseleave="this.style.borderColor='var(--border)'">
-                <span class="mds-rel-method">{{ $rel['method'] }}()</span>
+                <div style="min-width:160px;display:flex;flex-direction:column;gap:3px;">
+                    <span class="mds-rel-method">{{ $rel['method'] }}()</span>
+                    @if($fk)
+                    <span style="font-family:var(--font-mono);font-size:10px;color:{{ $isManyToMany ? 'var(--text-faint)' : '#FF2D20' }};opacity:.85;">{{ $isManyToMany ? 'via '.$fk : $fk }}</span>
+                    @endif
+                    @if($isDynamic)
+                    <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);background:var(--bg-hover);border:1px solid var(--border);padding:1px 6px;border-radius:4px;align-self:flex-start;">via config</span>
+                    @endif
+                </div>
                 <span class="mds-rel-type" style="color:{{ $rc['color'] }};background:{{ $rc['bg'] }};border-color:{{ $rc['border'] }};">{{ $rel['type'] }}</span>
                 <span class="mds-rel-arrow">→</span>
                 <span class="mds-rel-target">{{ $relName }}</span>

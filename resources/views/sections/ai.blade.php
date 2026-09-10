@@ -66,9 +66,10 @@
                 <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" opacity=".8"></path>
             </svg>
             <div>
-                <p style="font-size:13px;font-weight:700;color:#FF2D20;font-family:var(--font-mono);margin-bottom:2px;">Analyzing architecture…</p>
+                <p style="font-size:13px;font-weight:700;color:#FF2D20;font-family:var(--font-mono);margin-bottom:2px;" id="ai-loading-text">Analyzing architecture…</p>
                 <p style="font-size:11px;color:var(--text-faint);font-family:var(--font-mono);">Usually takes 10–30 seconds</p>
             </div>
+            <button onclick="aiCancel()" style="margin-left:8px;padding:5px 12px;font-size:11px;font-family:var(--font-mono);border-radius:6px;border:1px solid rgba(255,45,32,0.3);background:rgba(255,45,32,0.08);color:#FF2D20;cursor:pointer;">Cancel</button>
         </div>
     </div>
 

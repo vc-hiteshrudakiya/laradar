@@ -59,6 +59,17 @@ class ServiceAnalyzer
         preg_match_all('/public\s+function\s+(\w+)\s*\(/', $content, $mm);
         $methods = array_values(array_filter($mm[1] ?? [], fn($m) => !in_array($m, self::SKIP_METHODS)));
 
+        // Implements clause: class Foo extends Bar implements IFoo, IBar
+        $implements = [];
+        if (preg_match('/class\s+\w+(?:\s+extends\s+[\w\\\\]+)?\s+implements\s+([\w\s,\\\\]+?)(?:\{|$)/m', $content, $im)) {
+            foreach (explode(',', $im[1]) as $iface) {
+                $iface = trim($iface);
+                if ($iface !== '') {
+                    $implements[] = class_basename($iface);
+                }
+            }
+        }
+
         return [
             'name'         => $name,
             'namespace'    => $namespace,
@@ -66,6 +77,7 @@ class ServiceAnalyzer
             'dependencies' => $dependencies,
             'methods'      => $methods,
             'method_count' => count($methods),
+            'implements'   => $implements,
         ];
     }
 

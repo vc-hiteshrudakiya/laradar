@@ -45,7 +45,7 @@
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                         {{ $ctrl['name'] }}
-                        @if(!empty($ctrl['is_resource']))<span style="font-family:var(--font-mono);font-size:9px;padding:2px 6px;border-radius:10px;background:rgba(255,45,32,0.08);color:#FF2D20;border:1px solid rgba(255,45,32,0.2);margin-left:6px;">Resource</span>@endif
+                        @if(!empty($ctrl['is_resource']))<span style="font-family:var(--font-mono);font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(255,45,32,0.08);color:#FF2D20;border:1px solid rgba(255,45,32,0.2);margin-left:6px;">Resource</span>@endif
                     </div>
                     <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $ctrl['namespace'] }}</div>
                 </div>
@@ -57,7 +57,7 @@
                         <span style="font-family:var(--font-mono);font-size:10px;color:#FF2D20;font-weight:700;">{{ $ctrlComplexity }}%</span>
                     </div>
                     <div class="ctrl-complexity-track">
-                        <div class="ctrl-complexity-fill" style="width:0;" data-target="{{ $ctrlComplexity }}"></div>
+                        <div class="ctrl-complexity-fill" style="width:{{ $ctrlComplexity }}%;"></div>
                     </div>
                 </div>
             </div>

@@ -85,9 +85,9 @@ $opMeta = [
 @if(empty($migrations))
 <div style="text-align:center;padding:60px 20px;color:var(--text-faint);">
     <svg style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:.3;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
     </svg>
-    <p style="font-size:14px;font-weight:600;margin:0 0 6px;">No migrations found</p>
+    <p style="font-size:15px;font-weight:700;margin:0 0 6px;">No migrations found</p>
     <p style="font-size:12px;margin:0;">No migration files detected in <code style="font-family:var(--font-mono);">database/migrations/</code></p>
 </div>
 @else
@@ -243,24 +243,6 @@ $opMeta = [
 @endif
 
 {{-- ── Styles ────────────────────────────────────────────────────── --}}
-<style>
-
-.mg-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
-.mg-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-hover);}
-
-.mg-card-head{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;user-select:none;}
-.mg-card-head:hover{background:var(--bg-sunken);}
-
-.mg-col-table{width:100%;border-collapse:collapse;font-size:12px;}
-.mg-col-table th{font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-faint);padding:10px 16px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
-.mg-col-table td{padding:9px 16px;border-bottom:1px solid var(--border);vertical-align:middle;}
-.mg-col-table tbody tr:last-child td{border-bottom:none;}
-.mg-col-table tbody tr:hover td{background:var(--bg-sunken);}
-
-.mg-col-name{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text);}
-.mg-type-tag{font-family:var(--font-mono);font-size:11px;color:#FF2D20;background:rgba(255,45,32,.07);padding:2px 7px;border-radius:4px;border:1px solid rgba(255,45,32,.2);}
-.mg-badge{font-size:10px;font-weight:700;font-family:var(--font-mono);padding:2px 7px;border-radius:4px;border:1px solid;margin-left:4px;white-space:nowrap;}
-</style>
 
 <script>
 function mgToggle(idx) {

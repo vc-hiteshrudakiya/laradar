@@ -99,11 +99,19 @@ PROMPT;
             $body['system'] = 'You are a JSON API. Respond only with a valid JSON object — no markdown fences, no explanation, no text outside the JSON.';
         }
 
-        $response = Http::timeout(60)
+        $response = Http::timeout(180)
             ->withHeaders([
                 'x-api-key'         => $apiKey,
                 'anthropic-version' => self::API_VERSION,
                 'Content-Type'      => 'application/json',
+            ])
+            ->withOptions([
+                'curl' => [
+                    CURLOPT_NOPROGRESS       => false,
+                    CURLOPT_PROGRESSFUNCTION => static function(): int {
+                        return connection_aborted() ? 1 : 0;
+                    },
+                ],
             ])
             ->post(self::API_BASE . '/messages', $body);
 

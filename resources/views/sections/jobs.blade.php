@@ -39,7 +39,7 @@
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($job['name'],0,1)) }}</div>
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $job['name'] }}</div>
-                    @if($job['should_queue']??false)<span style="font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.08);color:#FF2D20;border:1px solid rgba(255,45,32,.2);font-family:var(--font-mono);">queued</span>@endif
+                    @if($job['should_queue']??false)<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.08);color:#FF2D20;border:1px solid rgba(255,45,32,.2);font-family:var(--font-mono);">queued</span>@endif
                 </div>
                 <div style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);">{{ $job['queue']??'default' }}</div>
                 <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-dim);">{{ $job['tries']??'—' }}</div>
