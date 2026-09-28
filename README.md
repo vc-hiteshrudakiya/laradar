@@ -12,7 +12,7 @@
 
 Laradar automatically **discovers, visualizes, and documents** your Laravel application architecture - without writing a single line of configuration.
 
-Drop it into any Laravel project and instantly get an interactive dashboard that maps your models, controllers, routes, migrations, jobs, events, services, and more. Optionally enhance it with AI-powered architecture insights from any of 7 supported providers.
+Drop it into any Laravel project and instantly get an interactive dashboard that maps your models, controllers, routes, migrations, jobs, events, services, and more. Optionally enhance it with AI-powered architecture insights from any of 6 supported providers.
 
 ---
 
@@ -127,7 +127,7 @@ return [
 
     'ai' => [
         'enabled'  => env('AI_ENABLED', false),
-        'provider' => env('AI_PROVIDER', 'gemini'),
+        'provider' => env('AI_PROVIDER'),
 
         // Async queue (optional — see Async AI section below)
         'async'       => env('LARADAR_AI_ASYNC', false),
@@ -149,7 +149,7 @@ Enable it in your `.env`:
 AI_ENABLED=true
 AI_PROVIDER=gemini
 GEMINI_API_KEY=your-key
-GEMINI_MODEL=gemini-2.0-flash   # the model used for the architecture review
+GEMINI_MODEL=gemini-3.5-flash   # model used for all AI features
 ```
 
 **Supported providers:**
@@ -159,7 +159,6 @@ GEMINI_MODEL=gemini-2.0-flash   # the model used for the architecture review
 | Google Gemini | `gemini` | `GEMINI_API_KEY` | `GEMINI_MODEL` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `OPENAI_MODEL` |
 | Anthropic Claude | `anthropic` | `ANTHROPIC_API_KEY` | `ANTHROPIC_MODEL` |
-| Groq | `groq` | `GROQ_API_KEY` | `GROQ_MODEL` |
 | Mistral | `mistral` | `MISTRAL_API_KEY` | `MISTRAL_MODEL` |
 | Ollama *(local, no key needed)* | `ollama` | — | `OLLAMA_MODEL` |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `OPENROUTER_MODEL` |
@@ -201,6 +200,8 @@ That's it. When you click **Analyze** or **Generate Docs** in the dashboard, the
 | `LARADAR_AI_ASYNC` | `false` | Enable background job processing for AI requests |
 | `LARADAR_AI_QUEUE` | `default` | Queue name to dispatch AI jobs on |
 | `LARADAR_AI_JOB_TIMEOUT` | `300` | Max seconds the AI job is allowed to run |
+| `AI_MAX_TOKENS` | `8192` | Max output tokens per AI response — increase for large projects (check your model's limit first) |
+| `AI_MAX_MESSAGE_LENGTH` | `5000` | Max characters allowed per chat message |
 
 > **Note:** If your application already uses queues for its own jobs, set `LARADAR_AI_QUEUE=laradar` and run a dedicated worker `php artisan queue:work --queue=laradar` so AI jobs don't compete with your application jobs.
 

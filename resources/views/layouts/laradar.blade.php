@@ -2037,7 +2037,7 @@ async function generateAIGraphicReport() {
     };
     const _stepActive = (step) => {
         const el = document.querySelector(`[data-step="${step}"] .step-icon`);
-        if (el) { el.style.cssText = 'width:14px;height:14px;border-radius:50%;border:2px solid #A78BFA;background:rgba(167,139,250,0.2);flex-shrink:0;display:inline-block;animation:pulse 1s infinite;'; }
+        if (el) { el.style.cssText = 'width:14px;height:14px;border-radius:50%;border:2px solid #FF2D20;background:rgba(255,45,32,0.15);flex-shrink:0;display:inline-block;animation:pulse 1s infinite;'; }
     };
     const _stepFail  = (step) => {
         const el = document.querySelector(`[data-step="${step}"] .step-icon`);
@@ -2048,44 +2048,38 @@ async function generateAIGraphicReport() {
     const aiDocs   = {};
 
     try {
-        // ── Step 1: AI analyze (non-fatal — timeout just skips AI summary) ──
-        _stepActive('analyze');
+        // ── Steps 1–7: Single request generates everything ───────────────────
+        ['analyze', ...DOC_TYPES].forEach(s => _stepActive(s));
         try {
-            const analyzeRes  = await fetch(AI_ENDPOINT, {
-                method: 'POST',
+            const res  = await fetch(AI_REPORT_ENDPOINT, {
+                method:  'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': AI_CSRF },
                 signal,
             });
-            const analyzeJson = await analyzeRes.json();
-            if (!analyzeRes.ok || analyzeJson.error) throw new Error(analyzeJson.error || 'AI analysis failed');
-            aiAnalysis = analyzeJson;
-            _stepDone('analyze');
+            const json = await res.json();
+            if (!res.ok || json.error) throw new Error(json.error || 'AI report generation failed');
+
+            let result = json;
+            if (json.job_id) {
+                const jobUrl = AI_JOB_ENDPOINT.replace('__ID__', json.job_id);
+                let jobDone = false;
+                for (let i = 0; i < 150; i++) {
+                    await new Promise(r => setTimeout(r, 7000));
+                    const pr = await fetch(jobUrl, { signal });
+                    const pj = await pr.json();
+                    if (pj.status === 'done') { result = pj.result; jobDone = true; break; }
+                    if (pj.status === 'failed') throw new Error(pj.error || 'AI report job failed');
+                }
+                if (!jobDone) throw new Error('AI report timed out. The job took too long to complete.');
+            }
+
+            aiAnalysis = result.analysis ?? null;
+            Object.assign(aiDocs, result.docs ?? {});
+            ['analyze', ...DOC_TYPES].forEach(s => _stepDone(s));
         } catch(e) {
             if (e.name === 'AbortError') throw e;
-            _stepFail('analyze');
-            aiAnalysis = null;
+            ['analyze', ...DOC_TYPES].forEach(s => _stepFail(s));
         }
-
-        // ── Steps 2–7: AI docs — all fired in parallel ──────────────────────
-        await Promise.all(DOC_TYPES.map(async (type) => {
-            _stepActive(type);
-            try {
-                const res  = await fetch(DOCS_ENDPOINT, {
-                    method:  'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': AI_CSRF },
-                    body:    JSON.stringify({ type }),
-                    signal,
-                });
-                const json = await res.json();
-                if (!res.ok || json.error) throw new Error(json.error);
-                aiDocs[type] = json.content;
-                _stepDone(type);
-            } catch(e) {
-                if (e.name === 'AbortError') throw e;
-                _stepFail(type);
-                aiDocs[type] = null;
-            }
-        }));
 
         // ── Step 8: Build & download ────────────────────────────────────────
         _stepActive('build');
@@ -2120,16 +2114,16 @@ function _mdToHtml(md) {
 
     // ── Code blocks (before inline code) ────────────────────────────────────
     html = html.replace(/```[\w]*\n?([\s\S]*?)```/g, (_, code) =>
-        `<pre style="background:#1e293b;color:#e2e8f0;border-radius:10px;padding:16px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:13px;line-height:1.6;margin:12px 0">${code.trim()}</pre>`
+        `<pre style="background:#1e293b;color:#e2e8f0;border-radius:10px;padding:16px;overflow-x:auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;line-height:1.6;margin:12px 0">${code.trim()}</pre>`
     );
     // ── Inline code ──────────────────────────────────────────────────────────
     html = html.replace(/`([^`\n]+)`/g,
-        '<code style="background:#f1f5f9;color:#0f172a;padding:2px 6px;border-radius:4px;font-family:ui-monospace,monospace;font-size:0.9em">$1</code>'
+        '<code style="background:#f1f5f9;color:#0f172a;padding:2px 6px;border-radius:4px;font-family:\'JetBrains Mono\',ui-monospace,monospace;font-size:0.85em">$1</code>'
     );
     // ── Headings ─────────────────────────────────────────────────────────────
     html = html.replace(/^### (.+)$/gm, '<h3 style="font-size:16px;font-weight:700;color:#1e293b;margin:20px 0 8px">$1</h3>');
     html = html.replace(/^## (.+)$/gm,  '<h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid #e2e8f0">$1</h2>');
-    html = html.replace(/^# (.+)$/gm,   '<h1 style="font-size:26px;font-weight:900;color:#0f172a;margin:0 0 16px">$1</h1>');
+    html = html.replace(/^# (.+)$/gm,   '<p style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 20px;padding-bottom:10px;border-bottom:1px solid #f1f5f9">$1</p>');
 
     // ── Tables (line-by-line approach — immune to \r\n and trailing-pipe bugs) ─
     const tableStyle  = 'width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden';
@@ -2218,21 +2212,20 @@ function _buildAIGraphicReport(d, ai, docs) {
 
     // ── Component stat cards ─────────────────────────────────────────────────
     const stats = [
-        ['Models',       s.models??0,        '#8b5cf6','#f5f3ff','#ede9fe'],
-        ['Controllers',  s.controllers??0,   '#3b82f6','#eff6ff','#dbeafe'],
-        ['Routes',       s.routes??0,        '#10b981','#f0fdf4','#d1fae5'],
-        ['Services',     s.services??0,      '#06b6d4','#ecfeff','#cffafe'],
-        ['Repositories', s.repositories??0,  '#f59e0b','#fffbeb','#fef3c7'],
-        ['Jobs',         s.jobs??0,          '#f97316','#fff7ed','#ffedd5'],
-        ['Jobs',         $summary['jobs']??0],
-        ['Events',       s.events??0,        '#d946ef','#fdf4ff','#fae8ff'],
-        ['Policies',     s.policies??0,      '#64748b','#f8fafc','#f1f5f9'],
-        ['API Routes',   rs.api??0,          '#0891b2','#ecfeff','#cffafe'],
-        ['Named Routes', rs.named_count??0,  '#7c3aed','#f5f3ff','#ede9fe'],
+        ['Models',       s.models??0],
+        ['Controllers',  s.controllers??0],
+        ['Routes',       s.routes??0],
+        ['Services',     s.services??0],
+        ['Repositories', s.repositories??0],
+        ['Jobs',         s.jobs??0],
+        ['Events',       s.events??0],
+        ['Policies',     s.policies??0],
+        ['API Routes',   rs.api??0],
+        ['Named Routes', rs.named_count??0],
     ];
-    const statCards = stats.map(([name, count, color, bg, border]) =>
-        `<div style="background:${bg};border:1px solid ${border};border-radius:14px;padding:16px 18px">
-            <div style="font-size:26px;font-weight:800;color:${color};font-family:system-ui,sans-serif">${count}</div>
+    const statCards = stats.map(([name, count]) =>
+        `<div style="background:#fff;border:1px solid #fecaca;border-top:3px solid #FF2D20;border-radius:12px;padding:16px 18px">
+            <div style="font-size:26px;font-weight:800;color:#FF2D20;font-family:system-ui,sans-serif">${count}</div>
             <div style="font-size:11px;color:#64748b;font-weight:500;margin-top:2px">${esc(name)}</div>
         </div>`
     ).join('');
@@ -2312,11 +2305,11 @@ function _buildAIGraphicReport(d, ai, docs) {
     const depSvg = _buildDepSvg(d.dependencies?.nodes ?? [], d.dependencies?.edges ?? []);
 
     // ── Section helper ───────────────────────────────────────────────────────
-    const sec = (title, color, content) =>
+    const sec = (title, _color, content) =>
         `<section style="margin-bottom:52px">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
-                <div style="width:4px;height:34px;border-radius:2px;background:${color};flex-shrink:0"></div>
-                <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;font-family:system-ui,sans-serif">${esc(title)}</h2>
+                <div style="width:4px;height:34px;border-radius:2px;background:#FF2D20;flex-shrink:0"></div>
+                <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0">${esc(title)}</h2>
             </div>
             ${content}
         </section>`;
@@ -2335,6 +2328,9 @@ function _buildAIGraphicReport(d, ai, docs) {
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>AI Architecture Report — ${esc(proj)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * {
   box-sizing: border-box;
@@ -2343,58 +2339,63 @@ function _buildAIGraphicReport(d, ai, docs) {
 }
 body {
   background: #f8fafc;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: 'Figtree', system-ui, -apple-system, sans-serif;
   color: #1e293b;
   line-height: 1.5;
 }
+code, pre {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
 @media print {
-  body {
-    background: #fff;
-  }
-  .no-print {
-    display: none !important;
-  }
+  body { background: #fff; }
+  .no-print { display: none !important; }
+  section { page-break-inside: avoid; }
 }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
-<div style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 60%,#4c1d95 100%);padding:48px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+<div style="background:#FF2D20;padding:48px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
     <div>
-        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 14px;margin-bottom:16px">
-            <span style="font-size:11px;color:#a5b4fc;font-weight:700;letter-spacing:0.1em">AI-POWERED ARCHITECTURE REPORT</span>
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:20px;padding:4px 14px;margin-bottom:16px">
+            <span style="font-size:11px;color:#fff;font-weight:700;letter-spacing:0.1em">AI-POWERED ARCHITECTURE REPORT</span>
         </div>
         <h1 style="font-size:36px;font-weight:900;color:#fff;margin-bottom:10px">${esc(proj)}</h1>
         <div style="display:flex;gap:20px;flex-wrap:wrap">
-            <span style="font-size:13px;color:#a5b4fc">Laravel ${esc(d.laravel_version ?? '')}</span>
-            <span style="font-size:13px;color:#a5b4fc">PHP ${esc(d.php_version ?? '')}</span>
-            <span style="font-size:13px;color:#a5b4fc">Generated ${esc(d.generated_at ?? '')}</span>
-            <span style="font-size:13px;color:#a5b4fc">Provider: ${esc(ai?.provider ?? d.ai_provider ?? 'AI')}</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.78)">Laravel ${esc(d.laravel_version ?? '')}</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.78)">PHP ${esc(d.php_version ?? '')}</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.78)">Generated ${esc(d.generated_at ?? '')}</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.78)">Provider: ${esc(ai?.provider ?? d.ai_provider ?? 'AI')}</span>
         </div>
     </div>
-    <div style="text-align:center;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:24px 32px;flex-shrink:0">
+    <div style="text-align:center;background:rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:24px 32px;flex-shrink:0">
         <div style="font-size:52px;font-weight:900;line-height:1;color:#fff">${score}</div>
-        <div style="font-size:15px;font-weight:700;color:#a78bfa;margin-top:6px">${esc(grade)}</div>
-        <div style="font-size:11px;color:#6d6d9a;margin-top:4px">Architecture Score</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-top:6px">${esc(grade)}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px">Architecture Score</div>
     </div>
 </div>
 
-<!-- AI SUMMARY BANNER -->
-${ai?.summary ? `<div style="background:#f0f9ff;border-bottom:2px solid #bfdbfe;padding:24px 48px">
-    <p style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">AI Executive Summary</p>
-    <p style="font-size:15px;color:#1e3a5f;line-height:1.7;max-width:900px">${esc(ai.summary)}</p>
-</div>` : ''}
+<!-- PRINT BUTTON -->
+<div class="no-print" style="background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 48px;display:flex;justify-content:flex-end;">
+    <button onclick="window.print()" style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;color:#475569;cursor:pointer;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><rect x="6" y="17" width="12" height="5" rx="1"/><path d="M6 13H4a2 2 0 0 0-2 2v4h4"/><path d="M18 13h2a2 2 0 0 1 2 2v4h-4"/></svg>
+        Print / Save PDF
+    </button>
+</div>
 
 <!-- BODY -->
 <div style="max-width:1200px;margin:0 auto;padding:48px 32px">
 
+    <!-- AI Summary (inside centered container) -->
+    ${ai?.summary ? `<div style="background:#fff8f8;border:1px solid #fecaca;border-left:4px solid #FF2D20;border-radius:12px;padding:20px 24px;margin-bottom:44px">
+        <p style="font-size:11px;font-weight:700;color:#FF2D20;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">AI Executive Summary</p>
+        <p style="font-size:14px;color:#1e293b;line-height:1.75;margin:0">${esc(ai.summary)}</p>
+    </div>` : ''}
+
     <!-- Stats Grid -->
-    ${sec('Component Overview', '#4f46e5',
-        `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px">${statCards}</div>`
+    ${sec('Component Overview', '#FF2D20',
+        `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">${statCards}</div>`
     )}
 
     <!-- Score -->
@@ -2406,7 +2407,7 @@ ${ai?.summary ? `<div style="background:#f0f9ff;border-bottom:2px solid #bfdbfe;
     )}
 
     <!-- SOLID Review -->
-    ${solidCards ? sec('SOLID Principles', '#6366f1',
+    ${solidCards ? sec('SOLID Principles', '#FF2D20',
         `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">${solidCards}</div>`
     ) : ''}
 
@@ -2426,23 +2427,23 @@ ${ai?.summary ? `<div style="background:#f0f9ff;border-bottom:2px solid #bfdbfe;
     )}
 
     <!-- Dependency Graph -->
-    ${depSvg ? sec('Dependency Graph', '#6366f1',
+    ${depSvg ? sec('Dependency Graph', '#FF2D20',
         `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden"><div style="overflow-x:auto;padding:20px">${depSvg}</div></div>`
     ) : ''}
 
     <!-- AI Documentation sections -->
-    ${docSection('architecture', 'Architecture Overview', '#4f46e5')}
-    ${docSection('models',       'Models Documentation',  '#8b5cf6')}
-    ${docSection('controllers',  'Controllers Documentation', '#3b82f6')}
-    ${docSection('routes',       'Routes Documentation',  '#10b981')}
-    ${docSection('services',     'Services Documentation','#f59e0b')}
-    ${docSection('modules',      'Modules Documentation', '#06b6d4')}
+    ${docSection('architecture', 'Architecture Overview',      '#FF2D20')}
+    ${docSection('models',       'Models Documentation',       '#FF2D20')}
+    ${docSection('controllers',  'Controllers Documentation',  '#FF2D20')}
+    ${docSection('routes',       'Routes Documentation',       '#FF2D20')}
+    ${docSection('services',     'Services Documentation',     '#FF2D20')}
+    ${docSection('modules',      'Modules Documentation',      '#FF2D20')}
 
 </div>
 
 <!-- FOOTER -->
-<div style="background:#1e293b;color:#64748b;text-align:center;padding:28px;font-size:12px;font-family:system-ui,sans-serif">
-    AI Architecture Report · Generated by <strong style="color:#94a3b8">laradar</strong> · ${esc(d.generated_at ?? '')}
+<div style="background:#0f172a;border-top:3px solid #FF2D20;color:#64748b;text-align:center;padding:28px;font-size:12px;">
+    AI Architecture Report &nbsp;·&nbsp; Generated by <strong style="color:#FF2D20">Laradar</strong> &nbsp;·&nbsp; ${esc(d.generated_at ?? '')}
 </div>
 
 </body>
@@ -2693,23 +2694,22 @@ function _buildGraphicReport(d) {
 
     // ── Stat cards HTML ──────────────────────────────────────────────────────
     const stats = [
-        ['Models',       s.models       ?? 0, '#8b5cf6', '#f5f3ff', '#ede9fe'],
-        ['Controllers',  s.controllers  ?? 0, '#3b82f6', '#eff6ff', '#dbeafe'],
-        ['Routes',       s.routes       ?? 0, '#10b981', '#f0fdf4', '#d1fae5'],
-        ['Services',     s.services     ?? 0, '#06b6d4', '#ecfeff', '#cffafe'],
-        ['Repositories', s.repositories ?? 0, '#f59e0b', '#fffbeb', '#fef3c7'],
-        ['Jobs',         s.jobs         ?? 0, '#f97316', '#fff7ed', '#ffedd5'],
-        ['Jobs',         $summary['jobs']??0],
-        ['Events',       s.events       ?? 0, '#d946ef', '#fdf4ff', '#fae8ff'],
-        ['Observers',    s.observers    ?? 0, '#ec4899', '#fdf2f8', '#fce7f3'],
-        ['Policies',     s.policies     ?? 0, '#64748b', '#f8fafc', '#f1f5f9'],
-        ['Modules',      s.modules      ?? 0, '#4f46e5', '#eef2ff', '#e0e7ff'],
-        ['API Routes',   rs.api         ?? 0, '#0891b2', '#ecfeff', '#cffafe'],
-        ['Named Routes', rs.named_count ?? 0, '#7c3aed', '#f5f3ff', '#ede9fe'],
+        ['Models',       s.models       ?? 0],
+        ['Controllers',  s.controllers  ?? 0],
+        ['Routes',       s.routes       ?? 0],
+        ['Services',     s.services     ?? 0],
+        ['Repositories', s.repositories ?? 0],
+        ['Jobs',         s.jobs         ?? 0],
+        ['Events',       s.events       ?? 0],
+        ['Observers',    s.observers    ?? 0],
+        ['Policies',     s.policies     ?? 0],
+        ['Modules',      s.modules      ?? 0],
+        ['API Routes',   rs.api         ?? 0],
+        ['Named Routes', rs.named_count ?? 0],
     ];
-    const statCards = stats.map(([name, count, color, bg, border]) =>
-        `<div style="background:${bg};border:1px solid ${border};border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;gap:4px">
-            <span style="font-size:24px;font-weight:800;color:${color};font-family:system-ui,sans-serif">${count}</span>
+    const statCards = stats.map(([name, count]) =>
+        `<div style="background:#fff;border:1px solid #fecaca;border-top:3px solid #FF2D20;border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:24px;font-weight:800;color:#FF2D20;font-family:system-ui,sans-serif">${count}</span>
             <span style="font-size:12px;color:#64748b;font-family:system-ui,sans-serif;font-weight:500">${esc(name)}</span>
         </div>`
     ).join('');
@@ -2769,7 +2769,7 @@ function _buildGraphicReport(d) {
     }).join('');
 
     // ── Section header helper ─────────────────────────────────────────────────
-    const secHeader = (title, sub, color = '#4f46e5') =>
+    const secHeader = (title, sub, color = '#FF2D20') =>
         `<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
             <div style="width:4px;height:32px;border-radius:2px;background:${color};flex-shrink:0"></div>
             <div>
@@ -2833,20 +2833,20 @@ table tr:hover {
 <body>
 
 <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
-<div style="background:linear-gradient(135deg,#1e293b 0%,#312e81 100%);color:#fff;padding:40px 48px;display:flex;align-items:center;justify-content:space-between;gap:20px">
+<div style="background:#FF2D20;color:#fff;padding:40px 48px;display:flex;align-items:center;justify-content:space-between;gap:20px">
     <div>
-        <p style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:#94a3b8;margin-bottom:6px">Architecture Report</p>
+        <p style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.75);margin-bottom:6px">Architecture Report</p>
         <h1 style="font-size:32px;font-weight:800;margin-bottom:8px">${esc(proj)}</h1>
         <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px">
-            <span style="font-size:13px;color:#94a3b8">Laravel ${esc(d.laravel_version ?? '')}</span>
-            <span style="font-size:13px;color:#94a3b8">PHP ${esc(d.php_version ?? '')}</span>
-            <span style="font-size:13px;color:#94a3b8">Generated: ${esc(d.generated_at ?? '')}</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.78)">Laravel ${esc(d.laravel_version ?? '')}</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.78)">PHP ${esc(d.php_version ?? '')}</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.78)">Generated: ${esc(d.generated_at ?? '')}</span>
         </div>
     </div>
-    <div style="text-align:center;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:20px 28px;flex-shrink:0">
+    <div style="text-align:center;background:rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:20px 28px;flex-shrink:0">
         <div style="font-size:48px;font-weight:900;line-height:1;color:#fff">${score}</div>
-        <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-top:4px">${esc(grade)}</div>
-        <div style="font-size:11px;color:#64748b;margin-top:2px">Architecture Score</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-top:4px">${esc(grade)}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px">Architecture Score</div>
     </div>
 </div>
 
@@ -2856,7 +2856,7 @@ table tr:hover {
     <!-- Stat Cards -->
     <section>
         ${secHeader('Component Overview', `${(d.models??[]).length} models · ${(d.controllers??[]).length} controllers · ${rs.total??0} routes`)}
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
             ${statCards}
         </div>
     </section>
@@ -2890,7 +2890,7 @@ table tr:hover {
 
     <!-- Dependency Graph -->
     ${depSvg ? `<section>
-        ${secHeader('Dependency Graph', `${depNodes.length} nodes · ${depEdges.length} edges`, '#6366f1')}
+        ${secHeader('Dependency Graph', `${depNodes.length} nodes · ${depEdges.length} edges`, '#FF2D20')}
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
             <div style="padding:20px">${depSvg}</div>
         </div>
@@ -2898,7 +2898,7 @@ table tr:hover {
 
     <!-- Models -->
     <section>
-        ${secHeader('Models', `${(d.models??[]).length} Eloquent models detected`, '#8b5cf6')}
+        ${secHeader('Models', `${(d.models??[]).length} Eloquent models detected`, '#FF2D20')}
         ${tableWrap(['Model','Table','Fillable Fields','Relationships'], modelRows || '<tr><td colspan="4" style="padding:12px;color:#94a3b8">No models.</td></tr>')}
     </section>
 
@@ -2911,8 +2911,8 @@ table tr:hover {
 </div>
 
 <!-- ═══ FOOTER ═══════════════════════════════════════════════════════════ -->
-<div style="background:#1e293b;color:#64748b;text-align:center;padding:24px;font-size:12px;font-family:system-ui,sans-serif;margin-top:20px">
-    Generated by <strong style="color:#94a3b8">laradar</strong> · ${esc(d.generated_at ?? '')}
+<div style="background:#111111;border-top:2px solid #FF2D20;color:#64748b;text-align:center;padding:24px;font-size:12px;font-family:system-ui,sans-serif;margin-top:20px">
+    Generated by <strong style="color:#FF2D20">laradar</strong> · ${esc(d.generated_at ?? '')}
 </div>
 
 </body>
@@ -3022,9 +3022,10 @@ function _buildDepSvg(nodes, edges) {
 
 // ── AI Insights ───────────────────────────────────────────────────────────────
 
-const AI_ENDPOINT     = '{{ route("laradar.ai.analyze") }}';
-const AI_CSRF         = '{{ csrf_token() }}';
-const AI_JOB_ENDPOINT = '{{ route("laradar.ai.job.status", ["id" => "__ID__"]) }}';
+const AI_ENDPOINT        = '{{ route("laradar.ai.analyze") }}';
+const AI_REPORT_ENDPOINT = '{{ route("laradar.ai.report") }}';
+const AI_CSRF            = '{{ csrf_token() }}';
+const AI_JOB_ENDPOINT    = '{{ route("laradar.ai.job.status", ["id" => "__ID__"]) }}';
 
 function _aiJobUrl(id) { return AI_JOB_ENDPOINT.replace('__ID__', id); }
 

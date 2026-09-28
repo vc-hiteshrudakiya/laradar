@@ -57,11 +57,12 @@ jobs:
 
       - name: Install dependencies
         run: |
+          composer config --global policy.advisories.block false
           composer require \
             "illuminate/support:^${{ matrix.laravel }}" \
             "orchestra/testbench:${{ matrix.testbench }}" \
             --no-update
-          composer update --prefer-dist --no-interaction
+          composer update --prefer-dist --no-interaction --no-audit
 
       - name: Run tests
         run: vendor/bin/phpunit

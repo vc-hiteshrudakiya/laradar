@@ -2,6 +2,8 @@
 
 namespace Vcian\Laradar\AI\Providers;
 
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Promise\Utils as PromiseUtils;
 use Illuminate\Support\Facades\Http;
 use Vcian\Laradar\AI\Contracts\AIProvider;
 use Vcian\Laradar\AI\DTO\AIAnalysisResponse;
@@ -71,6 +73,53 @@ PROMPT;
         }
     }
 
+    public function generateDocumentationBatch(array $architectureData, array $types): array
+    {
+        $apiKey = $this->config['api_key'] ?? '';
+        $model  = $this->config['model'] ?? '';
+
+        if (empty($apiKey)) {
+            throw new RuntimeException('Anthropic API key is not configured. Set ANTHROPIC_API_KEY in your .env file.');
+        }
+        if (empty($model)) {
+            throw new RuntimeException('Anthropic model is not configured. Set ANTHROPIC_MODEL=claude-sonnet-4-6 in your .env file.');
+        }
+
+        $timeout = (int) config('laradar.ai.job_timeout', 300) - 30;
+        $client  = new GuzzleClient(['timeout' => $timeout]);
+
+        $promises = [];
+        foreach ($types as $type) {
+            $prompt = (new DocumentationPrompt())->build($architectureData, $type);
+            $promises[$type] = $client->postAsync(self::API_BASE . '/messages', [
+                'headers' => [
+                    'x-api-key'         => $apiKey,
+                    'anthropic-version' => self::API_VERSION,
+                    'Content-Type'      => 'application/json',
+                ],
+                'json' => [
+                    'model'      => $model,
+                    'max_tokens' => (int) ($this->config['max_tokens'] ?? 8192),
+                    'messages'   => [['role' => 'user', 'content' => $prompt]],
+                ],
+            ]);
+        }
+
+        $settled = PromiseUtils::settle($promises)->wait();
+
+        $docs = [];
+        foreach ($settled as $type => $result) {
+            if ($result['state'] === 'fulfilled') {
+                $body = json_decode($result['value']->getBody()->getContents(), true);
+                $docs[$type] = $body['content'][0]['text'] ?? null;
+            } else {
+                $docs[$type] = null;
+            }
+        }
+
+        return $docs;
+    }
+
     private function request(string $prompt, string $model, bool $jsonMode): string
     {
         $apiKey = $this->config['api_key'] ?? '';
@@ -90,7 +139,7 @@ PROMPT;
 
         $body = [
             'model'      => $model,
-            'max_tokens' => 8192,
+            'max_tokens' => (int) ($this->config['max_tokens'] ?? 8192),
             'messages'   => [['role' => 'user', 'content' => $prompt]],
         ];
 
@@ -99,7 +148,7 @@ PROMPT;
             $body['system'] = 'You are a JSON API. Respond only with a valid JSON object — no markdown fences, no explanation, no text outside the JSON.';
         }
 
-        $response = Http::timeout(180)
+        $response = Http::timeout((int) config('laradar.ai.job_timeout', 300) - 30)
             ->withHeaders([
                 'x-api-key'         => $apiKey,
                 'anthropic-version' => self::API_VERSION,

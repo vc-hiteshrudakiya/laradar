@@ -1216,7 +1216,7 @@
         @if(config('laradar.ai.enabled', false))
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--emerald);background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);padding:5px 12px;border-radius:20px;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>
-            AI Ready · {{ config('laradar.ai.model', 'gemini-2.5-flash') }}
+            AI Ready · {{ config('laradar.ai.model') ?? config('laradar.ai.provider', 'ai') }}
         </span>
         @else
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--text-faint);background:var(--bg-hover);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">
@@ -1232,21 +1232,23 @@
     <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:24px;margin-bottom:24px;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
             <svg style="width:20px;height:20px;color:var(--amber);margin-top:2px;flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            <div>
+            <div style="flex:1;">
                 <p style="font-weight:700;color:var(--amber);margin-bottom:8px;">AI is not enabled</p>
-                <p style="font-size:13px;color:var(--text-dim);margin-bottom:12px;">To enable AI insights, add the following to your <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">.env</code> file and publish the config:</p>
-                <div style="background:var(--bg-sunken);border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:12px;color:var(--emerald);margin-bottom:10px;">
-                    GEMINI_API_KEY=your_api_key_here
+                <p style="font-size:13px;color:var(--text-dim);margin-bottom:12px;">Add these lines to your <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">.env</code> — the provider is auto-detected from whichever API key you add:</p>
+                <div style="background:var(--bg-sunken);border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:12px;margin-bottom:14px;line-height:1.8;">
+                    <span style="color:var(--text-faint);"># Step 1 — enable AI:</span><br>
+                    <span style="color:var(--emerald);">AI_ENABLED</span>=<span style="color:var(--text);">true</span><br><br>
+                    <span style="color:var(--text-faint);"># Step 2 — add ONE API key (provider is auto-detected):</span><br>
+                    <span style="color:var(--emerald);">ANTHROPIC_API_KEY</span>=<span style="color:var(--text-faint);">sk-ant-...</span><br>
+                    <span style="color:var(--emerald);">OPENAI_API_KEY</span>=<span style="color:var(--text-faint);">sk-...</span><br>
+                    <span style="color:var(--emerald);">GEMINI_API_KEY</span>=<span style="color:var(--text-faint);">AI...</span><br>
+                    <span style="color:var(--emerald);">MISTRAL_API_KEY</span>=<span style="color:var(--text-faint);">...</span><br>
+                    <span style="color:var(--emerald);">OPENROUTER_API_KEY</span>=<span style="color:var(--text-faint);">sk-or-...</span><br>
+                    <span style="color:var(--emerald);">OLLAMA_MODEL</span>=<span style="color:var(--text-faint);">llama3.2</span><br><br>
+                    <span style="color:var(--text-faint);"># Step 3 (optional) — pin a model for your chosen provider, e.g.:</span><br>
+                    <span style="color:var(--emerald);">GEMINI_MODEL</span>=<span style="color:var(--text);">gemini-3.5-flash</span>
                 </div>
-                <p style="font-size:13px;color:var(--text-dim);margin-bottom:8px;">Then in <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">config/laradar.php</code>:</p>
-                <div style="background:var(--bg-sunken);border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:12px;color:var(--text);">
-                    'ai' => [<br>
-                    &nbsp;&nbsp;'enabled' => <span style="color:var(--emerald);">true</span>,<br>
-                    &nbsp;&nbsp;'provider' => 'gemini',<br>
-                    &nbsp;&nbsp;'model' => 'gemini-2.5-flash',<br>
-                    ]
-                </div>
-                <p style="font-size:11px;color:var(--text-faint);margin-top:10px;font-family:var(--font-mono);">Get a free API key at aistudio.google.com</p>
+                <p style="font-size:12px;color:var(--text-faint);">Use the matching model key for your provider — <code style="background:var(--bg-hover);padding:2px 5px;border-radius:4px;font-family:var(--font-mono);">ANTHROPIC_MODEL</code>, <code style="background:var(--bg-hover);padding:2px 5px;border-radius:4px;font-family:var(--font-mono);">OPENAI_MODEL</code>, <code style="background:var(--bg-hover);padding:2px 5px;border-radius:4px;font-family:var(--font-mono);">OPENROUTER_MODEL</code>, etc. If omitted, a default is chosen automatically.</p>
             </div>
         </div>
     </div>
@@ -1259,7 +1261,7 @@
             Analyze with AI
         </button>
         <p style="font-size:12px;color:var(--text-faint);margin-top:10px;font-family:var(--font-mono);">
-            Sends your architecture to <span style="color:var(--cyan);">{{ config('laradar.ai.model', 'gemini-2.5-flash') }}</span> · Takes 10–30 seconds
+            Sends your architecture to <span style="color:var(--cyan);">{{ config('laradar.ai.model') ?? config('laradar.ai.provider', 'AI') }}</span> · Takes 10–30 seconds
         </p>
     </div>
 
@@ -1376,7 +1378,7 @@
 
     @if(!config('laradar.ai.enabled', false))
     <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:20px;">
-        <p style="font-size:13px;color:var(--amber);">AI is not enabled. Set <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ai.enabled = true</code> and <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code> in your .env.</p>
+        <p style="font-size:13px;color:var(--amber);">AI is not enabled. Add <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">AI_ENABLED=true</code> and any supported API key (<code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ANTHROPIC_API_KEY</code>, <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">OPENAI_API_KEY</code>, <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code>, etc.) to your .env.</p>
     </div>
     @endif
 
@@ -1461,7 +1463,7 @@
 
     @if(!config('laradar.ai.enabled', false))
     <div style="max-width:560px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:24px;">
-        <p style="font-size:13px;color:var(--amber);">AI is not enabled. Set <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ai.enabled = true</code> and <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code> in your .env.</p>
+        <p style="font-size:13px;color:var(--amber);">AI is not enabled. Add <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">AI_ENABLED=true</code> and any supported API key (<code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ANTHROPIC_API_KEY</code>, <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">OPENAI_API_KEY</code>, <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code>, etc.) to your .env.</p>
     </div>
     @endif
 

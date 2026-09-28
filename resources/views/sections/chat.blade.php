@@ -11,14 +11,14 @@
         @if(config('laradar.ai.enabled', false))
         <span style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--emerald);background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);padding:5px 12px;border-radius:20px;">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>
-            {{ config('laradar.ai.model', 'gemini-2.5-flash') }}
+            {{ config('laradar.ai.model') ?? config('laradar.ai.provider', 'AI') }}
         </span>
         @endif
     </div>
 
     @if(!config('laradar.ai.enabled', false))
     <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px;margin-bottom:20px;">
-        <p style="font-size:13px;color:var(--amber);">AI is not enabled. Set <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ai.enabled = true</code> and <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code> in your .env.</p>
+        <p style="font-size:13px;color:var(--amber);">AI is not enabled. Add <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">AI_ENABLED=true</code> and any supported API key (<code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">ANTHROPIC_API_KEY</code>, <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">OPENAI_API_KEY</code>, <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);">GEMINI_API_KEY</code>, etc.) to your .env.</p>
     </div>
     @endif
 

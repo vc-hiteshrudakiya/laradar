@@ -23,6 +23,12 @@ interface AIProvider
     public function generateDocumentation(array $architectureData, string $type = 'architecture'): string;
 
     /**
+     * Generate documentation for multiple types in parallel.
+     * Returns [ 'architecture' => '...', 'models' => '...', ... ]
+     */
+    public function generateDocumentationBatch(array $architectureData, array $types): array;
+
+    /**
      * Alias for analyze() — kept explicit for semantic clarity.
      */
     public function reviewArchitecture(array $architectureData): AIAnalysisResponse;

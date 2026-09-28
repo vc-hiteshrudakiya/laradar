@@ -43,7 +43,7 @@ class OllamaProvider extends OpenAICompatibleProvider
             $headers['Authorization'] = 'Bearer ' . $apiKey;
         }
 
-        $response = Http::timeout(120)
+        $response = Http::timeout((int) config('laradar.ai.job_timeout', 300) - 30)
             ->withHeaders($headers)
             ->withOptions([
                 'curl' => [

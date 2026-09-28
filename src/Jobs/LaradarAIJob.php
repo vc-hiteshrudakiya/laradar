@@ -15,13 +15,13 @@ class LaradarAIJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries   = 1;
-    public int $timeout = 300;
+    public int $timeout = 300; // overridden by config in constructor — set LARADAR_AI_JOB_TIMEOUT in .env
 
     public function __construct(
         private string $jobId,
-        private string $type,    // 'analyze' | 'documentation'
+        private string $type,    // 'analyze' | 'documentation' | 'report'
         private array  $report,
-        private array  $payload, // { type } for documentation, empty for analyze
+        private array  $payload, // { type } for documentation, empty for analyze|report
     ) {
         $this->timeout = (int) config('laradar.ai.job_timeout', 300);
     }
@@ -38,6 +38,7 @@ class LaradarAIJob implements ShouldQueue
                     'type'     => $this->payload['type'],
                     'filename' => ucfirst($this->payload['type']) . '.md',
                 ],
+                'report' => $ai->generateReport($this->report),
                 default => throw new \InvalidArgumentException("Unknown job type: {$this->type}"),
             };
 

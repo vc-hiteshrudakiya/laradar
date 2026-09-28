@@ -15,13 +15,7 @@ class AIController extends Controller
 {
     private const DOC_TYPES = ['architecture', 'models', 'controllers', 'routes', 'services', 'modules'];
 
-    public function __construct()
-    {
-        $perMinute = config('laradar.ai.rate_limit', 30);
-        if ($perMinute > 0) {
-            $this->middleware("throttle:{$perMinute},1")->only(['chat', 'analyze']);
-        }
-    }
+    public function __construct() {}
 
     public function analyze(Request $request, Laradar $discovery, AIManager $ai): JsonResponse
     {
@@ -78,6 +72,29 @@ class AIController extends Controller
             $context = $request->input('context', []);
             $reply   = $ai->chat($message, $context);
             return response()->json(['reply' => $reply]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function report(Request $request, Laradar $discovery, AIManager $ai): JsonResponse
+    {
+        if (!$ai->isEnabled()) {
+            return response()->json(['error' => 'AI is disabled.'], 503);
+        }
+
+        try {
+            $report = $discovery->discover()->getReport();
+
+            if (config('laradar.ai.async', false)) {
+                $jobId = Str::uuid()->toString();
+                Cache::put("laradar_ai_{$jobId}", ['status' => 'pending'], 1800);
+                LaradarAIJob::dispatch($jobId, 'report', $report, [])
+                    ->onQueue(config('laradar.ai.queue', 'default'));
+                return response()->json(['job_id' => $jobId, 'status' => 'queued']);
+            }
+
+            return response()->json($ai->generateReport($report));
         } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }

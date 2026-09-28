@@ -26,6 +26,16 @@ class OpenRouterProvider extends OpenAICompatibleProvider
     protected function apiBase(): string { return self::API_BASE; }
     protected function name(): string    { return 'openrouter'; }
 
+    protected function buildHeaders(): array
+    {
+        return [
+            'Authorization' => 'Bearer ' . ($this->config['api_key'] ?? ''),
+            'Content-Type'  => 'application/json',
+            'HTTP-Referer'  => $this->config['site_url'] ?? config('app.url', 'https://laravel.com'),
+            'X-Title'       => self::SITE_TITLE,
+        ];
+    }
+
     /**
      * Override request to add the HTTP-Referer and X-Title headers that OpenRouter
      * uses for model routing analytics, and to skip response_format since not all
@@ -65,10 +75,10 @@ class OpenRouterProvider extends OpenAICompatibleProvider
             'model'       => $resolvedModel,
             'messages'    => $messages,
             'temperature' => (float) ($this->config['temperature'] ?? 0.2),
-            'max_tokens'  => 8192,
+            'max_tokens'  => (int) ($this->config['max_tokens'] ?? 8192),
         ];
 
-        $response = Http::timeout(180)
+        $response = Http::timeout((int) config('laradar.ai.job_timeout', 300) - 30)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type'  => 'application/json',

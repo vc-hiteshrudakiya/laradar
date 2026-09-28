@@ -2,6 +2,8 @@
 
 namespace Vcian\Laradar\AI\Providers;
 
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Promise\Utils as PromiseUtils;
 use Illuminate\Support\Facades\Http;
 use Vcian\Laradar\AI\Contracts\AIProvider;
 use Vcian\Laradar\AI\DTO\AIAnalysisResponse;
@@ -77,6 +79,62 @@ PROMPT;
         }
     }
 
+    public function generateDocumentationBatch(array $architectureData, array $types): array
+    {
+        $model = $this->config['model'] ?? '';
+
+        if (empty($model)) {
+            throw new RuntimeException(ucfirst($this->name()) . ' model is not configured.');
+        }
+
+        $url     = rtrim($this->apiBase(), '/') . '/chat/completions';
+        $timeout = (int) config('laradar.ai.job_timeout', 300) - 30;
+        $client  = new GuzzleClient(['timeout' => $timeout]);
+
+        $promises = [];
+        foreach ($types as $type) {
+            $prompt = (new DocumentationPrompt())->build($architectureData, $type);
+            $promises[$type] = $client->postAsync($url, [
+                'headers' => $this->buildHeaders(),
+                'json'    => [
+                    'model'       => $model,
+                    'messages'    => [['role' => 'user', 'content' => $prompt]],
+                    'temperature' => (float) ($this->config['temperature'] ?? 0.2),
+                    'max_tokens'  => (int) ($this->config['max_tokens'] ?? 8192),
+                    'stream'      => false,
+                ],
+            ]);
+        }
+
+        $settled = PromiseUtils::settle($promises)->wait();
+
+        $docs = [];
+        foreach ($settled as $type => $result) {
+            if ($result['state'] === 'fulfilled') {
+                $body = json_decode($result['value']->getBody()->getContents(), true);
+                $text = $body['choices'][0]['message']['content'] ?? null;
+                if ($text !== null) {
+                    $text = trim(preg_replace('/<think>.*?<\/think>/si', '', $text));
+                }
+                $docs[$type] = $text;
+            } else {
+                $docs[$type] = null;
+            }
+        }
+
+        return $docs;
+    }
+
+    protected function buildHeaders(): array
+    {
+        $headers = ['Content-Type' => 'application/json'];
+        $apiKey  = $this->config['api_key'] ?? '';
+        if (!empty($apiKey)) {
+            $headers['Authorization'] = 'Bearer ' . $apiKey;
+        }
+        return $headers;
+    }
+
     protected function request(string $prompt, string $model, bool $jsonMode): string
     {
         $apiKey = $this->config['api_key'] ?? '';
@@ -99,9 +157,15 @@ PROMPT;
             'model'       => $model,
             'messages'    => [['role' => 'user', 'content' => $prompt]],
             'temperature' => (float) ($this->config['temperature'] ?? 0.2),
+            'max_tokens'  => (int) ($this->config['max_tokens'] ?? 8192),
         ];
 
-        $response = Http::withHeaders([
+        if ($jsonMode) {
+            $body['response_format'] = ['type' => 'json_object'];
+        }
+
+        $response = Http::timeout((int) config('laradar.ai.job_timeout', 300) - 30)
+            ->withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type'  => 'application/json',
             ])

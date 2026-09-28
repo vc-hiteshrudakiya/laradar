@@ -42,6 +42,7 @@ Route::middleware($middleware)->group(function () use ($path) {
     Route::post($path . '/ai/analyze',       [AIController::class, 'analyze'])->name('laradar.ai.analyze');
     Route::post($path . '/ai/chat',          [AIController::class, 'chat'])->name('laradar.ai.chat');
     Route::post($path . '/ai/documentation', [AIController::class, 'documentation'])->name('laradar.ai.documentation');
+    Route::post($path . '/ai/report',        [AIController::class, 'report'])->name('laradar.ai.report');
     Route::get($path  . '/ai/job/{id}',      [AIController::class, 'jobStatus'])->name('laradar.ai.job.status');
 
     // Serve package static assets without requiring vendor:publish

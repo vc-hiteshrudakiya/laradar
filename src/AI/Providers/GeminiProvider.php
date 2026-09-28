@@ -2,6 +2,8 @@
 
 namespace Vcian\Laradar\AI\Providers;
 
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Promise\Utils as PromiseUtils;
 use Illuminate\Support\Facades\Http;
 use Vcian\Laradar\AI\Contracts\AIProvider;
 use Vcian\Laradar\AI\DTO\AIAnalysisResponse;
@@ -68,6 +70,49 @@ PROMPT;
         }
     }
 
+    public function generateDocumentationBatch(array $architectureData, array $types): array
+    {
+        $apiKey = $this->config['api_key'] ?? '';
+        $model  = $this->config['model'] ?? '';
+
+        if (empty($apiKey)) {
+            throw new RuntimeException('Gemini API key is not configured. Set GEMINI_API_KEY in your .env file.');
+        }
+        if (empty($model)) {
+            throw new RuntimeException('Gemini model is not configured. Set GEMINI_MODEL=gemini-2.5-flash in your .env file.');
+        }
+
+        $timeout = (int) config('laradar.ai.job_timeout', 300) - 30;
+        $client  = new GuzzleClient(['timeout' => $timeout]);
+
+        $promises = [];
+        foreach ($types as $type) {
+            $prompt = (new DocumentationPrompt())->build($architectureData, $type);
+            $url    = self::API_BASE . "/{$model}:generateContent?key={$apiKey}";
+            $promises[$type] = $client->postAsync($url, [
+                'headers' => ['Content-Type' => 'application/json'],
+                'json'    => [
+                    'contents'         => [['parts' => [['text' => $prompt]], 'role' => 'user']],
+                    'generationConfig' => ['temperature' => (float) ($this->config['temperature'] ?? 0.2)],
+                ],
+            ]);
+        }
+
+        $settled = PromiseUtils::settle($promises)->wait();
+
+        $docs = [];
+        foreach ($settled as $type => $result) {
+            if ($result['state'] === 'fulfilled') {
+                $body = json_decode($result['value']->getBody()->getContents(), true);
+                $docs[$type] = $body['candidates'][0]['content']['parts'][0]['text'] ?? null;
+            } else {
+                $docs[$type] = null;
+            }
+        }
+
+        return $docs;
+    }
+
     private function request(string $prompt, string $model, bool $jsonMode): string
     {
         $apiKey = $this->config['api_key'] ?? '';
@@ -95,7 +140,8 @@ PROMPT;
             $body['generationConfig']['responseMimeType'] = 'application/json';
         }
 
-        $response = Http::withHeaders(['Content-Type' => 'application/json'])
+        $response = Http::timeout((int) config('laradar.ai.job_timeout', 300) - 30)
+            ->withHeaders(['Content-Type' => 'application/json'])
             ->withOptions([
                 'curl' => [
                     CURLOPT_NOPROGRESS       => false,
