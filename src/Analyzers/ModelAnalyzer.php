@@ -98,6 +98,9 @@ class ModelAnalyzer
             'relationships' => $this->detectRelationships($combined, $modelName),
             'traits'        => $traits,
             'observer'      => $this->detectObserver($content),
+            'scopes'        => $this->detectScopes($content),
+            'accessors'     => $this->detectAccessors($content),
+            'mutators'      => $this->detectMutators($content),
         ];
     }
 
@@ -255,6 +258,78 @@ class ModelAnalyzer
             }
         }
         return array_unique($traits);
+    }
+
+    private function detectScopes(string $content): array
+    {
+        $scopes = [];
+
+        // Laravel scope: public function scopeActive(Builder $query, ...)
+        preg_match_all('/public\s+function\s+scope([A-Z]\w+)\s*\(/', $content, $local);
+        foreach ($local[1] as $scope) {
+            $scopes[] = ['name' => lcfirst($scope), 'type' => 'local'];
+        }
+
+        // Global scope via static::addGlobalScope(...)
+        preg_match_all('/addGlobalScope\s*\(\s*(?:new\s+)?([A-Za-z][\w\\\\]+)/', $content, $global);
+        foreach ($global[1] as $gs) {
+            $scopes[] = ['name' => class_basename($gs), 'type' => 'global'];
+        }
+
+        return $scopes;
+    }
+
+    private function detectAccessors(string $content): array
+    {
+        $accessors = [];
+
+        // Laravel 8 style: public function getNameAttribute()
+        preg_match_all('/public\s+function\s+get([A-Z]\w+)Attribute\s*\(/', $content, $old);
+        foreach ($old[1] as $field) {
+            $accessors[] = Str::snake($field);
+        }
+
+        // Laravel 9+ style: public function name(): Attribute { return Attribute::make(get: ...) }
+        preg_match_all(
+            '/public\s+function\s+(\w+)\s*\(\s*\)\s*:\s*Attribute/',
+            $content,
+            $new
+        );
+        foreach ($new[1] as $method) {
+            // Only include if method body contains 'get:' (has getter)
+            $pattern = '/public\s+function\s+' . preg_quote($method, '/') . '\s*\(\s*\)\s*:\s*Attribute[^{]*\{(.*?)\}/s';
+            if (preg_match($pattern, $content, $body) && str_contains($body[1], 'get:')) {
+                $accessors[] = Str::snake($method);
+            }
+        }
+
+        return array_values(array_unique($accessors));
+    }
+
+    private function detectMutators(string $content): array
+    {
+        $mutators = [];
+
+        // Laravel 8 style: public function setNameAttribute($value)
+        preg_match_all('/public\s+function\s+set([A-Z]\w+)Attribute\s*\(/', $content, $old);
+        foreach ($old[1] as $field) {
+            $mutators[] = Str::snake($field);
+        }
+
+        // Laravel 9+ style: Attribute::make(set: ...) in same method as accessor
+        preg_match_all(
+            '/public\s+function\s+(\w+)\s*\(\s*\)\s*:\s*Attribute/',
+            $content,
+            $new
+        );
+        foreach ($new[1] as $method) {
+            $pattern = '/public\s+function\s+' . preg_quote($method, '/') . '\s*\(\s*\)\s*:\s*Attribute[^{]*\{(.*?)\}/s';
+            if (preg_match($pattern, $content, $body) && str_contains($body[1], 'set:')) {
+                $mutators[] = Str::snake($method);
+            }
+        }
+
+        return array_values(array_unique($mutators));
     }
 
     private function detectObserver(string $content): ?string

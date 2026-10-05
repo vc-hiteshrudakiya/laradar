@@ -53,7 +53,7 @@
                     $mRelGrp = collect($mRels)->groupBy('type');
                     $mTotalFieldsInCard = $mRelCnt + $mFillCnt;
                 @endphp
-                <div class="mds-card" onclick="showDetail('models',{{$i}})" data-name="{{ strtolower($model['name']) }}" style="cursor:pointer;--card-hover-border:{{ $mp['border'] }};">
+                <div class="mds-card" onclick="openDetailAjax('models','{{ route('laradar.model.detail', $model['name']) }}')" data-name="{{ strtolower($model['name']) }}" style="cursor:pointer;--card-hover-border:{{ $mp['border'] }};">
                     <div class="mds-card-glow" style="background:linear-gradient(90deg,{{ $mp['color'] }},transparent);"></div>
                     <div class="mds-card-head">
                         <div class="mds-card-av" style="background:{{ $mp['bg'] }};color:{{ $mp['color'] }};border-color:{{ $mp['border'] }};">{{ substr($model['name'],0,1) }}</div>
@@ -121,16 +121,16 @@
             </div>
             @foreach($data['models'] as $i => $model)
             @php $mp = $mPalette[$i % count($mPalette)]; @endphp
-            <div class="mds-list-row" onclick="showDetail('models',{{$i}})" data-name="{{ strtolower($model['name']) }}" style="cursor:pointer;">
+            <div class="mds-list-row" onclick="openDetailAjax('models','{{ route('laradar.model.detail', $model['name']) }}')" data-name="{{ strtolower($model['name']) }}" style="cursor:pointer;">
                 <div class="mds-list-av" style="background:{{ $mp['bg'] }};color:{{ $mp['color'] }};border-color:{{ $mp['border'] }};">{{ substr($model['name'],0,1) }}</div>
                 <div>
                     <span style="font-weight:700;font-size:13.5px;color:var(--text);">{{ $model['name'] }}</span>
-                    @if(!empty($model['observer']))<span style="font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(255,45,32,.08);color:#FF2D20;border:1px solid rgba(255,45,32,.2);font-family:var(--font-mono);margin-left:8px;">obs</span>@endif
+                    @if(!empty($model['observer']))<span style="font-size:10px;padding:2px 6px;border-radius:5px;background:rgba(255,45,32,.08);color:#FF2D20;border:1px solid rgba(255,45,32,.2);font-family:var(--font-mono);margin-left:8px;">obs</span>@endif
                 </div>
-                <span style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $model['table'] }}</span>
-                <span style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:{{ $mp['color'] }}">{{ count($model['relationships']??[]) }}</span>
-                <span style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:#FF2D20;">{{ count($model['fillable']??[]) }}</span>
-                <span style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:var(--text-dim);">{{ count($model['traits']??[]) }}</span>
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $model['table'] }}</span>
+                <span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:{{ $mp['color'] }}">{{ count($model['relationships']??[]) }}</span>
+                <span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:#FF2D20;">{{ count($model['fillable']??[]) }}</span>
+                <span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-dim);">{{ count($model['traits']??[]) }}</span>
             </div>
             @endforeach
         </div>

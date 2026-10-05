@@ -1,6 +1,8 @@
     <div id="policies-list">
         @php
-            $polActions = array_sum(array_map(fn($p) => count($p['actions']??[]), $data['policies']));
+            $polActions  = array_sum(array_map(fn($p) => count($p['actions']??[]), $data['policies']));
+            $polModels   = count(array_filter($data['policies'], fn($p) => !empty($p['model'])));
+            $polFullGuard = count(array_filter($data['policies'], fn($p) => count($p['actions']??[]) >= 6));
         @endphp
         <div class="mds-top-stats">
             <div class="mds-top-stat">
@@ -10,6 +12,14 @@
             <div class="mds-top-stat">
                 <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $polActions }}</span>
                 <span class="mds-top-stat-lbl">Total Actions</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $polModels }}</span>
+                <span class="mds-top-stat-lbl">Models Covered</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $polFullGuard }}</span>
+                <span class="mds-top-stat-lbl">Well Guarded</span>
             </div>
         </div>
         <div class="mds-toolbar">
@@ -30,10 +40,13 @@
                 <span></span><span>Policy</span><span>Model</span><span>Actions</span>
             </div>
             @foreach($data['policies'] as $i => $pol)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 120px 1fr;" data-name="{{ strtolower($pol['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 120px 1fr;cursor:pointer;" data-name="{{ strtolower($pol['name']) }}"
+                 onclick="openDetailAjax('policies', '{{ route('laradar.policy.detail', $pol['name']) }}')"
+                 onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background=''"
+            >
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($pol['name'],0,1)) }}</div>
                 <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pol['name'] }}</div>
-                <div style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pol['model']??'Unknown' }}</div>
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pol['model']??'Unknown' }}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:4px;">
                     @foreach($pol['actions']??[] as $a)
                     <span style="font-size:10px;font-family:var(--font-mono);color:#FF2D20;background:rgba(255,45,32,.08);padding:2px 8px;border-radius:20px;border:1px solid rgba(255,45,32,.2);">{{ $a }}</span>
@@ -44,5 +57,5 @@
         </div>
         @endif
     </div>
-
+    <div id="policies-detail" style="display:none"><div id="policies-detail-content"></div></div>
 

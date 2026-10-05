@@ -20,6 +20,16 @@ class PathDetector
         return app_path('Repositories');
     }
 
+    public static function domainPath(): ?string
+    {
+        foreach (['app/Domains', 'app/Domain', 'src/Domains'] as $dir) {
+            if (is_dir(base_path($dir))) {
+                return base_path($dir);
+            }
+        }
+        return null;
+    }
+
     public static function modulesPath(): string
     {
         foreach (['Modules', 'modules', 'src/Modules'] as $dir) {

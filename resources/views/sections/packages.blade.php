@@ -1,6 +1,9 @@
 
+<div id="packages-list">
     @php
     $packages   = $data['packages'] ?? [];
+    $pkgIndexMap = [];
+    foreach ($packages as $_pi => $_pkg) { $pkgIndexMap[$_pkg['key']] = $_pi; }
     $byCategory = [];
     foreach ($packages as $pkg) {
         $byCategory[$pkg['category']][] = $pkg;
@@ -62,6 +65,10 @@
             <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $devCount }}</span>
             <span class="mds-top-stat-lbl">Dev Only</span>
         </div>
+        <div class="mds-top-stat">
+            <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($packages) - $devCount }}</span>
+            <span class="mds-top-stat-lbl">Prod Only</span>
+        </div>
     </div>
     <div class="mds-toolbar">
         <input id="packages-search" oninput="filterPackages()" type="search" placeholder="Search packages…" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;max-width:240px;font-family:var(--font-mono);">
@@ -95,14 +102,17 @@
                 $initials = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice(explode(' ', $pkg['name']), 0, 2))));
                 $hasDoc   = !empty($pkg['docs']);
             @endphp
-            <div class="mds-list-row pkg-card" style="--pkg-i:{{ $globalPkgIdx++ }};grid-template-columns:40px 1fr 180px 90px 90px;" data-name="{{ strtolower($pkg['name'] . ' ' . $pkg['key']) }}">
+            @php $pkgIdx = $globalPkgIdx++; @endphp
+            <div class="mds-list-row pkg-card" style="--pkg-i:{{ $pkgIdx }};grid-template-columns:40px 1fr 180px 90px 90px;cursor:pointer;" data-name="{{ strtolower($pkg['name'] . ' ' . $pkg['key']) }}"
+                 onclick="openDetailAjax('packages', '{{ route('laradar.package.detail', $pkgIndexMap[$pkg['key']] ?? $pkgIdx) }}')"
+            >
                 <div class="mds-list-av" style="background:{{ $dotHex }}18;color:{{ $dotHex }};border-color:{{ $dotHex }}44;font-size:11px;">{{ $initials }}</div>
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pkg['name'] }}</div>
                     <div style="font-size:11px;color:var(--text-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pkg['description'] }}</div>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;min-width:0;">
-                    <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pkg['key'] }}</span>
+                    <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $pkg['key'] }}</span>
                     <button onclick="copyPkgKey(this,'{{ $pkg['key'] }}')" title="Copy" style="flex:none;background:transparent;border:none;color:var(--text-faint);cursor:pointer;padding:2px;border-radius:4px;display:flex;" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text-faint)'">
                         <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                     </button>
@@ -128,5 +138,6 @@
     </div>{{-- /packages-categories --}}
 
     @endif
-
+</div>{{-- #packages-list --}}
+<div id="packages-detail" style="display:none"><div id="packages-detail-content"></div></div>
 

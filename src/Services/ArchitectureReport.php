@@ -6,21 +6,22 @@ use Vcian\Laradar\Laradar;
 
 class ArchitectureReport
 {
-    private array $models       = [];
-    private array $controllers  = [];
-    private array $routes       = [];
-    private array $errors       = [];
-    private array $performance  = [];
-    private array $score        = [];
-    private array $jobs         = [];
-    private array $events       = [];
-    private array $services     = [];
-    private array $repositories = [];
-    private array $observers    = [];
-    private array $policies     = [];
-    private array $modules      = [];
-    private array $packages     = [];
-    private array $migrations   = [];
+    private array $models        = [];
+    private array $controllers   = [];
+    private array $routes        = [];
+    private array $errors        = [];
+    private array $performance   = [];
+    private array $score         = [];
+    private array $jobs          = [];
+    private array $events        = [];
+    private array $services      = [];
+    private array $repositories  = [];
+    private array $observers     = [];
+    private array $policies      = [];
+    private array $modules       = [];
+    private array $packages      = [];
+    private array $migrations    = [];
+    private array $dependencies  = ['nodes' => [], 'edges' => []];
 
     public function __construct(
         private string $projectName,
@@ -40,6 +41,14 @@ class ArchitectureReport
     public function addRoute(array $route): void       { $this->routes[]      = $route; }
     public function addError(array $error): void       { $this->errors[]      = $error; }
 
+    public function setDependencies(array $graph): void
+    {
+        $this->dependencies = [
+            'nodes' => $graph['nodes'] ?? [],
+            'edges' => $graph['edges'] ?? [],
+        ];
+    }
+
     public function setScore(array $score): void
     {
         $this->score = $score;
@@ -53,7 +62,34 @@ class ArchitectureReport
     public function addPolicy(array $p): void        { $this->policies[]     = $p; }
     public function addModule(array $m): void        { $this->modules[]      = $m; }
     public function addPackage(array $p): void       { $this->packages[]     = $p; }
-    public function addMigration(array $m): void    { $this->migrations[]   = $m; }
+    public function addMigration(array $m): void     { $this->migrations[]   = $m; }
+
+    // Enrich services + repositories with which controllers inject them
+    public function enrichServices(array $callerMap): void
+    {
+        foreach ($this->services as &$svc) {
+            $svc['used_by'] = $callerMap[$svc['name']] ?? [];
+        }
+        foreach ($this->repositories as &$repo) {
+            $repo['used_by'] = $callerMap[$repo['name']] ?? [];
+        }
+    }
+
+    // Enrich events with which classes dispatch them
+    public function enrichEvents(array $dispatcherMap): void
+    {
+        foreach ($this->events as &$event) {
+            $event['dispatched_by'] = $dispatcherMap[$event['name']] ?? [];
+        }
+    }
+
+    // Enrich jobs with which classes dispatch them
+    public function enrichJobs(array $dispatcherMap): void
+    {
+        foreach ($this->jobs as &$job) {
+            $job['dispatched_by'] = $dispatcherMap[$job['name']] ?? [];
+        }
+    }
 
     public function getReport(): array
     {
@@ -96,6 +132,7 @@ class ArchitectureReport
             'modules'       => $this->modules,
             'packages'      => $this->packages,
             'migrations'    => $this->migrations,
+            'dependencies'  => $this->dependencies,
             'errors'        => $this->errors,
         ];
     }

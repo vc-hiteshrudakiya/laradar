@@ -3,6 +3,7 @@
 namespace Vcian\Laradar\Support;
 
 use Vcian\Laradar\Analyzers\ControllerAnalyzer;
+use Vcian\Laradar\Analyzers\DependencyAnalyzer;
 use Vcian\Laradar\Analyzers\EventAnalyzer;
 use Vcian\Laradar\Analyzers\JobAnalyzer;
 use Vcian\Laradar\Analyzers\MigrationAnalyzer;
@@ -22,12 +23,13 @@ class ArchitectureScannerFactory
         $scan         = $config['scan']          ?? [];
         $paths        = $config['paths']         ?? [];
         $appNamespace = $config['app_namespace'] ?? PathDetector::appNamespace();
+        $domainPath   = PathDetector::domainPath();
 
         $analyzers = [];
 
         if ($scan['models'] ?? true) {
             $analyzers['models'] = new ModelAnalyzer(
-                $paths['models'] ?? PathDetector::modelsPath()
+                $paths['models'] ?? ($domainPath ?? PathDetector::modelsPath())
             );
         }
 
@@ -49,33 +51,33 @@ class ArchitectureScannerFactory
 
         if ($scan['events'] ?? true) {
             $analyzers['events'] = new EventAnalyzer(
-                $paths['events'] ?? app_path('Events')
+                $paths['events'] ?? ($domainPath ?? app_path('Events'))
             );
         }
 
         if ($scan['services'] ?? true) {
             $analyzers['services'] = new ServiceAnalyzer(
-                $paths['services'] ?? app_path('Services'),
+                $paths['services'] ?? ($domainPath ?? app_path('Services')),
                 'Service'
             );
         }
 
         if ($scan['repositories'] ?? true) {
             $analyzers['repositories'] = new ServiceAnalyzer(
-                $paths['repositories'] ?? PathDetector::repositoriesPath(),
+                $paths['repositories'] ?? ($domainPath ?? PathDetector::repositoriesPath()),
                 'Repository'
             );
         }
 
         if ($scan['observers'] ?? true) {
             $analyzers['observers'] = new ObserverAnalyzer(
-                $paths['observers'] ?? app_path('Observers')
+                $paths['observers'] ?? ($domainPath ?? app_path('Observers'))
             );
         }
 
         if ($scan['policies'] ?? true) {
             $analyzers['policies'] = new PolicyAnalyzer(
-                $paths['policies'] ?? app_path('Policies')
+                $paths['policies'] ?? ($domainPath ?? app_path('Policies'))
             );
         }
 
@@ -94,6 +96,10 @@ class ArchitectureScannerFactory
                 $paths['migrations'] ?? database_path('migrations')
             );
         }
+
+        $analyzers['dependencies'] = new DependencyAnalyzer(
+            $paths['app'] ?? app_path()
+        );
 
         return new ArchitectureScanner($analyzers);
     }

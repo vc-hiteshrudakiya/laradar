@@ -149,41 +149,76 @@ class MigrationAnalyzer
                 $mods[] = 'default:' . trim(trim($dm[1]), "'\"");
             }
 
-            $columns[] = $this->makeColumn($name, $type, in_array('nullable', $mods), $mods);
+            // Enum values: capture the second argument of enum() columns
+            $enumValues = [];
+            if ($type === 'enum') {
+                // Match full column call to capture the values array argument
+                $enumPattern = '/\$table\s*->\s*enum\s*\(\s*[\'"]' . preg_quote($name, '/') . '[\'"]\s*,\s*\[([^\]]+)\]/';
+                if (preg_match($enumPattern, $content, $em)) {
+                    preg_match_all('/[\'"]([^\'"]+)[\'"]/', $em[1], $ev);
+                    $enumValues = $ev[1] ?? [];
+                }
+            }
+
+            $columns[] = $this->makeColumn($name, $type, in_array('nullable', $mods), $mods, $enumValues);
         }
 
         return $columns;
     }
 
-    private function makeColumn(string $name, string $type, bool $nullable, array $modifiers): array
+    private function makeColumn(string $name, string $type, bool $nullable, array $modifiers, array $enumValues = []): array
     {
-        return ['name' => $name, 'type' => $type, 'nullable' => $nullable, 'modifiers' => $modifiers];
+        $col = ['name' => $name, 'type' => $type, 'nullable' => $nullable, 'modifiers' => $modifiers];
+        if ($enumValues) {
+            $col['enum_values'] = $enumValues;
+        }
+        return $col;
     }
 
     private function parseForeignKeys(string $content): array
     {
         $fks = [];
 
-        // $table->foreign('col')->references('id')->on('table')
+        // $table->foreign('col')->references('id')->on('table')->onDelete('cascade')->onUpdate('restrict')
         preg_match_all(
-            '/\$table\s*->\s*foreign\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)\s*->\s*references\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)\s*->\s*on\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)/s',
+            '/\$table\s*->\s*foreign\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)\s*->\s*references\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)\s*->\s*on\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)((?:\s*->[a-zA-Z]+\s*\([^)]*\))*)/s',
             $content, $matches, PREG_SET_ORDER
         );
         foreach ($matches as $m) {
-            $fks[] = ['column' => $m[1], 'references' => $m[2], 'on' => $m[3]];
+            $fks[] = [
+                'column'     => $m[1],
+                'references' => $m[2],
+                'on'         => $m[3],
+                'on_delete'  => $this->extractCascadeRule($m[4] ?? '', 'onDelete'),
+                'on_update'  => $this->extractCascadeRule($m[4] ?? '', 'onUpdate'),
+            ];
         }
 
-        // $table->foreignId('col')->constrained('table')
+        // $table->foreignId('col')->constrained('table')->onDelete('cascade')
         preg_match_all(
-            '/\$table\s*->\s*foreignId\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)(?:[^;]*?)->\s*constrained\s*\(\s*(?:[\'"]([^\'"]*)[\'"])?\s*\)/s',
+            '/\$table\s*->\s*foreignId\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)((?:[^;]*?))->\s*constrained\s*\(\s*(?:[\'"]([^\'"]*)[\'"])?\s*\)((?:\s*->[a-zA-Z]+\s*\([^)]*\))*)/s',
             $content, $matches, PREG_SET_ORDER
         );
         foreach ($matches as $m) {
             $col   = $m[1];
-            $table = !empty($m[2]) ? $m[2] : preg_replace('/_id$/', 's', $col);
-            $fks[] = ['column' => $col, 'references' => 'id', 'on' => $table];
+            $table = !empty($m[3]) ? $m[3] : preg_replace('/_id$/', 's', $col);
+            $fks[] = [
+                'column'     => $col,
+                'references' => 'id',
+                'on'         => $table,
+                'on_delete'  => $this->extractCascadeRule($m[4] ?? '', 'onDelete'),
+                'on_update'  => $this->extractCascadeRule($m[4] ?? '', 'onUpdate'),
+            ];
         }
 
         return $fks;
+    }
+
+    private function extractCascadeRule(string $modifiers, string $method): ?string
+    {
+        if (preg_match('/->' . $method . '\s*\(\s*[\'"]([^\'"]+)[\'"]\s*\)/', $modifiers, $m)) {
+            return $m[1];
+        }
+        return null;
     }
 }

@@ -229,6 +229,9 @@ class PackageDetector
         $requireDev = array_keys($composerJson['require-dev'] ?? []);
         $allKeys    = array_unique(array_map('strtolower', array_merge($require, $requireDev)));
 
+        // Build a map of package metadata from composer.lock for richer detail
+        $lockMeta = $this->buildLockMetaMap($composerLock);
+
         $items = [];
         foreach ($allKeys as $packageKey) {
             // Skip PHP itself and platform extensions (ext-*, php, lib-*)
@@ -236,31 +239,47 @@ class PackageDetector
                 continue;
             }
 
-            $version = $lockVersions[$packageKey] ?? $this->constraintFromJson($composerJson, $packageKey);
-            $isDev   = $this->isDevOnly($composerJson, $packageKey);
+            $version   = $lockVersions[$packageKey] ?? $this->constraintFromJson($composerJson, $packageKey);
+            $isDev     = $this->isDevOnly($composerJson, $packageKey);
+            $pkgMeta   = $lockMeta[$packageKey] ?? [];
+            $license   = $pkgMeta['license'] ?? null;
+            $providers = $pkgMeta['providers'] ?? [];
+            $aliases   = $pkgMeta['aliases'] ?? [];
+            $phpReq    = $pkgMeta['php_require'] ?? null;
+            $fwReq     = $pkgMeta['laravel_require'] ?? null;
 
             if (isset(self::KNOWN_PACKAGES[$packageKey])) {
                 $meta    = self::KNOWN_PACKAGES[$packageKey];
                 $items[] = [
-                    'key'         => $packageKey,
-                    'name'        => $meta['name'],
-                    'category'    => $meta['category'],
-                    'description' => $meta['description'],
-                    'color'       => $meta['color'],
-                    'docs'        => $meta['docs'],
-                    'version'     => $version,
-                    'dev'         => $isDev,
+                    'key'             => $packageKey,
+                    'name'            => $meta['name'],
+                    'category'        => $meta['category'],
+                    'description'     => $meta['description'],
+                    'color'           => $meta['color'],
+                    'docs'            => $meta['docs'],
+                    'version'         => $version,
+                    'dev'             => $isDev,
+                    'license'         => $license,
+                    'providers'       => $providers,
+                    'aliases'         => $aliases,
+                    'php_require'     => $phpReq,
+                    'laravel_require' => $fwReq,
                 ];
             } else {
-                $items[]   = [
-                    'key'         => $packageKey,
-                    'name'        => $packageKey,
-                    'category'    => 'Other',
-                    'description' => '',
-                    'color'       => 'laravel',
-                    'docs'        => '',
-                    'version'     => $version,
-                    'dev'         => $isDev,
+                $items[] = [
+                    'key'             => $packageKey,
+                    'name'            => $packageKey,
+                    'category'        => 'Other',
+                    'description'     => '',
+                    'color'           => 'laravel',
+                    'docs'            => '',
+                    'version'         => $version,
+                    'dev'             => $isDev,
+                    'license'         => $license,
+                    'providers'       => $providers,
+                    'aliases'         => $aliases,
+                    'php_require'     => $phpReq,
+                    'laravel_require' => $fwReq,
                 ];
             }
         }
@@ -286,6 +305,41 @@ class PackageDetector
         foreach (array_merge($lock['packages'] ?? [], $lock['packages-dev'] ?? []) as $pkg) {
             $map[strtolower($pkg['name'])] = ltrim($pkg['version'] ?? '', 'v');
         }
+        return $map;
+    }
+
+    private function buildLockMetaMap(?array $lock): array
+    {
+        if (!$lock) return [];
+
+        $map = [];
+        foreach (array_merge($lock['packages'] ?? [], $lock['packages-dev'] ?? []) as $pkg) {
+            $key = strtolower($pkg['name'] ?? '');
+            if (!$key) continue;
+
+            $licenseRaw = $pkg['license'] ?? [];
+            $license    = is_array($licenseRaw) ? implode(', ', $licenseRaw) : $licenseRaw;
+
+            $extra     = $pkg['extra']['laravel'] ?? [];
+            $providers = array_map(
+                fn($p) => class_basename(str_replace('\\', '/', $p)),
+                $extra['providers'] ?? []
+            );
+            $aliases = array_keys($extra['aliases'] ?? []);
+
+            $require       = $pkg['require'] ?? [];
+            $phpReq        = $require['php'] ?? null;
+            $laravelReq    = $require['laravel/framework'] ?? $require['illuminate/support'] ?? null;
+
+            $map[$key] = [
+                'license'         => $license ?: null,
+                'providers'       => $providers,
+                'aliases'         => $aliases,
+                'php_require'     => $phpReq,
+                'laravel_require' => $laravelReq,
+            ];
+        }
+
         return $map;
     }
 

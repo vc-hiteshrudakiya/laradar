@@ -48,6 +48,8 @@ $opMeta = [
 ];
 @endphp
 
+<div id="migrations-list">
+
 {{-- ── Stats ─────────────────────────────────────────────────────── --}}
 <div class="mds-top-stats">
     <div class="mds-top-stat">
@@ -99,9 +101,10 @@ $opMeta = [
     $cols = $mg['columns'] ?? [];
     $fks  = $mg['foreign_keys'] ?? [];
 @endphp
-<div class="mg-card" data-op="{{ $op }}" data-table="{{ strtolower($mg['table'] ?? '') }}" data-file="{{ strtolower($mg['filename'] ?? '') }}">
+<div class="mg-card" data-op="{{ $op }}" data-table="{{ strtolower($mg['table'] ?? '') }}" data-file="{{ strtolower($mg['filename'] ?? '') }}"
+     style="cursor:pointer;" onclick="openDetailAjax('migrations', '{{ route('laradar.migration.detail', $mg['filename'] ?? '') }}')">
     {{-- Card Header --}}
-    <div class="mg-card-head" onclick="mgToggle({{ $idx }})">
+    <div class="mg-card-head" style="pointer-events:none;">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
             {{-- Operation badge --}}
             <span style="font-size:10px;font-weight:700;font-family:var(--font-mono);padding:3px 9px;border-radius:5px;white-space:nowrap;flex:none;color:{{ $opm['color'] }};background:{{ $opm['bg'] }};border:1px solid {{ $opm['border'] }};">
@@ -143,115 +146,24 @@ $opMeta = [
             </span>
             @endif
 
-            {{-- Chevron --}}
-            <svg id="mg-chevron-{{ $idx }}" style="width:16px;height:16px;color:var(--text-faint);transition:transform .2s;flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            {{-- Arrow --}}
+            <svg style="width:15px;height:15px;color:var(--text-faint);flex:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
         </div>
     </div>
 
-    {{-- Card Body (collapsed by default) --}}
-    <div id="mg-body-{{ $idx }}" style="display:none;">
-        @if($op === 'drop' || $op === 'rename')
-        <div style="padding:16px 20px;font-size:13px;color:var(--text-faint);font-family:var(--font-mono);">
-            {{ $op === 'drop' ? 'Drops the table — no column schema.' : 'Renames the table — no column schema.' }}
-        </div>
-        @elseif(empty($cols))
-        <div style="padding:16px 20px;font-size:13px;color:var(--text-faint);font-family:var(--font-mono);">
-            No column definitions detected (raw SQL or complex builder).
-        </div>
-        @else
-
-        {{-- Columns Table --}}
-        <div style="overflow-x:auto;padding:0 0 4px;">
-            <table class="mg-col-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Column</th>
-                        <th>Type</th>
-                        <th>Group</th>
-                        <th>Nullable</th>
-                        <th>Modifiers</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach($cols as $ci => $col)
-                @php
-                    $grp = $typeGroup($col['type']);
-                    $gm  = $groupMeta[$grp] ?? $groupMeta['other'];
-                @endphp
-                <tr>
-                    <td style="color:var(--text-faint);font-size:11px;">{{ $ci + 1 }}</td>
-                    <td>
-                        <span class="mg-col-name">{{ $col['name'] }}</span>
-                        @if(in_array('primary', $col['modifiers'] ?? []) || $col['type'] === 'id' || str_contains($col['type'], 'Increments'))
-                        <span class="mg-badge" style="color:#FF2D20;background:rgba(255,45,32,.08);border-color:rgba(255,45,32,.2);">PK</span>
-                        @endif
-                    </td>
-                    <td>
-                        <code class="mg-type-tag">{{ $col['type'] }}</code>
-                    </td>
-                    <td>
-                        <span class="mg-badge" style="color:{{ $gm['color'] }};background:{{ $gm['bg'] }};border-color:{{ $gm['border'] }};">{{ $gm['label'] }}</span>
-                    </td>
-                    <td>
-                        @if($col['nullable'])
-                        <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#FF2D20;">
-                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            yes
-                        </span>
-                        @else
-                        <span style="font-size:11px;color:var(--text-faint);">—</span>
-                        @endif
-                    </td>
-                    <td>
-                        @php
-                            $displayMods = array_filter($col['modifiers'] ?? [], fn($mod) => $mod !== 'nullable');
-                        @endphp
-                        @foreach($displayMods as $mod)
-                        <span class="mg-badge" style="color:var(--text-dim);background:var(--bg-sunken);border-color:var(--border);">{{ $mod }}</span>
-                        @endforeach
-                        @if(empty($displayMods)) <span style="font-size:11px;color:var(--text-faint);">—</span> @endif
-                    </td>
-                </tr>
-                @endforeach
-                </tbody>
-            </table>
-        </div>
-        @endif
-
-        {{-- Foreign Keys --}}
-        @if(count($fks) > 0)
-        <div style="padding:12px 20px 16px;border-top:1px solid var(--border);">
-            <p style="font-size:11px;font-weight:700;font-family:var(--font-mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;margin:0 0 10px;">Foreign Keys</p>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                @foreach($fks as $fk)
-                <div style="display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:12px;background:var(--bg-sunken);border:1px solid var(--border);border-radius:8px;padding:6px 12px;">
-                    <span style="color:var(--text);font-weight:600;">{{ $fk['column'] }}</span>
-                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#FF2D20;flex:none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                    <span style="color:#FF2D20;">{{ $fk['on'] }}.{{ $fk['references'] }}</span>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
-    </div>
 </div>
 @endforeach
 </div>
 @endif
 
+</div>{{-- #migrations-list --}}
+<div id="migrations-detail" style="display:none"><div id="migrations-detail-content"></div></div>
+
 {{-- ── Styles ────────────────────────────────────────────────────── --}}
 
 <script>
-function mgToggle(idx) {
-    const body    = document.getElementById('mg-body-' + idx);
-    const chevron = document.getElementById('mg-chevron-' + idx);
-    const open    = body.style.display !== 'none';
-    body.style.display      = open ? 'none' : 'block';
-    chevron.style.transform = open ? '' : 'rotate(180deg)';
-}
 
 function mgFilter() {
     const q = (document.getElementById('mg-search')?.value || '').toLowerCase();

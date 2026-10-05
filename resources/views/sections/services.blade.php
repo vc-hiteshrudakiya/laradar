@@ -2,6 +2,8 @@
         @php
             $svcTotal   = count($data['services']);
             $svcMethods = $svcTotal > 0 ? round(array_sum(array_map(fn($s) => count($s['methods']??[]), $data['services'])) / $svcTotal) : 0;
+            $svcDeps    = array_sum(array_map(fn($s) => count($s['dependencies']??[]), $data['services']));
+            $svcWithDI  = count(array_filter($data['services'], fn($s) => count($s['dependencies']??[]) > 0));
         @endphp
         <div class="mds-top-stats">
             <div class="mds-top-stat">
@@ -11,6 +13,14 @@
             <div class="mds-top-stat">
                 <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $svcMethods }}</span>
                 <span class="mds-top-stat-lbl">Avg Methods</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $svcDeps }}</span>
+                <span class="mds-top-stat-lbl">Total Deps</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $svcWithDI }}</span>
+                <span class="mds-top-stat-lbl">With DI</span>
             </div>
         </div>
         <div class="mds-toolbar">
@@ -31,11 +41,14 @@
                 <span></span><span>Service</span><span>Methods</span><span>Deps</span>
             </div>
             @foreach($data['services'] as $i => $svc)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 90px 80px;" data-name="{{ strtolower($svc['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 90px 80px;cursor:pointer;" data-name="{{ strtolower($svc['name']) }}"
+                 onclick="openDetailAjax('services', '{{ route('laradar.service.detail', $svc['name']) }}')"
+                 onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background=''"
+            >
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($svc['name'],0,1)) }}</div>
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $svc['name'] }}</div>
-                    <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $svc['namespace'] }}</div>
+                    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $svc['namespace'] }}</div>
                 </div>
                 <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:#FF2D20;text-align:center;">{{ count($svc['methods']??[]) }}</div>
                 <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-dim);text-align:center;">{{ count($svc['dependencies']??[]) ?: '—' }}</div>
@@ -44,5 +57,5 @@
         </div>
         @endif
     </div>
-
+    <div id="services-detail" style="display:none"><div id="services-detail-content"></div></div>
 

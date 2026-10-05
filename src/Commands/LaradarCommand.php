@@ -90,9 +90,12 @@ class LaradarCommand extends Command
 
         // Auto-open the report via HTTP route if HTML was exported
         if (in_array('html', $formats) && !app()->runningUnitTests()) {
-            $reportUrl = rtrim(config('app.url', 'http://localhost:8000'), '/')
-                . '/' . ltrim(config('laradar.dashboard.path', 'laradar'), '/')
-                . '/report';
+            $base   = rtrim(config('app.url', 'http://localhost:8000'), '/');
+            $parsed = parse_url($base);
+            if (empty($parsed['port']) && in_array($parsed['host'] ?? '', ['localhost', '127.0.0.1'])) {
+                $base .= ':8000';
+            }
+            $reportUrl = $base . '/' . ltrim(config('laradar.dashboard.path', 'laradar'), '/') . '/report';
 
             $this->line("  <fg=cyan>↗  Opening report:</> <fg=yellow>{$reportUrl}</>");
             $this->newLine();

@@ -216,6 +216,9 @@ body {
   }
 }
 
+.p-6 { padding: 24px; }
+.p-6 > * { animation: fadeUp 0.35s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+
 /* ── Sidebar ── */
 .sidebar {
   background: var(--bg-elevated);
@@ -325,8 +328,8 @@ body {
   transition: background 0.2s, box-shadow 0.2s;
 }
 .nav-item svg {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
   flex: none;
   stroke: currentColor;
 }
@@ -641,13 +644,6 @@ select option {
   color: var(--text);
 }
 
-/* ── Table rows ── */
-tr.route-row:hover {
-  background: rgba(255, 45, 32, 0.04) !important;
-}
-thead tr {
-  background: var(--bg-sunken) !important;
-}
 
 /* ── Buttons ── */
 .atlas-btn {
@@ -2758,4 +2754,17 @@ code {
   border: 1px solid;
   margin-left: 4px;
   white-space: nowrap;
+}
+
+/* ── Reveal entrance animation (used by all detail partials) ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }

@@ -1,6 +1,8 @@
     <div id="observers-list">
         @php
-            $obsModels = count(array_unique(array_filter(array_column($data['observers'], 'model'))));
+            $obsModels  = count(array_unique(array_filter(array_column($data['observers'], 'model'))));
+            $obsTotalEv = array_sum(array_map(fn($o) => count($o['events']??[]), $data['observers']));
+            $obsAvgEv   = count($data['observers']) > 0 ? round($obsTotalEv / count($data['observers'])) : 0;
         @endphp
         <div class="mds-top-stats">
             <div class="mds-top-stat">
@@ -10,6 +12,14 @@
             <div class="mds-top-stat">
                 <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $obsModels }}</span>
                 <span class="mds-top-stat-lbl">Models Covered</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $obsTotalEv }}</span>
+                <span class="mds-top-stat-lbl">Total Events</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $obsAvgEv }}</span>
+                <span class="mds-top-stat-lbl">Avg Events</span>
             </div>
         </div>
         <div class="mds-toolbar">
@@ -30,13 +40,16 @@
                 <span></span><span>Observer</span><span>Observes</span><span>Events</span>
             </div>
             @foreach($data['observers'] as $i => $obs)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 160px 1fr;" data-name="{{ strtolower($obs['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 160px 1fr;cursor:pointer;" data-name="{{ strtolower($obs['name']) }}"
+                 onclick="openDetailAjax('observers', '{{ route('laradar.observer.detail', $obs['name']) }}')"
+                 onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background=''"
+            >
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($obs['name'],0,1)) }}</div>
                 <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $obs['name'] }}</div>
-                <div style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $obs['model']??'Unknown' }}</div>
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $obs['model']??'Unknown' }}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:4px;">
                     @foreach($obs['events']??[] as $e)
-                    <span style="font-size:10px;font-family:var(--font-mono);color:#FF2D20;background:rgba(255,45,32,.08);padding:2px 8px;border-radius:20px;border:1px solid rgba(255,45,32,.2);">{{ $e }}</span>
+                    <span style="font-size:10px;font-family:var(--font-mono);color:#FF2D20;background:rgba(255,45,32,.08);padding:2px 8px;border-radius:5px;border:1px solid rgba(255,45,32,.2);">{{ $e }}</span>
                     @endforeach
                 </div>
             </div>
@@ -44,5 +57,5 @@
         </div>
         @endif
     </div>
-
+    <div id="observers-detail" style="display:none"><div id="observers-detail-content"></div></div>
 

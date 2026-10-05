@@ -3,6 +3,7 @@
             $repoTotal    = count($data['repositories']);
             $repoMethods  = $repoTotal > 0 ? round(array_sum(array_map(fn($r) => count($r['methods']??[]), $data['repositories'])) / $repoTotal) : 0;
             $repoDeps     = array_sum(array_map(fn($r) => count($r['dependencies']??[]), $data['repositories']));
+            $repoWithDI   = count(array_filter($data['repositories'], fn($r) => count($r['dependencies']??[]) > 0));
         @endphp
         <div class="mds-top-stats">
             <div class="mds-top-stat">
@@ -16,6 +17,10 @@
             <div class="mds-top-stat">
                 <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $repoDeps }}</span>
                 <span class="mds-top-stat-lbl">Total Deps</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $repoWithDI }}</span>
+                <span class="mds-top-stat-lbl">With DI</span>
             </div>
         </div>
         <div class="mds-toolbar">
@@ -36,11 +41,14 @@
                 <span></span><span>Repository</span><span>Methods</span><span>Deps</span>
             </div>
             @foreach($data['repositories'] as $i => $repo)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 90px 80px;" data-name="{{ strtolower($repo['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 90px 80px;cursor:pointer;" data-name="{{ strtolower($repo['name']) }}"
+                 onclick="openDetailAjax('repositories', '{{ route('laradar.repository.detail', $repo['name']) }}')"
+                 onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background=''"
+            >
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($repo['name'],0,1)) }}</div>
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $repo['name'] }}</div>
-                    <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $repo['namespace'] }}</div>
+                    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $repo['namespace'] }}</div>
                     @if(!empty($repo['implements']))
                     <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;">
                         @foreach($repo['implements'] as $iface)
@@ -56,5 +64,5 @@
         </div>
         @endif
     </div>
-
+    <div id="repositories-detail" style="display:none"><div id="repositories-detail-content"></div></div>
 

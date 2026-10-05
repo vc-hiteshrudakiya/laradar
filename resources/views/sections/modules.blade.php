@@ -1,4 +1,5 @@
 
+<div id="modules-list">
     @php
         $modules    = $data['modules'] ?? [];
         $modCtrl    = count($modules) > 0 ? array_sum(array_column($modules, 'controllers')) : 0;
@@ -60,12 +61,12 @@
         $initial = strtoupper(substr($mod['name'], 0, 1));
         $hasExtras = $mod['jobs'] > 0 || $mod['events'] > 0 || $mod['services'] > 0;
         @endphp
-        <div data-name="{{ strtolower($mod['name']) }}" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s;" onmouseenter="this.style.borderColor='{{ $mp['border'] }}';this.style.transform='translateY(-3px)'" onmouseleave="this.style.borderColor='var(--border)';this.style.transform=''">
+        <div data-name="{{ strtolower($mod['name']) }}" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s;cursor:pointer;" onclick="openDetailAjax('modules', '{{ route('laradar.module.detail', $mod['name']) }}')" onmouseenter="this.style.borderColor='{{ $mp['border'] }}';this.style.transform='translateY(-3px)'" onmouseleave="this.style.borderColor='var(--border)';this.style.transform=''">
             {{-- Top glow bar --}}
             <div style="height:3px;background:linear-gradient(90deg,{{ $mp['color'] }},transparent);"></div>
             {{-- Header --}}
             <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border);">
-                <div style="width:42px;height:42px;border-radius:12px;background:{{ $mp['bg'] }};color:{{ $mp['color'] }};border:1px solid {{ $mp['border'] }};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex:none;">{{ $initial }}</div>
+                <div style="width:42px;height:42px;border-radius:12px;background:{{ $mp['bg'] }};color:{{ $mp['color'] }};border:1px solid {{ $mp['border'] }};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex:none;">{{ $initial }}</div>
                 <div style="min-width:0;flex:1;">
                     <p style="font-weight:700;font-size:14px;color:var(--text);line-height:1.25;">{{ $mod['name'] }}</p>
                     <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;">{{ $mod['path'] }}</p>
@@ -74,16 +75,16 @@
             {{-- Core stats --}}
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);">
                 <div style="text-align:center;padding:12px 8px;border-right:1px solid var(--border);">
-                    <p style="font-size:20px;font-weight:800;color:#FF2D20;font-family:var(--font-sans);">{{ $mod['controllers'] }}</p>
-                    <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">Controllers</p>
+                    <p style="font-size:18px;font-weight:700;color:#FF2D20;font-family:var(--font-sans);">{{ $mod['controllers'] }}</p>
+                    <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-top:2px;">Controllers</p>
                 </div>
                 <div style="text-align:center;padding:12px 8px;border-right:1px solid var(--border);">
-                    <p style="font-size:20px;font-weight:800;color:#FF2D20;font-family:var(--font-sans);">{{ $mod['models'] }}</p>
-                    <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">Models</p>
+                    <p style="font-size:18px;font-weight:700;color:#FF2D20;font-family:var(--font-sans);">{{ $mod['models'] }}</p>
+                    <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-top:2px;">Models</p>
                 </div>
                 <div style="text-align:center;padding:12px 8px;">
-                    <p style="font-size:20px;font-weight:800;color:#FF2D20;font-family:var(--font-sans);">{{ $mod['routes'] }}</p>
-                    <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;">Routes</p>
+                    <p style="font-size:18px;font-weight:700;color:#FF2D20;font-family:var(--font-sans);">{{ $mod['routes'] }}</p>
+                    <p style="font-size:10px;color:var(--text-faint);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-top:2px;">Routes</p>
                 </div>
             </div>
             {{-- Extra chips --}}
@@ -107,12 +108,13 @@
                 </span>
                 @endif
                 @if(!$hasExtras)
-                <span style="font-size:11px;color:var(--text-faint);font-style:italic;">No jobs, events, or services</span>
+                <span style="font-size:11px;color:var(--text-faint);font-family:var(--font-sans);">No jobs, events, or services</span>
                 @endif
             </div>
         </div>
         @endforeach
     </div>
     @endif
-
+</div>{{-- #modules-list --}}
+<div id="modules-detail" style="display:none"><div id="modules-detail-content"></div></div>
 

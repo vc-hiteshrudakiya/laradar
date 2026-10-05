@@ -120,38 +120,101 @@ class ControllerAnalyzer
 
     private function detectMethodDetails(string $content): array
     {
-        // Match each public non-magic method with its full signature
+        // Split file into individual method blocks to scope dispatch detection per-method
         preg_match_all(
-            '/public\s+function\s+(\w+)\s*\(([^)]*)\)/s',
+            '/public\s+function\s+(\w+)\s*\(([^)]*)\)\s*(?::\s*[\w\\\\?|]+)?\s*\{/s',
             $content,
-            $matches,
-            PREG_SET_ORDER
+            $signatures,
+            PREG_SET_ORDER | PREG_OFFSET_CAPTURE
         );
 
         $details = [];
-        foreach ($matches as $match) {
-            $name = $match[1];
+
+        foreach ($signatures as $i => $sig) {
+            $name = $sig[1][0];
             if (str_starts_with($name, '__')) continue;
 
-            $params = [];
-            $sig    = trim($match[2]);
-            if ($sig !== '') {
-                foreach (preg_split('/,(?![^<>]*>)/', $sig) as $param) {
+            // Extract method body (from opening brace to matching closing brace)
+            $bodyStart = $sig[0][1] + strlen($sig[0][0]) - 1; // position of '{'
+            $body      = $this->extractMethodBody($content, $bodyStart);
+
+            // Parameters
+            $params      = [];
+            $formRequest = null;
+            $sigStr      = trim($sig[2][0]);
+
+            if ($sigStr !== '') {
+                foreach (preg_split('/,(?![^<>]*>)/', $sigStr) as $param) {
                     $param = trim($param);
-                    // Handle union/intersection types and nullable prefix
                     if (preg_match('/\??([A-Z][\w\\\\]+(?:[|&]\??[A-Z][\w\\\\]+)*)\s+\$(\w+)/', $param, $p)) {
-                        $primary  = preg_split('/[|&]/', $p[1])[0];
-                        $params[] = ['type' => class_basename(str_replace('\\', '/', $primary)), 'var' => $p[2]];
+                        $primary = class_basename(str_replace('\\', '/', preg_split('/[|&]/', $p[1])[0]));
+                        $params[] = ['type' => $primary, 'var' => $p[2]];
+                        // Detect FormRequest — type ending in Request (but not the base Request class)
+                        if ($primary !== 'Request' && str_ends_with($primary, 'Request')) {
+                            $formRequest = $primary;
+                        }
                     } elseif (preg_match('/\$(\w+)/', $param, $p)) {
                         $params[] = ['type' => null, 'var' => $p[1]];
                     }
                 }
             }
 
-            $details[] = ['method' => $name, 'params' => $params];
+            // Events dispatched inside this method body
+            $eventsDispatched = [];
+            if ($body !== '') {
+                preg_match_all('/\bevent\s*\(\s*new\s+([A-Z][A-Za-z0-9]+)\s*[,()\]]/', $body, $em);
+                array_push($eventsDispatched, ...($em[1] ?? []));
+                preg_match_all('/Event::dispatch\s*\(\s*new\s+([A-Z][A-Za-z0-9]+)\s*[,()\]]/', $body, $em);
+                array_push($eventsDispatched, ...($em[1] ?? []));
+                preg_match_all('/\b([A-Z][A-Za-z0-9]+Event)::dispatch\s*\(/', $body, $em);
+                array_push($eventsDispatched, ...($em[1] ?? []));
+                $eventsDispatched = array_values(array_unique($eventsDispatched));
+            }
+
+            // Jobs dispatched inside this method body
+            $jobsDispatched = [];
+            if ($body !== '') {
+                preg_match_all('/\b([A-Z][A-Za-z0-9]+(?:Job)?)::dispatch(?:If|Unless)?\s*\(/', $body, $jm);
+                array_push($jobsDispatched, ...($jm[1] ?? []));
+                preg_match_all('/\bdispatch\s*\(\s*new\s+([A-Z][A-Za-z0-9]+)\s*[,()\]]/', $body, $jm);
+                array_push($jobsDispatched, ...($jm[1] ?? []));
+                $ignore         = ['Event', 'Mail', 'Notification'];
+                $jobsDispatched = array_values(array_unique(array_filter($jobsDispatched, fn($j) => !in_array($j, $ignore))));
+            }
+
+            $details[] = [
+                'method'           => $name,
+                'params'           => $params,
+                'form_request'     => $formRequest,
+                'events_dispatched'=> $eventsDispatched,
+                'jobs_dispatched'  => $jobsDispatched,
+            ];
         }
 
         return $details;
+    }
+
+    // Walk the content from an opening brace and return the method body text
+    private function extractMethodBody(string $content, int $openPos): string
+    {
+        $depth  = 0;
+        $len    = strlen($content);
+        $start  = $openPos;
+        $end    = $openPos;
+
+        for ($i = $openPos; $i < $len; $i++) {
+            if ($content[$i] === '{') {
+                $depth++;
+            } elseif ($content[$i] === '}') {
+                $depth--;
+                if ($depth === 0) {
+                    $end = $i;
+                    break;
+                }
+            }
+        }
+
+        return $end > $start ? substr($content, $start + 1, $end - $start - 1) : '';
     }
 
     private function isResourceController(array $methods): bool

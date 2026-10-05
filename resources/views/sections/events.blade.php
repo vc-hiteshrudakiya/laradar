@@ -1,5 +1,9 @@
     <div id="events-list">
-        @php $evtBroadcast = count(array_filter($data['events'], fn($e) => $e['should_broadcast']??false)); @endphp
+        @php
+            $evtBroadcast  = count(array_filter($data['events'], fn($e) => $e['should_broadcast']??false));
+            $evtNow        = count(array_filter($data['events'], fn($e) => $e['broadcastNow']??false));
+            $evtPayload    = count(array_filter($data['events'], fn($e) => count($e['properties']??[]) > 0));
+        @endphp
         <div class="mds-top-stats">
             <div class="mds-top-stat">
                 <span class="mds-top-stat-num" style="color:#FF2D20;">{{ count($data['events']) }}</span>
@@ -8,6 +12,14 @@
             <div class="mds-top-stat">
                 <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $evtBroadcast }}</span>
                 <span class="mds-top-stat-lbl">Broadcast</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $evtPayload }}</span>
+                <span class="mds-top-stat-lbl">With Payload</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $evtNow }}</span>
+                <span class="mds-top-stat-lbl">Broadcast Now</span>
             </div>
         </div>
         <div class="mds-toolbar">
@@ -28,15 +40,18 @@
                 <span></span><span>Event</span><span>Broadcast</span><span>Props</span>
             </div>
             @foreach($data['events'] as $i => $evt)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 100px 80px;" data-name="{{ strtolower($evt['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 100px 80px;cursor:pointer;" data-name="{{ strtolower($evt['name']) }}"
+                 onclick="openDetailAjax('events', '{{ route('laradar.event.detail', $evt['name']) }}')"
+                 onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background=''"
+            >
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($evt['name'],0,1)) }}</div>
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $evt['name'] }}</div>
-                    <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $evt['namespace'] }}</div>
+                    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $evt['namespace'] }}</div>
                 </div>
                 <div>
                     @if($evt['should_broadcast']??false)
-                    <span style="font-size:10px;font-family:var(--font-mono);color:#FF2D20;background:rgba(255,45,32,.08);padding:2px 8px;border-radius:20px;border:1px solid rgba(255,45,32,.2);">broadcast</span>
+                    <span style="font-size:10px;font-family:var(--font-mono);color:#FF2D20;background:rgba(255,45,32,.08);padding:2px 8px;border-radius:5px;border:1px solid rgba(255,45,32,.2);">broadcast</span>
                     @else
                     <span style="font-size:12px;color:var(--text-faint);">—</span>
                     @endif

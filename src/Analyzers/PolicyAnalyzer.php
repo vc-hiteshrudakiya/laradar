@@ -48,7 +48,7 @@ class PolicyAnalyzer
         // Infer model name from policy class name (UserPolicy → User)
         $model = str_ends_with($name, 'Policy') ? substr($name, 0, -6) : null;
 
-        // Detect implemented policy actions
+        // Detect implemented standard policy actions
         $actions = [];
         foreach (self::POLICY_ACTIONS as $action) {
             if (preg_match('/public\s+function\s+' . preg_quote($action, '/') . '\s*\(/', $content)) {
@@ -56,12 +56,20 @@ class PolicyAnalyzer
             }
         }
 
+        // Detect custom (non-standard) public methods
+        preg_match_all('/public\s+function\s+(\w+)\s*\(/', $content, $allMethods);
+        $customActions = array_values(array_filter(
+            $allMethods[1] ?? [],
+            fn($m) => !in_array($m, self::POLICY_ACTIONS) && !str_starts_with($m, '__')
+        ));
+
         return [
-            'name'      => $name,
-            'namespace' => $namespace,
-            'path'      => $file->getRelativePathname(),
-            'model'     => $model,
-            'actions'   => $actions,
+            'name'           => $name,
+            'namespace'      => $namespace,
+            'path'           => $file->getRelativePathname(),
+            'model'          => $model,
+            'actions'        => $actions,
+            'custom_actions' => $customActions,
         ];
     }
 }

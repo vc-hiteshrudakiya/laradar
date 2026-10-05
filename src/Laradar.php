@@ -9,10 +9,12 @@ class Laradar
 {
     const VERSION = '1.0.0';
 
+    private ?ArchitectureReport $cached = null;
+
     public function __construct(protected ArchitectureScanner $scanner) {}
 
     public function discover(): ArchitectureReport
     {
-        return $this->scanner->scan();
+        return $this->cached ??= $this->scanner->scan();
     }
 }

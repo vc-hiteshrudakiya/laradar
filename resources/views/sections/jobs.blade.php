@@ -1,7 +1,8 @@
     <div id="jobs-list">
         @php
-            $jobsQueued  = count(array_filter($data['jobs'], fn($j) => $j['should_queue']??false));
-            $jobsTimeout = count(array_filter($data['jobs'], fn($j) => !empty($j['timeout'])));
+            $jobsQueued   = count(array_filter($data['jobs'], fn($j) => $j['should_queue']??false));
+            $jobsTimeout  = count(array_filter($data['jobs'], fn($j) => !empty($j['timeout'])));
+            $jobsRetries  = count(array_filter($data['jobs'], fn($j) => !empty($j['tries'])));
         @endphp
         <div class="mds-top-stats">
             <div class="mds-top-stat">
@@ -15,6 +16,10 @@
             <div class="mds-top-stat">
                 <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $jobsTimeout }}</span>
                 <span class="mds-top-stat-lbl">With Timeout</span>
+            </div>
+            <div class="mds-top-stat">
+                <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $jobsRetries }}</span>
+                <span class="mds-top-stat-lbl">With Retries</span>
             </div>
         </div>
         <div class="mds-toolbar">
@@ -35,13 +40,16 @@
                 <span></span><span>Job</span><span>Queue</span><span>Tries</span><span>Timeout</span>
             </div>
             @foreach($data['jobs'] as $i => $job)
-            <div class="mds-list-row" style="grid-template-columns:40px 1fr 110px 80px 100px;" data-name="{{ strtolower($job['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:40px 1fr 110px 80px 100px;cursor:pointer;" data-name="{{ strtolower($job['name']) }}"
+                 onclick="openDetailAjax('jobs', '{{ route('laradar.job.detail', $job['name']) }}')"
+                 onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background=''"
+            >
                 <div class="mds-list-av" style="background:rgba(255,45,32,.10);color:#FF2D20;border-color:rgba(255,45,32,.25);">{{ strtoupper(substr($job['name'],0,1)) }}</div>
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $job['name'] }}</div>
                     @if($job['should_queue']??false)<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.08);color:#FF2D20;border:1px solid rgba(255,45,32,.2);font-family:var(--font-mono);">queued</span>@endif
                 </div>
-                <div style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);">{{ $job['queue']??'default' }}</div>
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);">{{ $job['queue']??'default' }}</div>
                 <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-dim);">{{ $job['tries']??'—' }}</div>
                 <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-dim);">{{ $job['timeout'] ? $job['timeout'].'s' : '—' }}</div>
             </div>
@@ -49,5 +57,5 @@
         </div>
         @endif
     </div>
-
+    <div id="jobs-detail" style="display:none"><div id="jobs-detail-content"></div></div>
 

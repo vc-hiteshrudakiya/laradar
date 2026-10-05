@@ -55,9 +55,12 @@ class ServiceAnalyzer
             }
         }
 
-        // Public methods (skip magic)
+        // Public methods (skip magic) — kept for backward compatibility
         preg_match_all('/public\s+function\s+(\w+)\s*\(/', $content, $mm);
         $methods = array_values(array_filter($mm[1] ?? [], fn($m) => !in_array($m, self::SKIP_METHODS)));
+
+        // Method details: name + parameters + return type
+        $methodDetails = $this->parseMethodDetails($content);
 
         // Implements clause: class Foo extends Bar implements IFoo, IBar
         $implements = [];
@@ -71,14 +74,71 @@ class ServiceAnalyzer
         }
 
         return [
-            'name'         => $name,
-            'namespace'    => $namespace,
-            'path'         => $this->relativePath($file->getRealPath()),
-            'dependencies' => $dependencies,
-            'methods'      => $methods,
-            'method_count' => count($methods),
-            'implements'   => $implements,
+            'name'           => $name,
+            'namespace'      => $namespace,
+            'path'           => $this->relativePath($file->getRealPath()),
+            'dependencies'   => $dependencies,
+            'methods'        => $methods,
+            'method_count'   => count($methods),
+            'method_details' => $methodDetails,
+            'implements'     => $implements,
         ];
+    }
+
+    private function parseMethodDetails(string $content): array
+    {
+        preg_match_all(
+            '/public\s+function\s+(\w+)\s*\(([^)]*)\)\s*(?::\s*(\??[\w\\\\|]+))?/s',
+            $content,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        $details = [];
+
+        foreach ($matches as $match) {
+            $name = $match[1];
+
+            if (in_array($name, self::SKIP_METHODS)) {
+                continue;
+            }
+
+            // Parse parameters
+            $params = [];
+            $sig    = trim($match[2] ?? '');
+
+            if ($sig !== '') {
+                foreach (preg_split('/,(?![^<>]*>)/', $sig) as $param) {
+                    $param = trim($param);
+                    if ($param === '') continue;
+
+                    if (preg_match('/\??([A-Z][\w\\\\]+(?:[|&]\??[A-Z][\w\\\\]+)*)\s+\$(\w+)/', $param, $p)) {
+                        $primary  = preg_split('/[|&]/', ltrim($p[1], '?'))[0];
+                        $params[] = ['type' => class_basename(str_replace('\\', '/', $primary)), 'var' => $p[2]];
+                    } elseif (preg_match('/([a-z]+(?:\|[a-z]+)*)\s+\$(\w+)/', $param, $p)) {
+                        $params[] = ['type' => $p[1], 'var' => $p[2]];
+                    } elseif (preg_match('/\$(\w+)/', $param, $p)) {
+                        $params[] = ['type' => null, 'var' => $p[1]];
+                    }
+                }
+            }
+
+            // Parse return type
+            $returnRaw  = trim($match[3] ?? '');
+            $returnType = $returnRaw !== ''
+                ? class_basename(str_replace('\\', '/', ltrim($returnRaw, '?')))
+                : null;
+            $returnNullable = str_starts_with($returnRaw, '?');
+
+            $details[] = [
+                'method'          => $name,
+                'params'          => $params,
+                'return_type'     => $returnType,
+                'return_nullable' => $returnNullable,
+            ];
+        }
+
+        return $details;
     }
 
     private function relativePath(string $absolutePath): string

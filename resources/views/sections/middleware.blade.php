@@ -1,10 +1,12 @@
 @php $rs = $data['route_summary'] ?? []; @endphp
+<div id="middleware-list">
     @php
-        $mwUsage   = $rs['middleware_usage'] ?? [];
-        $mwTotal   = count($mwUsage);
-        $mwTopName = $mwTotal > 0 ? array_key_first($mwUsage) : '—';
-        $mwTopCnt  = $mwTotal > 0 ? reset($mwUsage) : 0;
-        $mwAuthCnt = $mwUsage['auth'] ?? 0;
+        $mwUsage    = $rs['middleware_usage'] ?? [];
+        $mwTotal    = count($mwUsage);
+        $mwTopName  = $mwTotal > 0 ? array_key_first($mwUsage) : '—';
+        $mwTopCnt   = $mwTotal > 0 ? reset($mwUsage) : 0;
+        $mwAuthCnt  = $mwUsage['auth'] ?? 0;
+        $mwThrottle = count(array_filter(array_keys($mwUsage), fn($k) => str_contains(strtolower($k), 'throttle')));
     @endphp
     <div class="mds-top-stats">
         <div class="mds-top-stat">
@@ -18,6 +20,10 @@
         <div class="mds-top-stat">
             <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $mwAuthCnt }}</span>
             <span class="mds-top-stat-lbl">Auth Protected</span>
+        </div>
+        <div class="mds-top-stat">
+            <span class="mds-top-stat-num" style="color:#FF2D20;">{{ $mwThrottle }}</span>
+            <span class="mds-top-stat-lbl">Rate Limited</span>
         </div>
     </div>
     <div class="mds-toolbar">
@@ -43,7 +49,10 @@
         </div>
         <div id="middleware-grid">
             @foreach($mwUsage as $mwName => $mwCnt)
-            <div class="mw-row" data-name="{{ strtolower($mwName) }}">
+            <div class="mw-row" data-name="{{ strtolower($mwName) }}" style="cursor:pointer;"
+                 onclick="openDetailAjax('middleware', '{{ route('laradar.middleware.detail', $mwName) }}')"
+                 onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background=''"
+            >
                 <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,45,32,.10);border:1px solid rgba(255,45,32,.20);color:#FF2D20;display:flex;align-items:center;justify-content:center;flex:none;">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                 </div>
@@ -60,5 +69,6 @@
         </div>
     </div>
     @endif
-
+</div>{{-- #middleware-list --}}
+<div id="middleware-detail" style="display:none"><div id="middleware-detail-content"></div></div>
 

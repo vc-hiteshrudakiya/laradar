@@ -1,11 +1,12 @@
     <div id="controllers-list">
 
         @php
-            $ctrlTotal      = count($data['controllers']);
-            $ctrlTotalMeth  = array_sum(array_column($data['controllers'], 'method_count'));
-            $ctrlWithMw     = count(array_filter($data['controllers'], fn($c) => !empty($c['middleware'])));
-            $ctrlResource   = count(array_filter($data['controllers'], fn($c) => !empty($c['is_resource'])));
-            $ctrlMaxMethods = max(array_column($data['controllers'], 'method_count') ?: [1]);
+            $controllers    = $data['controllers'] ?? [];
+            $ctrlTotal      = count($controllers);
+            $ctrlTotalMeth  = array_sum(array_column($controllers, 'method_count'));
+            $ctrlWithMw     = count(array_filter($controllers, fn($c) => !empty($c['middleware'])));
+            $ctrlResource   = count(array_filter($controllers, fn($c) => !empty($c['is_resource'])));
+            $ctrlMaxMethods = max(array_column($controllers, 'method_count') ?: [1]);
         @endphp
         <div class="mds-top-stats">
             <div class="mds-top-stat">
@@ -35,19 +36,21 @@
             <div class="mds-list-head" style="grid-template-columns:36px 1fr 80px 70px 70px 90px;">
                 <span></span><span>Controller</span><span>Methods</span><span>Routes</span><span>Deps</span><span>Complexity</span>
             </div>
-            @foreach($data['controllers'] as $i => $ctrl)
+            @foreach($controllers as $i => $ctrl)
             @php
                 $ctrlRouteCount = count(array_filter($data['routes'] ?? [], fn($r) => class_basename($r['controller']['class'] ?? '') === $ctrl['name']));
                 $ctrlComplexity = $ctrlMaxMethods > 0 ? round(($ctrl['method_count']??0) / $ctrlMaxMethods * 100) : 0;
             @endphp
-            <div class="mds-list-row" style="grid-template-columns:36px 1fr 80px 70px 70px 90px;" data-name="{{ strtolower($ctrl['name']) }}">
+            <div class="mds-list-row" style="grid-template-columns:36px 1fr 80px 70px 70px 90px;cursor:pointer;" data-name="{{ strtolower($ctrl['name']) }}"
+                onclick="openDetailAjax('controllers','{{ route('laradar.controller.detail', $ctrl['name']) }}')"
+                onmouseenter="this.style.borderColor='rgba(255,45,32,0.3)'" onmouseleave="this.style.borderColor=''">
                 <div class="mds-list-av" style="background:rgba(255,45,32,0.10);color:#FF2D20;border-color:rgba(255,45,32,0.25);">{{ substr($ctrl['name'],0,1) }}</div>
                 <div style="min-width:0;">
                     <div style="font-weight:700;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                         {{ $ctrl['name'] }}
                         @if(!empty($ctrl['is_resource']))<span style="font-family:var(--font-mono);font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(255,45,32,0.08);color:#FF2D20;border:1px solid rgba(255,45,32,0.2);margin-left:6px;">Resource</span>@endif
                     </div>
-                    <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $ctrl['namespace'] }}</div>
+                    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $ctrl['namespace'] }}</div>
                 </div>
                 <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text);text-align:center;">{{ $ctrl['method_count']??0 }}</div>
                 <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:#FF2D20;text-align:center;">{{ $ctrlRouteCount }}</div>
@@ -65,4 +68,5 @@
         </div>
     </div>
 
+    <div id="controllers-detail" style="display:none"><div id="controllers-detail-content"></div></div>
 

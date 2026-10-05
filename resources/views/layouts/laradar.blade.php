@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="{{ route('laradar.asset', ['filename' => 'laradar.css']) }}">
+<link rel="stylesheet" href="{{ route('laradar.asset', ['filename' => 'detail.css']) }}">
 </head>
 <body class="atlas-layout">
 
@@ -40,6 +41,7 @@ $sectionLabel = [
     'ai'           => 'AI Insights',
     'chat'         => 'AI Chat',
     'aidocs'       => 'AI Docs',
+    'guide'        => 'Guide',
 ][$section] ?? 'Overview';
 $nav = fn(string $s) => $section === $s ? 'nav-item nav-active' : 'nav-item';
 @endphp
@@ -91,6 +93,10 @@ $nav = fn(string $s) => $section === $s ? 'nav-item nav-active' : 'nav-item';
             <button onclick="navigate('aidocs')" id="nav-aidocs" class="{{ $nav('aidocs') }}" title="AI Docs">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                 <span class="nav-label">AI Docs</span>
+            </button>
+            <button onclick="navigate('guide')" id="nav-guide" class="{{ $nav('guide') }}" title="Guide">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="nav-label">Guide</span>
             </button>
         </div>
 
@@ -199,17 +205,17 @@ $nav = fn(string $s) => $section === $s ? 'nav-item nav-active' : 'nav-item';
 </header>
 
 {{-- PAGE CONTENT --}}
-@isset($model)
+@hasSection('content')
     <div class="p-6 section-pane">
         @yield('content')
     </div>
 @else
-    @foreach(['overview','models','controllers','routes','migrations','jobs','events','services','repositories','observers','policies','modules','middleware','packages','ai','chat','aidocs'] as $__sec)
+    @foreach(['overview','models','controllers','routes','migrations','jobs','events','services','repositories','observers','policies','modules','middleware','packages','ai','chat','aidocs','guide'] as $__sec)
     <div id="sec-{{ $__sec }}" class="p-6 section-pane" @if($__sec !== $section) style="display:none" @endif>
         @include('laradar::sections.' . $__sec)
     </div>
     @endforeach
-@endisset
+@endif
 
 </main>
 
@@ -239,7 +245,7 @@ $nav = fn(string $s) => $section === $s ? 'nav-item nav-active' : 'nav-item';
 
 <script>
 const APP = @json($data);
-const SECTIONS = ['overview','models','controllers','routes','migrations','jobs','events','services','repositories','observers','policies','modules','middleware','packages','ai','chat','aidocs'];
+const SECTIONS = ['overview','models','controllers','routes','migrations','jobs','events','services','repositories','observers','policies','modules','middleware','packages','ai','chat','aidocs','guide'];
 
 const LARADAR_ROUTES = {
     overview:     '{{ route("laradar.dashboard") }}',
@@ -259,6 +265,7 @@ const LARADAR_ROUTES = {
     ai:           '{{ route("laradar.ai") }}',
     chat:         '{{ route("laradar.chat") }}',
     aidocs:       '{{ route("laradar.aidocs") }}',
+    guide:        '{{ route("laradar.guide") }}',
 };
 
 const _ALL_SECTION_LABELS = {
@@ -266,7 +273,7 @@ const _ALL_SECTION_LABELS = {
     routes:'Route Explorer', jobs:'Jobs', events:'Events', services:'Services',
     repositories:'Repositories', observers:'Observers', policies:'Policies',
     modules:'Modules', middleware:'Middleware', packages:'Packages',
-    ai:'AI Insights', chat:'AI Chat', aidocs:'AI Docs',
+    ai:'AI Insights', chat:'AI Chat', aidocs:'AI Docs', guide:'Guide',
 };
 
 function navigate(s) {
@@ -281,14 +288,24 @@ function navigate(s) {
     });
     const target = document.getElementById('sec-' + s);
     if (!target) {
-        // Model detail page — section panes not in DOM, do full navigation
+        // Direct URL page (detail page) — section panes not in DOM, do full navigation
         window.location.href = LARADAR_ROUTES[s];
         return;
     }
     target.style.display = '';
-    // If we were in a detail view, reset to list when navigating to a section
-    if (_activeDetailType) { showList(_activeDetailType); }
-    history.pushState({ section: s }, '', LARADAR_ROUTES[s]);
+    // If we were in a detail view, reset only the list/detail panels — do NOT call
+    // showList() here because it would re-show the old section pane and fight navigate().
+    if (_activeDetailType) {
+        const _lEl = document.getElementById(_activeDetailType + '-list');
+        const _dEl = document.getElementById(_activeDetailType + '-detail');
+        if (_lEl) _lEl.style.display = 'block';
+        if (_dEl) _dEl.style.display = 'none';
+        _activeDetailType = null;
+        _activeDetailIdx  = null;
+    }
+    // Replace when already on this section, push when switching sections
+    const histFn = (history.state && history.state.section === s) ? 'replaceState' : 'pushState';
+    history[histFn]({ section: s }, '', LARADAR_ROUTES[s]);
     document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('nav-active'));
     const navBtn = document.getElementById('nav-' + s);
     if (navBtn) navBtn.classList.add('nav-active');
@@ -301,86 +318,222 @@ function navigate(s) {
 history.replaceState({ section: '{{ $section }}' }, '', window.location.href);
 
 window.addEventListener('popstate', (e) => {
-    const s   = e.state?.section || 'overview';
-    const det = e.state?.detail;
-    const idx = e.state?.idx;
+    const s       = e.state?.section || 'overview';
+    const det     = e.state?.detail;
+    const idx     = e.state?.idx;
+    const ajaxUrl = e.state?.ajaxDetail;
 
-    // If going back to a detail view (e.g. model detail)
-    if (det !== undefined && idx !== undefined && s === 'models') {
+    // Helper: sync nav highlight and topbar label
+    function syncNav(section) {
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('nav-active'));
+        const nb = document.getElementById('nav-' + section);
+        if (nb) nb.classList.add('nav-active');
+        const le = document.getElementById('topbar-section');
+        if (le) le.textContent = _ALL_SECTION_LABELS[section] || section;
+    }
+
+    // Helper: hide all sec-* panes; if sec-s is missing we're on a detail-only page —
+    // fall back to a full-page replace so the correct section loads cleanly.
+    function showSection(section) {
         SECTIONS.forEach(sec => { const el = document.getElementById('sec-' + sec); if (el) el.style.display = 'none'; });
-        const target = document.getElementById('sec-models');
-        if (target) target.style.display = '';
-        showDetail('models', idx, false);
+        const tgt = document.getElementById('sec-' + section);
+        if (!tgt) {
+            window.location.replace(LARADAR_ROUTES[section] || LARADAR_ROUTES.overview);
+            return false;
+        }
+        tgt.style.display = '';
+        return true;
+    }
+
+    // Helper: reset every list/detail pair so the target section always shows its list.
+    // Doing all four (not just _activeDetailType) is safe and avoids stale state when
+    // cross-section navigation leaves a previous section's detail still visible.
+    function resetAllDetails() {
+        ['models', 'controllers', 'routes', 'migrations',
+         'services', 'repositories', 'jobs', 'events', 'observers',
+         'policies', 'modules', 'middleware', 'packages'].forEach(function(type) {
+            const lEl = document.getElementById(type + '-list');
+            const dEl = document.getElementById(type + '-detail');
+            if (lEl) lEl.style.display = 'block';
+            if (dEl) dEl.style.display = 'none';
+        });
+        _activeDetailType = null;
+        _activeDetailIdx  = null;
+    }
+
+    // If going to an AJAX-loaded detail (routes, controllers, migrations, models)
+    if (ajaxUrl) {
+        if (!showSection(s)) return;
+        syncNav(s);
+        openDetailAjax(s, ajaxUrl, false);
         return;
     }
 
-    // If going back to a list — reset any open detail first
-    if (_activeDetailType) {
-        document.getElementById(_activeDetailType + '-list').style.display = 'block';
-        document.getElementById(_activeDetailType + '-detail').style.display = 'none';
-        _activeDetailType = null;
-        _activeDetailIdx  = null;
-        _hideBackBtn();
+    // If going back to an inline detail view (model, controller, or route)
+    if (det !== undefined && idx !== undefined && ['models', 'controllers', 'routes'].includes(s)) {
+        if (!showSection(s)) return;
+        syncNav(s);
+        showDetail(s, idx, false);
+        return;
     }
 
-    SECTIONS.forEach(sec => {
-        const el = document.getElementById('sec-' + sec);
-        if (el) el.style.display = 'none';
-    });
-    const target = document.getElementById('sec-' + s);
-    if (target) target.style.display = '';
-    document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('nav-active'));
-    const navBtn = document.getElementById('nav-' + s);
-    if (navBtn) navBtn.classList.add('nav-active');
-    const labelEl = document.getElementById('topbar-section');
-    if (labelEl) labelEl.textContent = _ALL_SECTION_LABELS[s] || s;
+    // Going back to a section list
+    resetAllDetails();
+    if (!showSection(s)) return;
+    syncNav(s);
     const content = document.querySelector('.content');
     if (content) content.scrollTop = 0;
 });
 
-function _atlasTheme(el) {
-    // Light theme: Tailwind's native colours are correct — no post-processing needed.
-}
-
-const _SECTION_LABELS = {
-    models:'Models', controllers:'Controllers', routes:'Route Explorer',
-    events:'Events', services:'Services',
-    repositories:'Repositories', observers:'Observers', policies:'Policies',
-};
 let _activeDetailType = null;
 let _activeDetailIdx  = null;
 
-function _showBackBtn(label) {}
-function _hideBackBtn() {}
-
-function showDetail(type, idx, pushState = true) {
-    document.getElementById(type + '-list').style.display = 'none';
-    document.getElementById(type + '-detail').style.display = 'block';
-    const contentEl = document.getElementById(type + '-detail-content');
-    contentEl.innerHTML = renderDetail(type, APP[type][idx]);
-    _atlasTheme(contentEl);
-    _activeDetailType = type;
-    _activeDetailIdx  = idx;
-    _showBackBtn('Back to ' + (_SECTION_LABELS[type] || type));
-    if (pushState && type === 'models' && APP.models[idx]) {
-        const name = APP.models[idx].name || idx;
-        history.pushState({ section: type, detail: name, idx }, '', LARADAR_ROUTES.models + '/' + encodeURIComponent(name));
-    }
+function triggerReveal(container) {
+    var reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    container.querySelectorAll('.reveal').forEach(function(el, i) {
+        setTimeout(function() { el.classList.add('is-visible'); }, reduced ? 0 : 60 * i);
+    });
 }
 
-function showList(type) {
-    document.getElementById(type + '-list').style.display = 'block';
-    document.getElementById(type + '-detail').style.display = 'none';
+function showDetail(type, idx, pushState = true) {
+    // Cross-section navigation: if the target section isn't active, switch to it
+    // without a separate history entry — showDetail will produce the single entry below.
+    const curSec = history.state && history.state.section;
+    if (pushState && curSec && curSec !== type) {
+        SECTIONS.forEach(s => { const e = document.getElementById('sec-' + s); if (e) e.style.display = 'none'; });
+        const tgt = document.getElementById('sec-' + type);
+        if (tgt) tgt.style.display = '';
+        if (_activeDetailType) {
+            const ldl = document.getElementById(_activeDetailType + '-list');
+            const ldd = document.getElementById(_activeDetailType + '-detail');
+            if (ldl) ldl.style.display = 'block';
+            if (ldd) ldd.style.display = 'none';
+            _activeDetailType = null;
+            _activeDetailIdx  = null;
+            }
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('nav-active'));
+        const nb = document.getElementById('nav-' + type);
+        if (nb) nb.classList.add('nav-active');
+        const le = document.getElementById('topbar-section');
+        if (le) le.textContent = _ALL_SECTION_LABELS[type] || type;
+        const ct = document.querySelector('.content');
+        if (ct) ct.scrollTop = 0;
+    }
+
+    const listEl = document.getElementById(type + '-list');
+    const detailEl = document.getElementById(type + '-detail');
+    const contentEl = document.getElementById(type + '-detail-content');
+    if (!listEl || !detailEl || !contentEl) return;
+    listEl.style.display = 'none';
+    detailEl.style.display = 'block';
+    contentEl.innerHTML = '';
+    // Check BEFORE updating — if already in the same section's detail, replace instead of push
+    const alreadyInDetail = _activeDetailType === type;
+    _activeDetailType = type;
+    _activeDetailIdx  = idx;
+    if (pushState) {
+        const histFn = alreadyInDetail ? 'replaceState' : 'pushState';
+        if (type === 'models' && APP.models[idx]) {
+            const name = APP.models[idx].name || idx;
+            history[histFn]({ section: type, detail: name, idx }, '', LARADAR_ROUTES.models + '/' + encodeURIComponent(name));
+        } else if (type === 'controllers' && (APP.controllers||[])[idx]) {
+            const name = APP.controllers[idx].name || String(idx);
+            history[histFn]({ section: type, detail: name, idx }, '', LARADAR_ROUTES.controllers + '/' + encodeURIComponent(name));
+        } else if (type === 'routes' && (APP.routes||[])[idx]) {
+            const key = APP.routes[idx].name || String(idx);
+            history[histFn]({ section: type, detail: key, idx }, '', LARADAR_ROUTES.routes + '/' + encodeURIComponent(key));
+        }
+    }
+    requestAnimationFrame(function() {
+        contentEl.querySelectorAll('.reveal').forEach(function(el, i) {
+            setTimeout(function() { el.classList.add('is-visible'); }, 60 * i);
+        });
+    });
+}
+
+function showList(type, pushState = false) {
+    const listEl   = document.getElementById(type + '-list');
+    const detailEl = document.getElementById(type + '-detail');
+    // Direct-page mode: SPA section panes not in DOM — navigate to section base URL
+    if (!listEl || !detailEl) {
+        window.location.href = LARADAR_ROUTES[type] || LARADAR_ROUTES.overview;
+        return;
+    }
+    // Ensure the section pane is visible (guards against cross-section call)
+    SECTIONS.forEach(s => { const e = document.getElementById('sec-' + s); if (e) e.style.display = 'none'; });
+    const secEl = document.getElementById('sec-' + type);
+    if (secEl) secEl.style.display = '';
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('nav-active'));
+    const nb = document.getElementById('nav-' + type);
+    if (nb) nb.classList.add('nav-active');
+    const le = document.getElementById('topbar-section');
+    if (le) le.textContent = _ALL_SECTION_LABELS[type] || type;
+
+    listEl.style.display   = 'block';
+    detailEl.style.display = 'none';
     _activeDetailType = null;
     _activeDetailIdx  = null;
-    _hideBackBtn();
-    if (type === 'models') {
-        history.pushState({ section: 'models' }, '', LARADAR_ROUTES.models);
+    const histFn = pushState ? 'pushState' : 'replaceState';
+    if (LARADAR_ROUTES[type]) {
+        history[histFn]({ section: type }, '', LARADAR_ROUTES[type]);
     }
 }
 
 function topbarGoBack() {
     if (_activeDetailType) showList(_activeDetailType);
+}
+
+async function openDetailAjax(type, url, pushState = true) {
+    const listEl    = document.getElementById(type + '-list');
+    const detailEl  = document.getElementById(type + '-detail');
+    const contentEl = document.getElementById(type + '-detail-content');
+    if (!listEl || !detailEl || !contentEl) { window.location.href = url; return; }
+
+    // Switch section if needed
+    const curSec = history.state && history.state.section;
+    if (curSec && curSec !== type) {
+        SECTIONS.forEach(s => { const e = document.getElementById('sec-' + s); if (e) e.style.display = 'none'; });
+        const tgt = document.getElementById('sec-' + type);
+        if (tgt) tgt.style.display = '';
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('nav-active'));
+        const nb = document.getElementById('nav-' + type);
+        if (nb) nb.classList.add('nav-active');
+        const le = document.getElementById('topbar-section');
+        if (le) le.textContent = _ALL_SECTION_LABELS[type] || type;
+    }
+
+    // Show detail container with loading state
+    listEl.style.display   = 'none';
+    detailEl.style.display = 'block';
+    contentEl.innerHTML    = '<div style="padding:60px;text-align:center;color:var(--text-faint);font-family:var(--font-mono);font-size:12px;">Loading…</div>';
+    _activeDetailType = type;
+
+    const ct = document.querySelector('.content');
+    if (ct) ct.scrollTop = 0;
+
+    if (pushState) {
+        const alreadyInDetail = history.state && history.state.ajaxDetail;
+        // replaceState only if navigating to the exact same URL (e.g. page refresh);
+        // pushState for everything else so browser Back works through the full chain
+        const histFn = (alreadyInDetail && history.state.ajaxDetail === url) ? 'replaceState' : 'pushState';
+        history[histFn]({ section: type, ajaxDetail: url }, '', url);
+    }
+
+    try {
+        const res  = await fetch(url, { headers: { 'X-Partial': '1', 'X-Requested-With': 'XMLHttpRequest' } });
+        const html = await res.text();
+        contentEl.innerHTML = html;
+        requestAnimationFrame(function() {
+            triggerReveal(contentEl);
+            const routeEl = contentEl.querySelector('[data-route-idx]');
+            if (routeEl) {
+                const idx = parseInt(routeEl.dataset.routeIdx, 10);
+                setTimeout(function() { initRouteGraph(idx); }, 60);
+            }
+        });
+    } catch (e) {
+        contentEl.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-faint);font-size:13px;">Failed to load. Please try again.</div>';
+    }
 }
 
 function toggleSidebar() {
@@ -410,6 +563,18 @@ document.addEventListener('DOMContentLoaded', function() {
         else sb.scrollTop = pos;
         localStorage.removeItem('laradar_sidebar_scroll');
     }
+
+    // On direct URL load (detail pages), trigger reveal animations and route graph
+    const contentPane = document.querySelector('.p-6.section-pane');
+    if (contentPane && contentPane.querySelector('.reveal')) {
+        triggerReveal(contentPane);
+        const routeEl = contentPane.querySelector('[data-route-idx]');
+        if (routeEl) {
+            const idx = parseInt(routeEl.dataset.routeIdx, 10);
+            setTimeout(function() { initRouteGraph(idx); }, 100);
+        }
+    }
+
 });
 
 function filterGrid(type) {
@@ -439,7 +604,7 @@ function filterRoutes() {
     const mf  = document.getElementById('routes-method-filter')?.value || '';
     const mwf = (document.getElementById('routes-mw-filter')?.value || '').toLowerCase();
     document.querySelectorAll('.route-row').forEach(row => {
-        const handler  = (row.querySelector('td:nth-child(3)')?.textContent || '').toLowerCase();
+        const handler  = (row.dataset.handler || '').toLowerCase();
         const textOk   = !q   || row.dataset.uri.includes(q) || handler.includes(q);
         const methodOk = !mf  || row.dataset.methods.includes(mf);
         const mwOk     = !mwf || row.dataset.mw.includes(mwf);
@@ -447,230 +612,31 @@ function filterRoutes() {
     });
 }
 
-// ── Detail renderers ──────────────────────────────────────────────────────────
-
-function renderDetail(type, item) {
-    const map = {
-        models: renderModel,
-    };
-    return (map[type] || (() => ''))(item);
-}
-
-function detailCard(title, body) {
-    return `<div style="background:var(--bg-elevated);border-radius:12px;border:1px solid var(--border);padding:20px;margin-bottom:16px;"><h3 style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;margin-top:0;">${title}</h3>${body}</div>`;
-}
-
-function pill(text, color) {
-    const c = color || '#6B778C';
-    return `<span style="font-size:11px;font-family:var(--font-mono);padding:2px 8px;border-radius:5px;background:rgba(142,155,184,.12);color:${c};border:1px solid rgba(142,155,184,.2);">${text}</span>`;
-}
-
-function avatar(letter, color) {
-    const c = color || '#6B778C';
-    const rgb = c.replace('#','').match(/.{2}/g).map(x=>parseInt(x,16)).join(',');
-    return `<div style="width:48px;height:48px;border-radius:12px;background:rgba(${rgb},.15);border:1px solid rgba(${rgb},.3);display:flex;align-items:center;justify-content:center;color:${c};font-size:18px;font-weight:700;flex:none;">${letter}</div>`;
-}
-
-const MDS_PALETTE = [
-    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
-    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
-    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
-    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
-    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
-    {color:'#FF2D20', rgb:'255,45,32', hex:'#FF2D20'},
-];
-const MDS_REL_CFG = {
-    hasMany:       {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
-    hasOne:        {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
-    belongsTo:     {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
-    belongsToMany: {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
-    morphMany:     {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
-    morphTo:       {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
-    morphOne:      {hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
-    hasManyThrough:{hex:'#FF2D20',color:'#FF2D20',bg:'rgba(255,45,32,.10)',border:'rgba(255,45,32,.28)'},
-};
-
-function _mdsColor(name) {
-    const code = Math.abs((name || 'A').charCodeAt(0) - 65);
-    return MDS_PALETTE[code % MDS_PALETTE.length];
-}
-
-function renderModel(m) {
-    const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    const pal = _mdsColor(m.name || 'A');
-
-    // Find which controllers use this model via dep edges
-    const depEdges = APP.dependencies?.edges || [];
-    const usedBy = [];
-    depEdges.forEach(e => {
-        if (e.to === m.name || e.to === (m.name||'').split('\\').pop()) {
-            const ctrl = (APP.controllers||[]).find(c => c.name === e.from);
-            if (ctrl && !usedBy.find(u => u.name === ctrl.name)) {
-                const rCnt = (APP.routes||[]).filter(r => (r.controller?.class||r.action||'').includes(ctrl.name)).length;
-                usedBy.push({name:ctrl.name, routes:rCnt});
-            }
-        }
-    });
-
-    // Build column type map from migrations matched by table name
-    const columnTypes = {};
-    (APP.migrations||[]).forEach(mig => {
-        if (mig.table === m.table) {
-            (mig.columns||[]).forEach(col => { columnTypes[col.name] = col.type; });
-        }
-    });
-
-    // Build unified field map from fillable + hidden + casts + db type
-    const fieldMap = new Map();
-    (m.fillable||[]).forEach(f => fieldMap.set(f, {fillable:true, hidden:false, cast:null, db_type:columnTypes[f]||null}));
-    (m.hidden||[]).forEach(f => {
-        const ex = fieldMap.get(f) || {fillable:false, hidden:false, cast:null, db_type:columnTypes[f]||null};
-        ex.hidden = true; fieldMap.set(f, ex);
-    });
-    Object.entries(m.casts||{}).forEach(([f,type]) => {
-        const ex = fieldMap.get(f) || {fillable:false, hidden:false, cast:null, db_type:columnTypes[f]||null};
-        ex.cast = String(type); fieldMap.set(f, ex);
-    });
-
-    const fillCnt = m.fillable?.length || 0;
-    const hideCnt = m.hidden?.length   || 0;
-    const relCnt  = m.relationships?.length || 0;
-    const castCnt = Object.keys(m.casts||{}).length;
-    const traitCnt= m.traits?.length || 0;
-    const initial = (m.name?.[0]||'?').toUpperCase();
-    const traits  = (m.traits||[]).map(t => t.split('\\').pop());
-
-    // ── 2-column wrapper ──
-    let h = `<div class="mds-det-wrap">`;
-
-    // ── LEFT SIDEBAR ──
-    h += `<aside class="mds-sidebar">
-      <div class="mds-side-card">
-        <div class="mds-side-top">
-          <div class="mds-side-av" style="background:rgba(${pal.rgb},.18);color:${pal.color};border-color:rgba(${pal.rgb},.4);">${esc(initial)}</div>
-          <p class="mds-side-name">${esc(m.name)}</p>
-          <p class="mds-side-tbl">
-            <svg style="width:10px;height:10px;display:inline;margin-right:4px;vertical-align:middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0018 0V5"/></svg>
-            ${esc(m.table)}
-          </p>
-          <p class="mds-side-ns">${esc(m.namespace||'')}</p>
-        </div>
-
-        <div class="mds-side-stats">
-          ${fillCnt  ? `<div class="mds-side-stat" onclick="mdsTab('fields')" title="Go to fields"><span class="mds-side-stat-lbl">Fillable</span><span class="mds-side-stat-val" style="color:#FF2D20;">${fillCnt}</span></div>` : ''}
-          ${hideCnt  ? `<div class="mds-side-stat" onclick="mdsTab('fields')" title="Go to fields"><span class="mds-side-stat-lbl">Hidden</span><span class="mds-side-stat-val" style="color:#FF2D20;">${hideCnt}</span></div>` : ''}
-          ${castCnt  ? `<div class="mds-side-stat" onclick="mdsTab('fields')" title="Go to fields"><span class="mds-side-stat-lbl">Casts</span><span class="mds-side-stat-val" style="color:#FF2D20;">${castCnt}</span></div>` : ''}
-          ${relCnt   ? `<div class="mds-side-stat" onclick="mdsTab('relations')" title="Go to relationships"><span class="mds-side-stat-lbl">Relationships</span><span class="mds-side-stat-val" style="color:#FF2D20;">${relCnt}</span></div>` : ''}
-          ${usedBy.length ? `<div class="mds-side-stat" onclick="mdsTab('usedby')" title="Go to used by"><span class="mds-side-stat-lbl">Used by</span><span class="mds-side-stat-val" style="color:#FF2D20;">${usedBy.length}</span></div>` : ''}
-          ${!fillCnt && !relCnt && !usedBy.length ? `<p style="font-size:12px;color:var(--text-faint);text-align:center;padding:8px 0;">No data available</p>` : ''}
-        </div>
-
-        <div class="mds-side-meta">
-          ${m.observer ? `<p style="font-size:10.5px;color:var(--text-faint);font-family:var(--font-mono);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Observer</p>
-          <span class="mds-side-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.25);">${esc(m.observer.split('\\').pop())}</span>` : ''}
-          ${traits.length ? `<p style="font-size:10.5px;color:var(--text-faint);font-family:var(--font-mono);margin:${m.observer?'12':'0'}px 0 8px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Traits</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;">${traits.map(t => `<span class="mds-side-chip" style="background:rgba(255,45,32,.08);color:#FF2D20;border-color:rgba(255,45,32,.25);">${esc(t)}</span>`).join('')}</div>` : ''}
-          ${m.timestamps !== false ? `<span class="mds-side-chip" style="background:rgba(255,45,32,.06);color:#FF2D20;border-color:rgba(255,45,32,.2);margin-top:8px;">timestamps</span>` : ''}
-        </div>
-      </div>
-    </aside>`;
-
-    // ── RIGHT MAIN CONTENT ──
-    h += `<div>`;
-
-    // Tabs
-    h += `<div class="mds-tabs" id="mds-tabs-row">
-      <button class="mds-tab-btn active" id="mds-tab-fields"    onclick="mdsTab('fields')">
-        Fields ${fieldMap.size ? `<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.12);color:#FF2D20;margin-left:5px;font-family:var(--font-mono);">${fieldMap.size}</span>` : ''}
-      </button>
-      ${relCnt ? `<button class="mds-tab-btn" id="mds-tab-relations" onclick="mdsTab('relations')">Relationships <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.12);color:#FF2D20;margin-left:5px;font-family:var(--font-mono);">${relCnt}</span></button>` : ''}
-      ${usedBy.length ? `<button class="mds-tab-btn" id="mds-tab-usedby" onclick="mdsTab('usedby')">Used By <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,45,32,.12);color:#FF2D20;margin-left:5px;font-family:var(--font-mono);">${usedBy.length}</span></button>` : ''}
-    </div>`;
-
-    // ── Fields Tab ──
-    h += `<div class="mds-tab-pane active" id="mds-pane-fields">`;
-    if (fieldMap.size) {
-        h += `<div class="mds-schema-wrap">
-          <table class="mds-schema-tbl">
-            <thead><tr>
-              <th>Field</th><th>Status</th><th>Type</th><th>Cast Type</th>
-            </tr></thead>
-            <tbody>`;
-        fieldMap.forEach((info, fname) => {
-            h += `<tr>
-              <td><span class="mds-field-name">${esc(fname)}</span></td>
-              <td>
-                ${info.fillable ? `<span class="mds-fbadge fill">FILLABLE</span>` : ''}
-                ${info.hidden   ? `<span class="mds-fbadge hide">HIDDEN</span>`   : ''}
-              </td>
-              <td>${info.db_type ? `<span class="mds-cast-val">${esc(info.db_type)}</span>` : '<span style="color:var(--text-faint);font-size:12px;">—</span>'}</td>
-              <td>${info.cast ? `<span class="mds-cast-val">${esc(info.cast)}</span>` : '<span style="color:var(--text-faint);font-size:12px;">—</span>'}</td>
-            </tr>`;
-        });
-        h += `</tbody></table></div>`;
-    }
-
-    // Feature flags
-    const flags = [];
-    if (traits.some(t => t.includes('SoftDeletes'))) flags.push({label:'SoftDeletes',        color:'#FF2D20', bg:'rgba(255,45,32,.08)', border:'rgba(255,45,32,.2)'});
-    if (traits.some(t => t.includes('HasFactory')))  flags.push({label:'HasFactory',          color:'#FF2D20', bg:'rgba(255,45,32,.08)', border:'rgba(255,45,32,.2)'});
-    if (traits.some(t => t.includes('Searchable')))  flags.push({label:'Searchable',          color:'#FF2D20', bg:'rgba(255,45,32,.08)', border:'rgba(255,45,32,.2)'});
-    if (m.timestamps !== false)                       flags.push({label:'$timestamps = true', color:'#FF2D20', bg:'rgba(255,45,32,.06)', border:'rgba(255,45,32,.15)'});
-    if (flags.length) {
-        h += `<div class="mds-flag-row">${flags.map(f => `<span class="mds-flag" style="color:${f.color};background:${f.bg};border-color:${f.border};">${esc(f.label)}</span>`).join('')}</div>`;
-    }
-    if (!fieldMap.size && !flags.length) {
-        h += `<p style="color:var(--text-faint);font-size:13px;text-align:center;padding:40px 0;">No fillable, hidden or cast fields detected.</p>`;
-    }
-    h += `</div>`; // end fields pane
-
-    // ── Relationships Tab ──
-    if (relCnt) {
-        h += `<div class="mds-tab-pane" id="mds-pane-relations">`;
-        (m.relationships||[]).forEach(r => {
-            const rc         = MDS_REL_CFG[r.type] || {color:'var(--text-dim)',bg:'rgba(91,103,133,.1)',border:'var(--border)'};
-            const rel        = r.related ? r.related.split('\\').pop() : '—';
-            const navIdx     = (APP.models||[]).findIndex(md => md.name === rel);
-            const fk         = r.foreign_key || null;
-            const isManyMany = r.type === 'belongsToMany';
-            const fkLine     = fk
-                ? `<span style="font-family:var(--font-mono);font-size:10px;color:${isManyMany ? 'var(--text-faint)' : '#FF2D20'};opacity:.85;">${isManyMany ? 'via ' + esc(fk) : esc(fk)}</span>`
-                : '';
-            h += `<div class="mds-rel-card" style="border-color:var(--border);" onmouseenter="this.style.borderColor='${rc.border}'" onmouseleave="this.style.borderColor='var(--border)'">
-              <div style="min-width:160px;display:flex;flex-direction:column;gap:3px;">
-                <span class="mds-rel-method">${esc(r.method)}()</span>
-                ${fkLine}
-              </div>
-              <span class="mds-rel-type" style="color:${rc.color};background:${rc.bg};border-color:${rc.border};">${esc(r.type)}</span>
-              <span class="mds-rel-arrow">→</span>
-              <span class="mds-rel-target">${esc(rel)}</span>
-              ${navIdx >= 0
-                ? `<button class="mds-nav-btn" style="color:${rc.color};background:${rc.bg};border-color:${rc.border};" onclick="event.stopPropagation();showDetail('models',${navIdx});">View →</button>`
-                : '<span></span>'}
-            </div>`;
-        });
-        h += `</div>`;
-    }
-
-    // ── Used By Tab ──
-    if (usedBy.length) {
-        h += `<div class="mds-tab-pane" id="mds-pane-usedby">`;
-        usedBy.forEach(u => {
-            const ci = (APP.controllers||[]).findIndex(c => c.name === u.name);
-            h += `<div class="mds-usedby-card">
-              <div>
-                <span style="font-size:14px;font-weight:700;color:var(--text);">${esc(u.name)}</span>
-                <span style="font-size:11px;color:var(--text-faint);margin-left:10px;font-family:var(--font-mono);">${u.routes} route${u.routes!==1?'s':''}</span>
-              </div>
-              ${ci >= 0 ? `<button class="mds-nav-btn" style="color:#FF2D20;background:rgba(255,45,32,.08);border-color:rgba(255,45,32,.2);" onclick="event.stopPropagation();navigate('controllers');">View controller →</button>` : ''}
-            </div>`;
-        });
-        h += `</div>`;
-    }
-
-    h += `</div></div>`; // close main + wrap
-    return h;
-}
+// ── Route Graph — global state + functions (used by both SPA and direct-access) ──
+var _rfNodes={},_rfEdges=[],_rfSelected=null,_rfRoute=null,_rfMws=[],_rfAnimFrame=null;
+var RF_COLOR={request:{border:'#FF2D20',type:'#FF2D20',dot:'#FF2D20'},middleware:{border:'rgba(255,45,32,.65)',type:'rgba(255,45,32,.9)',dot:'rgba(255,45,32,.8)'},controller:{border:'#FF2D20',type:'#FF2D20',dot:'#FF2D20'},service:{border:'rgba(255,45,32,.55)',type:'rgba(255,45,32,.85)',dot:'rgba(255,45,32,.8)'},repository:{border:'rgba(255,45,32,.55)',type:'rgba(255,45,32,.85)',dot:'rgba(255,45,32,.8)'},model:{border:'rgba(255,45,32,.70)',type:'rgba(255,45,32,.95)',dot:'rgba(255,45,32,.9)'},database:{border:'rgba(255,45,32,.35)',type:'rgba(255,45,32,.65)',dot:'rgba(255,45,32,.6)'},unknown:{border:'rgba(148,163,184,.40)',type:'rgba(148,163,184,.8)',dot:'rgba(148,163,184,.7)'}};
+var RF_LAYER_ORDER=['request','middleware','controller','service','repository','model','database','job','event','listener','unknown'];
+var RF_TYPE_LABEL={request:'HTTP Request',middleware:'Middleware',controller:'Controller',service:'Service',repository:'Repository',model:'Model',database:'Database',unknown:'Component'};
+var EDGE_LABEL={injects:'injects',uses:'uses',triggers:'triggers',persists:'persists'};
+function _rfEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function rfProp(label,val){if(!val&&val!==0)return '';return '<div class="rf-prop"><span class="rf-prop-label">'+label+'</span><p class="rf-prop-value">'+_rfEsc(String(val))+'</p></div>';}
+function buildDepGraph(){var nodeMap={},edgeMap={};for(var n of((APP.dependencies&&APP.dependencies.nodes)||[]))nodeMap[n.name]=n;for(var e of((APP.dependencies&&APP.dependencies.edges)||[])){if(!edgeMap[e.from])edgeMap[e.from]=[];edgeMap[e.from].push(e);}return{nodeMap:nodeMap,edgeMap:edgeMap};}
+function traceChain(startName){var g=buildDepGraph(),nodeMap=g.nodeMap,edgeMap=g.edgeMap,chain=[],visited=new Set();function dfs(name,edgeType){if(visited.has(name))return;visited.add(name);chain.push({name:name,layer:(nodeMap[name]&&nodeMap[name].layer)||'unknown',edgeType:edgeType});for(var e of(edgeMap[name]||[]))dfs(e.to,e.type);}dfs(startName,null);if(!chain.some(function(n){return['service','repository','model'].includes(n.layer);})){var stripped=startName.replace(/Controller|Page|Resource|Component|Widget|Action|Form|Table|Panel$/g,'');var words=stripped.match(/[A-Z][a-z0-9]*/g)||[stripped];var candidates=[stripped].concat(words.sort(function(a,b){return b.length-a.length;}));var depNodes=(APP.dependencies&&APP.dependencies.nodes)||[],models=APP.models||[];function score(nodeName){var n=nodeName.toLowerCase().replace(/(service|repository|repo)$/i,'');for(var i=0;i<candidates.length;i++){var c=candidates[i].toLowerCase();if(n===c)return 100-i;if(n.startsWith(c))return 80-i;if(n.includes(c))return 60-i;if(c.includes(n)&&n.length>=3)return 40-i;}return 0;}if(!chain.some(function(n){return n.layer==='service';})){var best=depNodes.filter(function(n){return n.layer==='service';}).map(function(n){return{n:n,s:score(n.name)};}).filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;})[0];if(best&&!visited.has(best.n.name)){chain.push({name:best.n.name,layer:'service',edgeType:'injects',_inferred:true});visited.add(best.n.name);for(var e of(edgeMap[best.n.name]||[]))dfs(e.to,e.type);}}if(!chain.some(function(n){return n.layer==='repository';})){var best=depNodes.filter(function(n){return n.layer==='repository';}).map(function(n){return{n:n,s:score(n.name)};}).filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;})[0];if(best&&!visited.has(best.n.name)){chain.push({name:best.n.name,layer:'repository',edgeType:'uses',_inferred:true});visited.add(best.n.name);for(var e of(edgeMap[best.n.name]||[]))dfs(e.to,e.type);}}if(!chain.some(function(n){return n.layer==='model';})){var best=models.map(function(m){return{m:m,s:score(m.name)};}).filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;})[0];if(best&&!visited.has(best.m.name)){chain.push({name:best.m.name,layer:'model',edgeType:'uses',_inferred:true});visited.add(best.m.name);}}}return chain;}
+function initRouteGraph(idx){var route=APP.routes[idx];if(!route)return;var methods=(route.methods||[]).filter(function(m){return m!=='HEAD';});var ctrl=(route.controller&&route.controller.class)?route.controller.class.split('\\').pop():null;var action=(route.controller&&route.controller.method)||null;var mws=route.middleware||[];var chain=ctrl?traceChain(ctrl):[];_rfRoute=route;_rfMws=mws;_rfNodes={};_rfEdges=[];_rfSelected=null;var uid=0;function mkNode(type,name,sub,meta){var id='rg'+(uid++);_rfNodes[id]={id:id,type:type,name:name,sub:sub||'',meta:meta||{}};return id;}function mkEdge(from,to,label){_rfEdges.push({from:from,to:to,label:label||''});}var routeId=mkNode('request',methods.map(function(m){return m.toLowerCase();}).join('|')+' /'+(route.uri||''),route.name||'',{route:route});var prevId=routeId;if(mws.length){var mwId=mkNode('middleware','Middleware Stack',mws.length+' layers',{mws:mws});mkEdge(prevId,mwId,'enters');prevId=mwId;}if(chain.length>0){var lastId=prevId;chain.forEach(function(node,i){var isCtrl=i===0,nodeType=isCtrl?'controller':node.layer;if(nodeType==='database')return;var sub=isCtrl?(action&&action!=='__invoke'?'@'+action:'Invokable'):(RF_TYPE_LABEL[node.layer]||node.layer);var nid=mkNode(nodeType,node.name,sub,{node:node,action:isCtrl?action:null,inferred:!!node._inferred});var lbl=i===0?'dispatches':(EDGE_LABEL[node.edgeType]||node.edgeType||'calls');mkEdge(lastId,nid,lbl);if(nodeType!=='model')lastId=nid;});var modelNodes=chain.filter(function(n){return n.layer==='model';});if(modelNodes.length>0){var dbId=mkNode('database','Database','Eloquent ORM',{});modelNodes.forEach(function(modelNode){var modelNid=Object.values(_rfNodes).find(function(n){return n.name===modelNode.name&&n.type==='model';});if(modelNid)mkEdge(modelNid.id,dbId,'persists');});}}else if(ctrl){var cid=mkNode('controller',ctrl,action&&action!=='__invoke'?'@'+action:'Invokable',{});mkEdge(prevId,cid,'dispatches');}
+var NW=200,NH=68,GAP_Y=88,GAP_X=20,PAD=32,MAX_PER_ROW=3,layers={};Object.values(_rfNodes).forEach(function(n){var li=RF_LAYER_ORDER.indexOf(n.type),k=li>=0?li:99;if(!layers[k])layers[k]=[];layers[k].push(n);});var layerKeys=Object.keys(layers).map(Number).sort(function(a,b){return a-b;});var maxRowW=Math.max.apply(null,layerKeys.map(function(k){return Math.min(layers[k].length,MAX_PER_ROW)*NW+(Math.min(layers[k].length,MAX_PER_ROW)-1)*GAP_X;}));var CANVAS_W=Math.max(maxRowW+PAD*2,380),totalSubRows=layerKeys.reduce(function(sum,k){return sum+Math.ceil(layers[k].length/MAX_PER_ROW);},0),CANVAS_H=totalSubRows*(NH+GAP_Y)+PAD*2-GAP_Y+PAD,pos={},currentY=PAD;
+layerKeys.forEach(function(lk){var row=layers[lk],chunks=[];for(var i=0;i<row.length;i+=MAX_PER_ROW)chunks.push(row.slice(i,i+MAX_PER_ROW));chunks.forEach(function(chunk){var totalW=chunk.length*NW+(chunk.length-1)*GAP_X,x=(CANVAS_W-totalW)/2;chunk.forEach(function(n){pos[n.id]={x:x,y:currentY,cx:x+NW/2,cy:currentY+NH/2};x+=NW+GAP_X;});currentY+=NH+GAP_Y;});});
+// Expand SVG to container width so nodes are truly centered; overflow-x:auto handles wider graphs
+var wrap=document.getElementById('rf-canvas-wrap');if(!wrap)return;var containerW=wrap.clientWidth;if(containerW>CANVAS_W){var shift=(containerW-CANVAS_W)/2;Object.values(pos).forEach(function(p){p.x+=shift;p.cx+=shift;});CANVAS_W=containerW;}
+var defs='<defs><pattern id="rf-dot" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.9" fill="rgba(255,45,32,0.08)"/></pattern><marker id="rf-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="rgba(255,45,32,0.55)"/></marker><filter id="rf-node-shadow" x="-15%" y="-15%" width="130%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs>';
+var edgesSvg=_rfEdges.map(function(e){var f=pos[e.from],t=pos[e.to];if(!f||!t)return '';var x1=f.cx,y1=f.y+NH,x2=t.cx,y2=t.y,cp=Math.min(Math.abs(y2-y1)*0.5,80),d='M'+x1+','+y1+' C'+x1+','+(y1+cp)+' '+x2+','+(y2-cp)+' '+x2+','+y2;return '<path d="'+d+'" class="rf-edge-path" fill="none" stroke="rgba(255,45,32,0.35)" stroke-width="1.5" marker-end="url(#rf-arr)"/>';}).join('');
+var nodesSvg=Object.values(_rfNodes).map(function(n){var p=pos[n.id];if(!p)return '';var c=RF_COLOR[n.type]||RF_COLOR.unknown,typeLabel=RF_TYPE_LABEL[n.type]||n.type,shortName=n.name.length>22?n.name.slice(0,21)+'…':n.name,shortSub=(n.sub||'').length>26?n.sub.slice(0,25)+'…':(n.sub||'');var strokeDash=n.meta&&n.meta.inferred?'stroke-dasharray="4,3"':'',alphaAttr=n.meta&&n.meta.inferred?'opacity="0.88"':'';return '<g class="rf-node" data-id="'+n.id+'" onclick="rfClick(\''+n.id+'\')" style="cursor:pointer" '+alphaAttr+'><rect x="'+p.x+'" y="'+p.y+'" width="'+NW+'" height="'+NH+'" rx="10" style="fill:var(--bg-elevated)" stroke="'+c.border+'" stroke-width="1.5" '+strokeDash+' id="rf-rect-'+n.id+'" filter="url(#rf-node-shadow)"/><rect x="'+p.x+'" y="'+p.y+'" width="'+NW+'" height="18" rx="10" fill="'+c.border+'" fill-opacity="0.18"/><rect x="'+p.x+'" y="'+(p.y+9)+'" width="'+NW+'" height="9" fill="'+c.border+'" fill-opacity="0.18"/><circle cx="'+(p.x+12)+'" cy="'+(p.y+9)+'" r="2.8" fill="'+c.dot+'"/><text x="'+(p.x+20)+'" y="'+(p.y+13)+'" fill="'+c.type+'" font-size="7.5" font-family="\'JetBrains Mono\',monospace" font-weight="700" letter-spacing="0.12em">'+typeLabel.toUpperCase()+'</text><text x="'+(p.x+10)+'" y="'+(p.y+39)+'" style="fill:var(--text)" font-size="11.5" font-family="\'JetBrains Mono\',monospace" font-weight="700">'+_rfEsc(shortName)+'</text>'+(shortSub?'<text x="'+(p.x+10)+'" y="'+(p.y+55)+'" style="fill:var(--text-faint)" font-size="9" font-family="\'JetBrains Mono\',monospace">'+_rfEsc(shortSub)+'</text>':'')+'</g>';}).join('');
+wrap.innerHTML='<svg id="rf-svg" width="'+CANVAS_W+'" height="'+CANVAS_H+'" style="display:block;">'+defs+'<rect width="'+CANVAS_W+'" height="'+CANVAS_H+'" fill="url(#rf-dot)"/>'+edgesSvg+nodesSvg+'<g id="rf-dots-g"></g></svg>';
+var firstNode=Object.values(_rfNodes)[0];_rfSelected=firstNode;rfRefreshPanel();setTimeout(function(){rfHighlight(firstNode&&firstNode.id);},20);var reduced=window.matchMedia('(prefers-reduced-motion:reduce)').matches;if(!reduced)setTimeout(startRfFlowAnimation,80);}
+function rfRefreshPanel(){var el=document.getElementById('rf-panel');if(!el)return;el.innerHTML=rfNodeProps(_rfSelected||Object.values(_rfNodes)[0]);}
+function rfNodeProps(node){if(!node)return '<p style="color:var(--text-faint);font-size:11px;text-align:center;margin-top:24px;">Click a node</p>';var c=RF_COLOR[node.type]||RF_COLOR.unknown;var header='<div class="rf-panel-head"><div class="rf-panel-dot" style="background:'+c.dot+';"></div><div style="min-width:0;flex:1;"><p class="rf-panel-type" style="color:'+c.type+';">'+(RF_TYPE_LABEL[node.type]||node.type)+'</p><p class="rf-panel-name" style="color:var(--text);" title="'+_rfEsc(node.name)+'">'+_rfEsc(node.name)+'</p></div></div>';var inferred=(node.meta&&node.meta.inferred)?'<div style="margin-bottom:10px;padding:5px 8px;background:rgba(255,45,32,.08);border:1px solid rgba(255,45,32,.2);border-radius:6px;font-size:10px;color:rgba(255,45,32,.7);">~ inferred by naming convention</div>':'';var body=inferred,rdata=_rfRoute,mws=_rfMws;if(node.type==='request'){var ms=(rdata.methods||[]).filter(function(m){return m!=='HEAD';});body+=rfProp('Method',ms.map(function(m){return m.toUpperCase();}).join(', '))+rfProp('Middleware',mws.length?mws.length+' applied':'None');}else if(node.type==='middleware'){body+=mws.map(function(mw,i){return rfProp('#'+(i+1),mw.split('\\').pop());}).join('');}else if(node.type==='controller'){var cc=rdata.controller||{};body+=rfProp('Class',cc.class||node.name)+rfProp('Method',(node.meta&&node.meta.action&&node.meta.action!=='__invoke')?node.meta.action:null)+rfProp('Type',(!node.meta||!node.meta.action||node.meta.action==='__invoke')?'Invokable':'Resource Method');var ci=(APP.controllers||[]).findIndex(function(c){return c.name===node.name;});if(ci>=0){body+='<span class="rf-panel-link" style="cursor:pointer;" onclick="window.location.href=LARADAR_ROUTES.controllers+\'/\'+encodeURIComponent(\''+node.name+'\')">View Controller <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg></span>';}}else if(node.type==='model'){var md=(APP.models||[]).find(function(m){return m.name===node.name;});if(md)body+=rfProp('Table',md.table)+rfProp('Fillable',md.fillable&&md.fillable.length?md.fillable.length+' fields':null);var mi=(APP.models||[]).findIndex(function(m){return m.name===node.name;});if(mi>=0){body+='<span class="rf-panel-link" style="cursor:pointer;" onclick="window.location.href=LARADAR_ROUTES.models+\'/\'+encodeURIComponent(\''+node.name+'\')">View Model <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg></span>';}}else if(node.type==='database'){body+=rfProp('Table',node.name)+rfProp('Model',node.meta&&node.meta.model?node.meta.model.name:null);}else if(node.type==='service'){body+=rfProp('Class',node.name)+rfProp('Injected into',_rfRoute&&_rfRoute.controller?_rfRoute.controller.class.split('\\').pop():null);body+='<span class="rf-panel-link rf-panel-link--soon">Detail page coming soon</span>';}else{body+=rfProp('Name',node.name)+rfProp('Layer',node.type);}return header+body;}
+window.rfClick=function(nid){_rfSelected=_rfNodes[nid];rfHighlight(nid);rfRefreshPanel();};
+function rfHighlight(nid){document.querySelectorAll('g.rf-node[data-id]').forEach(function(g){var r=document.getElementById('rf-rect-'+g.getAttribute('data-id'));if(r){r.setAttribute('stroke-width','1.5');r.style.filter='';}});if(!nid)return;var rect=document.getElementById('rf-rect-'+nid);if(rect){rect.setAttribute('stroke-width','3');rect.style.filter='drop-shadow(0 0 10px rgba(255,45,32,0.85))';}}
+function startRfFlowAnimation(){if(_rfAnimFrame){cancelAnimationFrame(_rfAnimFrame);_rfAnimFrame=null;}var svg=document.getElementById('rf-svg'),dotsG=document.getElementById('rf-dots-g');if(!svg||!dotsG)return;var paths=svg.querySelectorAll('.rf-edge-path');if(!paths.length)return;dotsG.innerHTML='';var ns='http://www.w3.org/2000/svg',dots=[];paths.forEach(function(path,i){var len=path.getTotalLength();if(len<10)return;for(var d=0;d<2;d++){var glow=document.createElementNS(ns,'circle');glow.setAttribute('r','9');glow.setAttribute('fill','#FF2D20');glow.setAttribute('opacity','0.15');var circle=document.createElementNS(ns,'circle');circle.setAttribute('r','4');circle.setAttribute('fill','#FF2D20');circle.setAttribute('opacity','0.9');dotsG.appendChild(glow);dotsG.appendChild(circle);dots.push({dot:circle,glow:glow,path:path,len:len,progress:(d*0.5+i*0.17)%1});}});var SPEED=0.35,last=performance.now();function tick(now){var dt=(now-last)/1000;last=now;dots.forEach(function(d){d.progress=(d.progress+SPEED*dt/d.len*100)%1;var pt=d.path.getPointAtLength(d.progress*d.len);d.dot.setAttribute('cx',pt.x);d.dot.setAttribute('cy',pt.y);d.glow.setAttribute('cx',pt.x);d.glow.setAttribute('cy',pt.y);});_rfAnimFrame=requestAnimationFrame(tick);}   _rfAnimFrame=requestAnimationFrame(tick);}
 
 function mdsTab(tab) {
     document.querySelectorAll('.mds-tab-btn').forEach(b => b.classList.remove('active'));
@@ -692,16 +658,16 @@ function mdsView(view) {
 // ── Model Relationship Map ────────────────────────────────────────────────────
 
 const REL_COLORS = {
-    hasMany:        { color:'#34D399', bg:'rgba(52,211,153,.13)',  border:'rgba(52,211,153,.3)'  },
-    hasOne:         { color:'#FF2D20', bg:'rgba(255,45,32,.12)',   border:'rgba(255,45,32,.3)'   },
-    belongsTo:      { color:'#60A5FA', bg:'rgba(96,165,250,.13)',  border:'rgba(96,165,250,.3)'  },
-    belongsToMany:  { color:'#A78BFA', bg:'rgba(167,139,250,.13)', border:'rgba(167,139,250,.3)' },
-    morphMany:      { color:'#FB923C', bg:'rgba(251,146,60,.13)',  border:'rgba(251,146,60,.3)'  },
-    morphOne:       { color:'#FBBF24', bg:'rgba(251,191,36,.13)',  border:'rgba(251,191,36,.3)'  },
-    morphTo:        { color:'#F87171', bg:'rgba(248,113,113,.13)', border:'rgba(248,113,113,.3)' },
-    morphToMany:    { color:'#E879F9', bg:'rgba(232,121,249,.13)', border:'rgba(232,121,249,.3)' },
-    hasManyThrough: { color:'#2DD4BF', bg:'rgba(45,212,191,.13)',  border:'rgba(45,212,191,.3)'  },
-    hasOneThrough:  { color:'#38BDF8', bg:'rgba(56,189,248,.13)',  border:'rgba(56,189,248,.3)'  },
+    hasMany:        { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
+    hasOne:         { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
+    belongsTo:      { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
+    belongsToMany:  { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
+    morphMany:      { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
+    morphOne:       { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
+    morphTo:        { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
+    morphToMany:    { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
+    hasManyThrough: { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
+    hasOneThrough:  { color:'#FF2D20', bg:'rgba(255,45,32,.12)', border:'rgba(255,45,32,.28)' },
 };
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
@@ -936,7 +902,7 @@ function _buildOvArchDiagram() {
     LAYERS.forEach((layer, li) => {
         const t = li / (n - 1);
         const color = _lerpColor(OV_VIOLET, OV_CYAN_RGB, t);
-        const tx = _svgEl('text', { x:colX[li], y:22, 'text-anchor':'middle', 'font-family':'Inter,sans-serif', 'font-size':10, 'font-weight':700, 'letter-spacing':'0.08em', fill:color });
+        const tx = _svgEl('text', { x:colX[li], y:22, 'text-anchor':'middle', 'font-family':'Figtree,sans-serif', 'font-size':10, 'font-weight':700, 'letter-spacing':'0.08em', fill:color });
         tx.textContent = layer.name.toUpperCase();
         svg.appendChild(tx);
         // Subtle column separator line
@@ -990,7 +956,7 @@ function _buildOvArchDiagram() {
         const dotEl = _svgEl('circle', { cx:x+16, cy:y+BOX_H/2, r:dotR, fill: pos.isMore ? 'rgba(255,45,32,0.35)' : color });
 
         // Label: max 22 chars (wider box allows more)
-        const lbl = _svgEl('text', { x:x+30, y:y+20, 'font-family':'Inter,sans-serif', 'font-size':'11', 'font-weight': pos.isMore ? '500' : '600', fill: pos.isMore ? '#6B778C' : '#172B4D' });
+        const lbl = _svgEl('text', { x:x+30, y:y+20, 'font-family':'Figtree,sans-serif', 'font-size':'11', 'font-weight': pos.isMore ? '500' : '600', fill: pos.isMore ? '#6B778C' : '#172B4D' });
         lbl.textContent = pos.label.length > 22 ? pos.label.slice(0, 22) + '…' : pos.label;
 
         const sub = _svgEl('text', { x:x+30, y:y+36, 'font-family':'JetBrains Mono,monospace', 'font-size':'9.5', fill:'#6B778C' });
@@ -1282,7 +1248,7 @@ function initDepGraph() {
         lbl.setAttribute('x', bandMinX + 6);
         lbl.setAttribute('y', band.y1 + (band.y2 - band.y1) / 2 + 4);
         lbl.setAttribute('font-size', '10');
-        lbl.setAttribute('font-family', 'system-ui,sans-serif');
+        lbl.setAttribute('font-family', 'Figtree,sans-serif');
         lbl.setAttribute('fill', cfg.color || '#64748b');
         lbl.setAttribute('font-weight', '600');
         lbl.setAttribute('opacity', '0.7');
@@ -1345,7 +1311,7 @@ function initDepGraph() {
         text.setAttribute('y', pos.y + _DEP_NH / 2 + 4);
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('font-size', '10.5');
-        text.setAttribute('font-family', 'system-ui,sans-serif');
+        text.setAttribute('font-family', 'Figtree,sans-serif');
         text.setAttribute('font-weight', '600');
         text.setAttribute('fill', '#172B4D');
         text.textContent = display;
@@ -1556,11 +1522,17 @@ function chatExtractContext(question) {
 
     // Controller keyword match
     const ctrlHits = (APP.controllers || []).filter(c => words.some(w => c.name.toLowerCase().includes(w)));
-    if (ctrlHits.length) { data.controllers = ctrlHits; labels.push(ctrlHits.map(c => c.name).join(', ')); }
+    if (ctrlHits.length) {
+        data.controllers = ctrlHits;
+        labels.push(ctrlHits.length > 3 ? ctrlHits.length + ' controllers' : ctrlHits.map(c => c.name).join(', '));
+    }
 
     // Model keyword match
     const modelHits = (APP.models || []).filter(m => words.some(w => m.name.toLowerCase().includes(w)));
-    if (modelHits.length) { data.models = modelHits; labels.push(modelHits.map(m => m.name).join(', ')); }
+    if (modelHits.length) {
+        data.models = modelHits;
+        labels.push(modelHits.length > 3 ? modelHits.length + ' models' : modelHits.map(m => m.name).join(', '));
+    }
 
     // Route keyword match
     const routeHits = (APP.routes || []).filter(r =>
@@ -1570,7 +1542,10 @@ function chatExtractContext(question) {
 
     // Service keyword match
     const svcHits = (APP.services || []).filter(s => words.some(w => (s.name || '').toLowerCase().includes(w)));
-    if (svcHits.length) { data.services = svcHits; labels.push(svcHits.map(s => s.name).join(', ')); }
+    if (svcHits.length) {
+        data.services = svcHits;
+        labels.push(svcHits.length > 3 ? svcHits.length + ' services' : svcHits.map(s => s.name).join(', '));
+    }
 
     // Score / SOLID / quality
     if (/score|solid|grade|quality|best practice|principle/.test(q)) {
@@ -1658,33 +1633,10 @@ function chatReplaceBubble(id, text, contextLabels = [], isError = false) {
         return;
     }
 
-    // Typewriter reveal: type plain text first, then swap to full rendered HTML
     const rendered = chatMarkdown(text);
-    const plain    = rendered.replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
-
-    const box = document.createElement('div');
-    box.style.cssText = 'font-size:13px;color:#334155;line-height:1.65;';
-    box.className = 'type-cursor';
-    inner.innerHTML = '';
-    inner.appendChild(box);
-
-    const wrap  = document.getElementById('chat-messages');
-    const speed = plain.length > 400 ? 6 : plain.length > 150 ? 12 : 18;
-    const chunk = plain.length > 400 ? 5 : plain.length > 150 ? 3 : 1;
-    let i = 0;
-
-    const tick = () => {
-        if (i >= plain.length) {
-            inner.innerHTML = `<div style="font-size:13px;color:#334155;line-height:1.65;">${rendered}</div>${ctxHtml}`;
-            wrap.scrollTop = wrap.scrollHeight;
-            return;
-        }
-        i = Math.min(i + chunk, plain.length);
-        box.textContent = plain.slice(0, i);
-        wrap.scrollTop = wrap.scrollHeight;
-        setTimeout(tick, speed);
-    };
-    tick();
+    const wrap = document.getElementById('chat-messages');
+    inner.innerHTML = `<div style="font-size:13px;color:#334155;line-height:1.65;">${rendered}</div>${ctxHtml}`;
+    wrap.scrollTop = wrap.scrollHeight;
 }
 
 function chatMarkdown(text) {
@@ -1701,7 +1653,7 @@ function chatMarkdown(text) {
         if (/\S[ \t]*↓[ \t]*\S/.test(code)) {
             code = code.split('↓').map(s => s.trim()).filter(Boolean).join('\n    ↓\n');
         }
-        return `<pre style="background:#1e293b;color:#86efac;border-radius:8px;padding:12px;margin:8px 0;font-size:11px;white-space:pre-wrap;word-break:break-word;overflow-x:auto;font-family:monospace;"><code style="background:none;border:none;padding:0;color:inherit;">${code}</code></pre>`;
+        return `<pre style="background:#1e293b;color:#86efac;border-radius:8px;padding:12px;margin:8px 0;font-size:11px;white-space:pre-wrap;word-break:break-word;overflow-x:auto;font-family:'JetBrains Mono',monospace;"><code style="background:none;border:none;padding:0;color:inherit;">${code}</code></pre>`;
     });
 
     // Normalize inline tables — AI sometimes returns all rows on one line separated by "| |"
@@ -1751,7 +1703,7 @@ function chatMarkdown(text) {
 
     // Inline formatting
     return text
-        .replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;color:#4f46e5;padding:1px 5px;border-radius:3px;font-size:11px;font-family:monospace;border:none;">$1</code>')
+        .replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;color:#4f46e5;padding:1px 5px;border-radius:3px;font-size:11px;font-family:\'JetBrains Mono\',monospace;border:none;">$1</code>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.+?)\*/g, '<em>$1</em>')
         .replace(/^### (.+)$/gm, '<p style="font-weight:600;color:#1e293b;margin:10px 0 3px;font-size:13px;">$1</p>')
@@ -2205,9 +2157,9 @@ function _buildAIGraphicReport(d, ai, docs) {
     const gaugeSvg = `<svg width="160" height="160" viewBox="0 0 160 160">
         <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="#f1f5f9" stroke-width="${SW}" stroke-linecap="round" stroke-dasharray="${arc} ${circ}" stroke-dashoffset="0" transform="rotate(135 ${CX} ${CY})"/>
         <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${gColor}" stroke-width="${SW}" stroke-linecap="round" stroke-dasharray="${arc} ${circ}" stroke-dashoffset="${offset}" transform="rotate(135 ${CX} ${CY})"/>
-        <text x="${CX}" y="${CY - 8}" text-anchor="middle" font-size="28" font-weight="800" fill="#1e293b" font-family="system-ui,sans-serif">${score}</text>
-        <text x="${CX}" y="${CY + 14}" text-anchor="middle" font-size="12" font-weight="600" fill="${gColor}" font-family="system-ui,sans-serif">${esc(grade)}</text>
-        <text x="${CX}" y="${CY + 30}" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="system-ui,sans-serif">/ 100</text>
+        <text x="${CX}" y="${CY - 8}" text-anchor="middle" font-size="28" font-weight="800" fill="#1e293b" font-family="Figtree,sans-serif">${score}</text>
+        <text x="${CX}" y="${CY + 14}" text-anchor="middle" font-size="12" font-weight="600" fill="${gColor}" font-family="Figtree,sans-serif">${esc(grade)}</text>
+        <text x="${CX}" y="${CY + 30}" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="Figtree,sans-serif">/ 100</text>
     </svg>`;
 
     // ── Component stat cards ─────────────────────────────────────────────────
@@ -2225,7 +2177,7 @@ function _buildAIGraphicReport(d, ai, docs) {
     ];
     const statCards = stats.map(([name, count]) =>
         `<div style="background:#fff;border:1px solid #fecaca;border-top:3px solid #FF2D20;border-radius:12px;padding:16px 18px">
-            <div style="font-size:26px;font-weight:800;color:#FF2D20;font-family:system-ui,sans-serif">${count}</div>
+            <div style="font-size:26px;font-weight:800;color:#FF2D20;font-family:Figtree,sans-serif">${count}</div>
             <div style="font-size:11px;color:#64748b;font-weight:500;margin-top:2px">${esc(name)}</div>
         </div>`
     ).join('');
@@ -2402,7 +2354,7 @@ code, pre {
     ${sec('Architecture Score', '#10b981',
         `<div style="display:grid;grid-template-columns:160px 1fr;gap:24px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;align-items:start">
             ${gaugeSvg}
-            <table style="width:100%;border-collapse:collapse;font-family:system-ui,sans-serif"><tbody>${checkRows}</tbody></table>
+            <table style="width:100%;border-collapse:collapse;font-family:Figtree,sans-serif"><tbody>${checkRows}</tbody></table>
         </div>`
     )}
 
@@ -2667,16 +2619,16 @@ function _buildGraphicReport(d) {
             stroke-dasharray="${arc} ${circ}" stroke-dashoffset="0" transform="rotate(135 ${CX} ${CY})"/>
         <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${gColor}" stroke-width="${SW}" stroke-linecap="round"
             stroke-dasharray="${arc} ${circ}" stroke-dashoffset="${offset}" transform="rotate(135 ${CX} ${CY})"/>
-        <text x="${CX}" y="${CY - 8}" text-anchor="middle" font-size="28" font-weight="800" fill="#1e293b" font-family="system-ui,sans-serif">${score}</text>
-        <text x="${CX}" y="${CY + 14}" text-anchor="middle" font-size="12" font-weight="600" fill="${gColor}" font-family="system-ui,sans-serif">${esc(grade)}</text>
-        <text x="${CX}" y="${CY + 30}" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="system-ui,sans-serif">/ 100</text>
+        <text x="${CX}" y="${CY - 8}" text-anchor="middle" font-size="28" font-weight="800" fill="#1e293b" font-family="Figtree,sans-serif">${score}</text>
+        <text x="${CX}" y="${CY + 14}" text-anchor="middle" font-size="12" font-weight="600" fill="${gColor}" font-family="Figtree,sans-serif">${esc(grade)}</text>
+        <text x="${CX}" y="${CY + 30}" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="Figtree,sans-serif">/ 100</text>
     </svg>`;
 
     // ── Route method bars ────────────────────────────────────────────────────
     const methodColors = { GET:'#10b981', POST:'#3b82f6', PUT:'#f59e0b', PATCH:'#f97316', DELETE:'#ef4444' };
     const byMethod     = rs.by_method ?? {};
     const maxMCount    = Math.max(1, ...Object.values(byMethod));
-    const routeBarsSvg = `<svg width="260" height="${Math.max(40, Object.keys(byMethod).length * 38 + 10)}" font-family="system-ui,sans-serif">
+    const routeBarsSvg = `<svg width="260" height="${Math.max(40, Object.keys(byMethod).length * 38 + 10)}" font-family="Figtree,sans-serif">
         ${Object.entries(byMethod).map(([m, cnt], i) => {
             const bw  = Math.max(4, Math.round((cnt / maxMCount) * 180));
             const col = methodColors[m] ?? '#64748b';
@@ -2709,8 +2661,8 @@ function _buildGraphicReport(d) {
     ];
     const statCards = stats.map(([name, count]) =>
         `<div style="background:#fff;border:1px solid #fecaca;border-top:3px solid #FF2D20;border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:4px">
-            <span style="font-size:24px;font-weight:800;color:#FF2D20;font-family:system-ui,sans-serif">${count}</span>
-            <span style="font-size:12px;color:#64748b;font-family:system-ui,sans-serif;font-weight:500">${esc(name)}</span>
+            <span style="font-size:24px;font-weight:800;color:#FF2D20;font-family:Figtree,sans-serif">${count}</span>
+            <span style="font-size:12px;color:#64748b;font-family:Figtree,sans-serif;font-weight:500">${esc(name)}</span>
         </div>`
     ).join('');
 
@@ -2773,14 +2725,14 @@ function _buildGraphicReport(d) {
         `<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
             <div style="width:4px;height:32px;border-radius:2px;background:${color};flex-shrink:0"></div>
             <div>
-                <h2 style="margin:0;font-size:20px;font-weight:800;color:#0f172a;font-family:system-ui,sans-serif">${esc(title)}</h2>
-                ${sub ? `<p style="margin:2px 0 0;font-size:13px;color:#64748b;font-family:system-ui,sans-serif">${esc(sub)}</p>` : ''}
+                <h2 style="margin:0;font-size:20px;font-weight:800;color:#0f172a;font-family:Figtree,sans-serif">${esc(title)}</h2>
+                ${sub ? `<p style="margin:2px 0 0;font-size:13px;color:#64748b;font-family:Figtree,sans-serif">${esc(sub)}</p>` : ''}
             </div>
         </div>`;
 
     const tableWrap = (headers, rows) =>
         `<div style="border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;background:#ffffff">
-            <table style="width:100%;border-collapse:collapse;font-family:system-ui,sans-serif">
+            <table style="width:100%;border-collapse:collapse;font-family:Figtree,sans-serif">
                 <thead><tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0">
                     ${headers.map(h => `<th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em">${esc(h)}</th>`).join('')}
                 </tr></thead>
@@ -2867,7 +2819,7 @@ table tr:hover {
         <div style="display:grid;grid-template-columns:160px 1fr;gap:24px;align-items:start;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px">
             ${gaugeSvg}
             <div style="overflow-x:auto">
-                <table style="width:100%;border-collapse:collapse;font-family:system-ui,sans-serif">
+                <table style="width:100%;border-collapse:collapse;font-family:Figtree,sans-serif">
                     <tbody>${checkRows || '<tr><td colspan="3" style="padding:12px;color:#94a3b8;font-size:13px">No score checks available.</td></tr>'}</tbody>
                 </table>
             </div>
@@ -2911,7 +2863,7 @@ table tr:hover {
 </div>
 
 <!-- ═══ FOOTER ═══════════════════════════════════════════════════════════ -->
-<div style="background:#111111;border-top:2px solid #FF2D20;color:#64748b;text-align:center;padding:24px;font-size:12px;font-family:system-ui,sans-serif;margin-top:20px">
+<div style="background:#111111;border-top:2px solid #FF2D20;color:#64748b;text-align:center;padding:24px;font-size:12px;font-family:Figtree,sans-serif;margin-top:20px">
     Generated by <strong style="color:#FF2D20">laradar</strong> · ${esc(d.generated_at ?? '')}
 </div>
 
